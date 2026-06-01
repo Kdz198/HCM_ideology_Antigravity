@@ -59,9 +59,12 @@ export default function Quiz() {
         <div className="flex justify-between items-center h-20 px-gutter max-w-container-max mx-auto">
           <div className="font-display-md text-display-md text-primary tracking-tight">Ký Ức Văn Hóa</div>
           <div className="hidden md:flex items-center gap-lg">
-            <Link className="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" to="/">Trang chủ</Link>
-            <Link className="font-label-md text-label-md text-primary border-b-2 border-primary pb-1 font-bold" to="/quiz">Trắc nghiệm</Link>
-            <Link className="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" to="/map">Bản đồ số</Link>
+            <Link className="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" to="/">Trang chủ</Link>
+            <Link className="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" to="/map">Bản đồ số</Link>
+            <Link className="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" to="/heritage-map">Bản đồ di sản</Link>
+            <Link className="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" to="/notebook">Tư liệu</Link>
+            <Link className="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" to="/mailbox">Hộp thư ký ức</Link>
+            <Link className="text-primary border-b-2 border-primary pb-1 font-bold font-body-md text-body-md" to="/quiz">Trắc nghiệm</Link>
           </div>
           <button className="bg-primary text-on-primary px-lg py-2 rounded-lg font-label-md text-label-md hover:opacity-90 transition-all scale-95 active:scale-90">
             Đăng nhập

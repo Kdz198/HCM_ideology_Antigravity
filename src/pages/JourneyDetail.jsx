@@ -7,13 +7,14 @@ export default function JourneyDetail() {
         <div className="flex justify-between items-center w-full px-gutter py-md max-w-container-max mx-auto">
           <div className="font-headline-md text-headline-md text-primary tracking-tight">Heritage & Horizon</div>
           <nav className="hidden md:flex gap-lg">
-            <Link className="text-on-surface-variant font-medium hover:text-tertiary transition-colors duration-300 font-label-md text-label-md uppercase tracking-wider" to="/map">Bản đồ di sản</Link>
-            <Link className="text-primary border-b-2 border-primary pb-1 font-semibold font-label-md text-label-md uppercase tracking-wider" to="/detail">Hành trình</Link>
-            <Link className="text-on-surface-variant font-medium hover:text-tertiary transition-colors duration-300 font-label-md text-label-md uppercase tracking-wider" to="/notebook">Tư liệu</Link>
-            <Link className="text-on-surface-variant font-medium hover:text-tertiary transition-colors duration-300 font-label-md text-label-md uppercase tracking-wider" to="/">Văn hóa</Link>
-            <Link className="text-on-surface-variant font-medium hover:text-tertiary transition-colors duration-300 font-label-md text-label-md uppercase tracking-wider" to="/quiz">Giáo dục</Link>
+            <Link className="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" to="/">Trang chủ</Link>
+            <Link className="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" to="/map">Bản đồ số</Link>
+            <Link className="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" to="/heritage-map">Bản đồ di sản</Link>
+            <Link className="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" to="/notebook">Tư liệu</Link>
+            <Link className="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" to="/mailbox">Hộp thư ký ức</Link>
+            <Link className="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" to="/quiz">Trắc nghiệm</Link>
           </nav>
-          <button className="bg-primary-container text-on-primary-container px-md py-xs rounded-lg hover:bg-primary transition-colors duration-300 font-label-md text-label-md scale-95 active:scale-90 transition-transform">Tham gia</button>
+          <button className="bg-primary-container text-on-primary-container px-md py-xs rounded-lg hover:bg-primary transition-colors duration-300 font-label-md text-label-md scale-95 active:scale-90 transition-transform">Đăng nhập</button>
         </div>
       </header>
 
