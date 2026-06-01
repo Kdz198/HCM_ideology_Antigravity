@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Góc cảm nhận &amp; Lan tỏa | Ký Ức Văn Hóa</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&amp;family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>.material-symbols-outlined {
+    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24
+    }
+.paper-texture {
+    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuAn3WIwGOuaCLcGrUhgsGiOh0K38iG8H-w6n7LuaM2M-HZm3p_ow5M1eO46KnI04sd8pzLYg4uwvXmrfpbO-cvVUDyKh7Jr-E6jJ1tNcfdvcWc8s70kBzjXQq6S8aM2AWbKTC_7rBFb_4xE8z40mgUkKYFP2BlrI4CSHfkNcZnjab-0U7fkny3-7nq2tI7RktoKVDs-ThY4ZKlz4EQQGa9ybwCLGscJmoJ2G6vmMySvd35Pan1KXHJb2UhyT8k41ushWEIIAHTvVioS)
+    }
+.sticky-note {
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)
+    }
+.sticky-note:hover {
+    transform: scale(1.05) rotate(1deg);
+    z-index: 10
+    }
+.line-input {
+    border: none;
+    border-bottom: 1px solid var(--tw-outline-variant);
+    background: transparent;
+    border-radius: 0
+    }
+.line-input:focus {
+    outline: none;
+    border-bottom: 2px solid var(--tw-primary);
+    box-shadow: none
+    }</style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed-dim": "#e9c349",
+                        "on-primary": "#ffffff",
+                        "secondary-container": "#e7e2d9",
+                        "inverse-on-surface": "#f3f0ef",
+                        "tertiary-fixed": "#ffe088",
+                        "secondary-fixed-dim": "#cac6be",
+                        "on-surface-variant": "#58413f",
+                        "on-surface": "#1c1b1b",
+                        "surface": "#fcf9f8",
+                        "secondary-fixed": "#e7e2d9",
+                        "surface-bright": "#fcf9f8",
+                        "on-error-container": "#93000a",
+                        "outline": "#8c716e",
+                        "outline-variant": "#dfbfbc",
+                        "primary": "#801318",
+                        "on-secondary-container": "#67645d",
+                        "on-secondary-fixed-variant": "#494740",
+                        "primary-container": "#a12c2c",
+                        "surface-variant": "#e5e2e1",
+                        "secondary": "#615e57",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-fixed": "#1d1c16",
+                        "primary-fixed-dim": "#ffb3ae",
+                        "surface-container-highest": "#e5e2e1",
+                        "surface-tint": "#ab3332",
+                        "on-primary-container": "#ffbdb8",
+                        "inverse-surface": "#313030",
+                        "on-background": "#1c1b1b",
+                        "primary-fixed": "#ffdad7",
+                        "tertiary": "#735c00",
+                        "on-tertiary-container": "#4f3e00",
+                        "on-primary-fixed-variant": "#8a1a1e",
+                        "error": "#ba1a1a",
+                        "inverse-primary": "#ffb3ae",
+                        "on-error": "#ffffff",
+                        "tertiary-container": "#cca830",
+                        "surface-dim": "#dcd9d9",
+                        "on-tertiary-fixed": "#241a00",
+                        "on-tertiary-fixed-variant": "#574500",
+                        "surface-container-high": "#eae7e7",
+                        "background": "#fcf9f8",
+                        "surface-container-low": "#f6f3f2",
+                        "on-primary-fixed": "#410004",
+                        "surface-container-lowest": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-tertiary": "#ffffff",
+                        "surface-container": "#f0eded"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "container-max": "1200px",
+                        "gutter": "24px",
+                        "lg": "48px",
+                        "xs": "4px",
+                        "base": "8px",
+                        "xl": "80px",
+                        "md": "24px",
+                        "sm": "12px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Be Vietnam Pro"],
+                        "display-lg": ["EB Garamond"],
+                        "body-md": ["Be Vietnam Pro"],
+                        "caption": ["Be Vietnam Pro"],
+                        "headline-lg-mobile": ["EB Garamond"],
+                        "headline-lg": ["EB Garamond"],
+                        "display-md": ["EB Garamond"],
+                        "headline-md": ["EB Garamond"],
+                        "body-lg": ["Be Vietnam Pro"]
+                    },
+                    "fontSize": {
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "display-lg": ["56px", {"lineHeight": "64px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "caption": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "500"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "500"}],
+                        "display-md": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-surface font-body-md text-on-surface paper-texture min-h-screen">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-surface/90 dark:bg-surface-dim/90 backdrop-blur-md border-b border-outline-variant/30">
+<div class="flex justify-between items-center h-20 px-gutter max-w-container-max mx-auto">
+<div class="font-display-md text-display-md text-primary tracking-tight">Ký Ức Văn Hóa</div>
+<div class="hidden md:flex items-center gap-md">
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors duration-300" href="#">Trang chủ</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors duration-300" href="#">Trắc nghiệm</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors duration-300" href="#">Bản đồ số</a>
+<a class="font-label-md text-label-md text-primary border-b-2 border-primary pb-1 font-bold" href="#">Sổ tay</a>
+</div>
+<button class="bg-primary text-on-primary px-md py-sm font-label-md text-label-md rounded-lg scale-95 active:scale-90 transition-transform">Đăng nhập</button>
+</div>
+</nav>
+<main class="pt-20">
+<!-- Hero Header -->
+<section class="py-xl px-gutter max-w-container-max mx-auto text-center">
+<h1 class="font-display-lg text-display-lg text-primary mb-sm">Góc cảm nhận &amp; Lan tỏa</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto italic">
+                "Học để làm việc, làm người, làm cán bộ. Học để phụng sự đoàn thể, phụng sự giai cấp và nhân dân, phụng sự Tổ quốc và nhân loại."
+            </p>
+<div class="w-16 h-1 bg-tertiary-container mx-auto mt-md"></div>
+</section>
+<!-- Main Content Grid -->
+<section class="px-gutter max-w-container-max mx-auto grid grid-cols-1 lg:grid-cols-12 gap-lg items-start">
+<!-- Left: Input Section -->
+<aside class="lg:col-span-4 sticky top-24 bg-surface-container-low p-md rounded-xl border border-outline-variant/20 shadow-sm">
+<div class="flex items-center gap-sm mb-md">
+<span class="material-symbols-outlined text-primary" data-icon="edit_note">edit_note</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Viết cảm nhận</h2>
+</div>
+<form class="space-y-md" id="noteForm">
+<div>
+<label class="font-label-md text-label-md text-on-surface-variant mb-xs block">Tên hiển thị</label>
+<input class="w-full line-input font-body-md text-body-md py-sm" placeholder="Nhập tên hoặc để trống để ẩn danh..." type="text"/>
+</div>
+<div>
+<label class="font-label-md text-label-md text-on-surface-variant mb-xs block">Lời tâm huyết</label>
+<textarea class="w-full line-input font-body-md text-body-md py-sm resize-none" placeholder="Chia sẻ suy nghĩ của bạn về tư tưởng Hồ Chí Minh..." rows="4"></textarea>
+</div>
+<div>
+<label class="font-label-md text-label-md text-on-surface-variant mb-xs block">Cam kết hành động</label>
+<select class="w-full line-input font-body-md text-body-md py-sm">
+<option value="">Chọn một lời hứa của bạn...</option>
+<option value="Tự học">Không ngừng tự học, nâng cao trình độ</option>
+<option value="Tiết kiệm">Tiết kiệm thời gian, tiền bạc, của công</option>
+<option value="Đạo đức">Giữ gìn đạo đức cách mạng, lối sống lành mạnh</option>
+<option value="Phụng sự">Tích cực tham gia các hoạt động cộng đồng</option>
+</select>
+</div>
+<div class="flex gap-sm pt-sm">
+<div class="w-8 h-8 rounded-full bg-[#FFE8D6] border-2 border-primary cursor-pointer" onclick="setActiveColor('#FFE8D6')"></div>
+<div class="w-8 h-8 rounded-full bg-[#E2F0CB] border-2 border-transparent cursor-pointer" onclick="setActiveColor('#E2F0CB')"></div>
+<div class="w-8 h-8 rounded-full bg-[#D4E2F5] border-2 border-transparent cursor-pointer" onclick="setActiveColor('#D4E2F5')"></div>
+<div class="w-8 h-8 rounded-full bg-[#F5D4E2] border-2 border-transparent cursor-pointer" onclick="setActiveColor('#F5D4E2')"></div>
+</div>
+<button class="w-full bg-primary text-on-primary font-label-md text-label-md py-sm rounded-lg hover:opacity-90 transition-opacity flex justify-center items-center gap-sm" type="submit">
+<span class="material-symbols-outlined" data-icon="send">send</span>
+                        Dán lên tường
+                    </button>
+</form>
+<div class="mt-xl border-t border-outline-variant/20 pt-md">
+<p class="font-label-md text-label-md text-on-secondary-fixed-variant mb-sm">Gợi ý chủ đề</p>
+<div class="flex flex-wrap gap-xs">
+<span class="bg-secondary-container text-on-secondary-container px-sm py-xs rounded-full font-caption text-caption">#TiếtKiệm</span>
+<span class="bg-secondary-container text-on-secondary-container px-sm py-xs rounded-full font-caption text-caption">#TựHọc</span>
+<span class="bg-secondary-container text-on-secondary-container px-sm py-xs rounded-full font-caption text-caption">#ĐạoĐức</span>
+<span class="bg-secondary-container text-on-secondary-container px-sm py-xs rounded-full font-caption text-caption">#ThanhNiên</span>
+</div>
+</div>
+</aside>
+<!-- Right: Digital Wall -->
+<div class="lg:col-span-8">
+<!-- Filter bar -->
+<div class="flex items-center gap-md mb-lg overflow-x-auto pb-sm scrollbar-hide">
+<button class="whitespace-nowrap px-md py-xs rounded-full bg-primary text-on-primary font-label-md text-label-md">Tất cả</button>
+<button class="whitespace-nowrap px-md py-xs rounded-full bg-surface-container border border-outline-variant/30 text-on-surface-variant font-label-md text-label-md hover:bg-secondary-container transition-colors">Tiết kiệm</button>
+<button class="whitespace-nowrap px-md py-xs rounded-full bg-surface-container border border-outline-variant/30 text-on-surface-variant font-label-md text-label-md hover:bg-secondary-container transition-colors">Tự học</button>
+<button class="whitespace-nowrap px-md py-xs rounded-full bg-surface-container border border-outline-variant/30 text-on-surface-variant font-label-md text-label-md hover:bg-secondary-container transition-colors">Đạo đức</button>
+<button class="whitespace-nowrap px-md py-xs rounded-full bg-surface-container border border-outline-variant/30 text-on-surface-variant font-label-md text-label-md hover:bg-secondary-container transition-colors">Cộng đồng</button>
+</div>
+<!-- Bento Grid for Notes -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md items-start">
+<!-- Note 1 -->
+<div class="sticky-note bg-[#FFE8D6] p-md rounded-lg border border-black/5 shadow-sm rotate-1 relative">
+<div class="absolute -top-3 left-1/2 -translate-x-1/2 w-8 h-8 flex items-center justify-center opacity-20">
+<span class="material-symbols-outlined text-primary text-[32px]" data-icon="push_pin">push_pin</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface mb-md">"Mình luôn tâm niệm lời Bác về việc tự học. Mỗi ngày dành ra 30 phút đọc sách không chỉ là nạp kiến thức mà là rèn luyện kỷ luật."</p>
+<div class="flex justify-between items-end">
+<div>
+<div class="font-label-md text-label-md text-primary">@MinhQuan_K68</div>
+<div class="font-caption text-caption text-on-surface-variant opacity-60">Cam kết: Tự học</div>
+</div>
+<button class="text-primary flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]" data-icon="favorite" style="font-variation-settings: 'FILL' 1;">favorite</span>
+<span class="font-label-md text-label-md">24</span>
+</button>
+</div>
+</div>
+<!-- Note 2 -->
+<div class="sticky-note bg-[#D4E2F5] p-md rounded-lg border border-black/5 shadow-sm -rotate-2">
+<p class="font-body-md text-body-md text-on-surface mb-md">"Học cách tiết kiệm từ những việc nhỏ nhất như tắt điện khi rời phòng học. Đó cũng là cách yêu nước thực tế nhất."</p>
+<div class="flex justify-between items-end">
+<div>
+<div class="font-label-md text-label-md text-primary">Ẩn danh</div>
+<div class="font-caption text-caption text-on-surface-variant opacity-60">Cam kết: Tiết kiệm</div>
+</div>
+<button class="text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]" data-icon="favorite">favorite</span>
+<span class="font-label-md text-label-md">12</span>
+</button>
+</div>
+</div>
+<!-- Note 3 -->
+<div class="sticky-note bg-[#E2F0CB] p-md rounded-lg border border-black/5 shadow-sm rotate-2">
+<p class="font-body-md text-body-md text-on-surface mb-md">"Di chúc của Bác nhắc nhở mình về trách nhiệm của thế hệ trẻ. Mình hứa sẽ cống hiến hết mình cho các dự án thiện nguyện sắp tới."</p>
+<div class="flex justify-between items-end">
+<div>
+<div class="font-label-md text-label-md text-primary">Thanh_Huyen</div>
+<div class="font-caption text-caption text-on-surface-variant opacity-60">Cam kết: Phụng sự</div>
+</div>
+<button class="text-primary flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]" data-icon="favorite" style="font-variation-settings: 'FILL' 1;">favorite</span>
+<span class="font-label-md text-label-md">45</span>
+</button>
+</div>
+</div>
+<!-- Note 4 -->
+<div class="sticky-note bg-[#F5D4E2] p-md rounded-lg border border-black/5 shadow-sm -rotate-1">
+<p class="font-body-md text-body-md text-on-surface mb-md">"Đạo đức cách mạng không phải là cái gì xa vời, nó là lòng trung thực trong thi cử và sự tử tế với bạn bè."</p>
+<div class="flex justify-between items-end">
+<div>
+<div class="font-label-md text-label-md text-primary">GenZ_HocBac</div>
+<div class="font-caption text-caption text-on-surface-variant opacity-60">Cam kết: Đạo đức</div>
+</div>
+<button class="text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]" data-icon="favorite">favorite</span>
+<span class="font-label-md text-label-md">31</span>
+</button>
+</div>
+</div>
+<!-- Image Insert Card -->
+<div class="md:col-span-2 mt-md rounded-xl overflow-hidden border border-outline-variant/30 h-64 relative group">
+<img alt="Student Community" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="A warm, atmospheric photograph of a group of diverse university students sitting together in a sunlit, modern academic lounge. They are engaged in deep, positive conversation, surrounded by books and digital devices. The lighting is soft and golden, creating a sense of camaraderie and shared purpose. The color palette is natural with rich wood tones and soft ivory surfaces, aligning with a heritage yet contemporary aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCIYo2LB5D7H5C4P1nSHZJhZtwoHaTpgkTO3HiD7yPRr2Fb3gWe4zb781DwB1AYG8MPd9cqKDrm-ksmm9XQI2IHLt55x6Nj039q21YhpEpNw_bawBFoOCTo0xx-POV5nIQKrJk0KC-cf0UTAJ3NDLpvDVLZwRFDxtHFLMZhn1yztjF3_oJB38wLDXN_3sG-JxT-kbHJxImhALSsoUTFonZeKMUtipRG1R-rHm3Y7jyEY3lIk_X2_hmrsbb_NwwZVYOCAAMwa9v5lbVY"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent flex items-end p-md">
+<p class="text-on-primary font-headline-md text-headline-md">Hành trình của chúng ta, di sản của Bác.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Global Action FAB -->
+<button class="fixed bottom-gutter right-gutter w-14 h-14 bg-primary text-on-primary rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform active:scale-95 z-40 md:hidden">
+<span class="material-symbols-outlined text-[28px]" data-icon="add_comment">add_comment</span>
+</button>
+</main>
+<!-- Footer -->
+<footer class="bg-secondary-container dark:bg-inverse-surface w-full py-xl mt-xl border-t border-outline-variant/20">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-lg max-w-container-max mx-auto px-gutter">
+<div class="space-y-md">
+<div class="font-headline-md text-headline-md text-primary">Ký Ức Văn Hóa</div>
+<p class="font-caption text-caption text-on-secondary-container/80">Một dự án của sinh viên Đại học Quốc gia TP.HCM về việc gìn giữ và lan tỏa tư tưởng Hồ Chí Minh trong thời đại số.</p>
+</div>
+<div>
+<h3 class="font-label-md text-label-md text-on-secondary-container mb-md">Liên kết nhanh</h3>
+<ul class="space-y-sm">
+<li><a class="font-caption text-caption text-on-secondary-container/80 hover:text-primary underline underline-offset-4 transition-opacity" href="#">Về dự án</a></li>
+<li><a class="font-caption text-caption text-on-secondary-container/80 hover:text-primary underline underline-offset-4 transition-opacity" href="#">Chính sách bảo mật</a></li>
+<li><a class="font-caption text-caption text-on-secondary-container/80 hover:text-primary underline underline-offset-4 transition-opacity" href="#">Liên hệ</a></li>
+<li><a class="font-caption text-caption text-on-secondary-container/80 hover:text-primary underline underline-offset-4 transition-opacity" href="#">Tư liệu tham khảo</a></li>
+</ul>
+</div>
+<div class="space-y-md">
+<h3 class="font-label-md text-label-md text-on-secondary-container">Theo dõi hành trình</h3>
+<div class="flex gap-md">
+<span class="material-symbols-outlined text-on-secondary-container opacity-80 hover:opacity-100 cursor-pointer" data-icon="facebook">social_leaderboard</span>
+<span class="material-symbols-outlined text-on-secondary-container opacity-80 hover:opacity-100 cursor-pointer" data-icon="share">share</span>
+<span class="material-symbols-outlined text-on-secondary-container opacity-80 hover:opacity-100 cursor-pointer" data-icon="mail">mail</span>
+</div>
+<p class="font-caption text-caption text-on-secondary-container/60 mt-md">© 2024 Ký Ức Văn Hóa - Hành trình Di sản Hồ Chí Minh</p>
+</div>
+</div>
+</footer>
+<script>
+        let currentNoteColor = '#FFE8D6';
+        
+        function setActiveColor(color) {
+            currentNoteColor = color;
+            document.querySelectorAll('.rounded-full.border-2').forEach(el => {
+                el.classList.remove('border-primary');
+                el.classList.add('border-transparent');
+            });
+            event.target.classList.add('border-primary');
+            event.target.classList.remove('border-transparent');
+        }
+
+        document.getElementById('noteForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Animation logic for button interaction
+            const btn = this.querySelector('button[type="submit"]');
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin" data-icon="sync">sync</span> Đang gửi...';
+            
+            setTimeout(() => {
+                alert('Cảm ơn bạn đã chia sẻ và lan tỏa những giá trị tốt đẹp!');
+                btn.innerHTML = '<span class="material-symbols-outlined" data-icon="send">send</span> Dán lên tường';
+                this.reset();
+            }, 1000);
+        });
+
+        // Simple parallax or float effect for sticky notes
+        document.querySelectorAll('.sticky-note').forEach(note => {
+            note.addEventListener('mousemove', (e) => {
+                const rect = note.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const xc = rect.width / 2;
+                const yc = rect.height / 2;
+                const dx = x - xc;
+                const dy = y - yc;
+                note.style.transform = `scale(1.05) rotate(${(dx / xc) * 2}deg) translateY(${(dy / yc) * 2}px)`;
+            });
+            note.addEventListener('mouseleave', () => {
+                note.style.transform = '';
+            });
+        });
+    </script>
+</body></html>

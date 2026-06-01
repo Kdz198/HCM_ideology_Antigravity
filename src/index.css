@@ -1,0 +1,78 @@
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=EB+Garamond:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-background text-on-background font-sans;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif;
+  }
+}
+
+@layer utilities {
+  .paper-texture {
+    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuBwZgpNfFUKyexmQ6unLOXZgceBdePuag2iWUTblBh5FULCqXE1rhU_YQO5ZAr5TMOSOKtGIJ8guQyDHwH6bBqIGQD0sdvnCjJ_myW4nXtGiz_frnx47TQsU-FQFsLN2Yh4woJM9i2yvh-3x-uF1XRqg36b5PH6EUllBVYkVBU0-O6cDC4mGAf9_pA2177rhqdN8vBPplIxVvtruq42ootRcFcMyAwr8Bwq09MowdJBJNcZQglMKXP9IfSaub6oUF2UukfM8l0PVlLl);
+    mix-blend-mode: multiply;
+  }
+  .lotus-bg {
+    background-image: radial-gradient(circle at 2px 2px, rgba(128, 19, 24, 0.05) 1px, transparent 0);
+    background-size: 40px 40px;
+  }
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(140, 113, 110, 0.2);
+  }
+  .hero-gradient {
+    background: linear-gradient(to right, rgba(252, 249, 248, 1) 40%, rgba(252, 249, 248, 0) 100%);
+  }
+  .material-symbols-outlined {
+    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+  }
+  .quiz-transition {
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .animate-bloom {
+    animation: bloom 0.6s forwards ease-out;
+  }
+  .bamboo-line {
+    background: linear-gradient(to bottom, transparent, #cca830 20%, #cca830 80%, transparent);
+    width: 1px;
+  }
+  .scroll-mask {
+    mask-image: linear-gradient(to bottom, transparent, black 5%, black 95%, transparent);
+    -webkit-mask-image: linear-gradient(to bottom, transparent, black 5%, black 95%, transparent);
+  }
+  .ink-line {
+    background: linear-gradient(to bottom, transparent, #801318 15%, #801318 85%, transparent);
+    width: 1px;
+  }
+  .stamp-shadow {
+    box-shadow: 0 4px 0 0 rgba(128, 19, 24, 0.2);
+  }
+  .node-bloom:hover .lotus-node {
+    transform: scale(1.5);
+    color: #735c00;
+  }
+  .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+  .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+  .custom-scrollbar::-webkit-scrollbar-thumb { background: #dfbfbc; border-radius: 10px; }
+  
+  .ink-effect { filter: grayscale(100%) contrast(120%) brightness(90%); mix-blend-mode: multiply; }
+  .wax-seal { box-shadow: inset -2px -2px 4px rgba(0, 0, 0, 0.3), 2px 2px 5px rgba(0, 0, 0, 0.2); background: radial-gradient(circle at 30% 30%, #a12c2c, #801318); }
+  .scrolling-bg { background-size: cover; background-position: center; }
+  
+  .sticky-note { transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+  .sticky-note:hover { transform: scale(1.05) rotate(1deg); z-index: 10; }
+  .line-input { border: none; border-bottom: 1px solid #dfbfbc; background: transparent; border-radius: 0; }
+  .line-input:focus { outline: none; border-bottom: 2px solid #801318; box-shadow: none; }
+}
+@keyframes bloom {
+  0% { transform: scale(0.9); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}

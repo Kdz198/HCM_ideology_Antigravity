@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&amp;family=Be+Vietnam+Pro:wght@100;200;300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-container": "#67645d",
+                        "on-primary-fixed-variant": "#8a1a1e",
+                        "error": "#ba1a1a",
+                        "on-surface": "#1c1b1b",
+                        "on-error-container": "#93000a",
+                        "on-primary-container": "#ffbdb8",
+                        "on-tertiary": "#ffffff",
+                        "outline": "#8c716e",
+                        "primary-fixed": "#ffdad7",
+                        "tertiary": "#735c00",
+                        "on-background": "#1c1b1b",
+                        "on-primary-fixed": "#410004",
+                        "inverse-surface": "#313030",
+                        "background": "#fcf9f8",
+                        "on-secondary": "#ffffff",
+                        "secondary-container": "#e7e2d9",
+                        "on-surface-variant": "#58413f",
+                        "error-container": "#ffdad6",
+                        "secondary": "#615e57",
+                        "tertiary-fixed-dim": "#e9c349",
+                        "surface-dim": "#dcd9d9",
+                        "surface-container-highest": "#e5e2e1",
+                        "on-secondary-fixed-variant": "#494740",
+                        "on-secondary-fixed": "#1d1c16",
+                        "surface-bright": "#fcf9f8",
+                        "on-error": "#ffffff",
+                        "inverse-primary": "#ffb3ae",
+                        "on-tertiary-container": "#4f3e00",
+                        "surface-tint": "#ab3332",
+                        "primary": "#801318",
+                        "inverse-on-surface": "#f3f0ef",
+                        "tertiary-fixed": "#ffe088",
+                        "tertiary-container": "#cca830",
+                        "primary-container": "#a12c2c",
+                        "surface-container-high": "#eae7e7",
+                        "surface-container": "#f0eded",
+                        "on-primary": "#ffffff",
+                        "surface": "#fcf9f8",
+                        "primary-fixed-dim": "#ffb3ae",
+                        "surface-container-lowest": "#ffffff",
+                        "outline-variant": "#dfbfbc",
+                        "surface-container-low": "#f6f3f2",
+                        "secondary-fixed": "#e7e2d9",
+                        "on-tertiary-fixed": "#241a00",
+                        "surface-variant": "#e5e2e1",
+                        "secondary-fixed-dim": "#cac6be",
+                        "on-tertiary-fixed-variant": "#574500"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "xs": "4px",
+                        "container-max": "1200px",
+                        "base": "8px",
+                        "lg": "48px",
+                        "xl": "80px",
+                        "md": "24px",
+                        "sm": "12px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "caption": ["Be Vietnam Pro"],
+                        "label-md": ["Be Vietnam Pro"],
+                        "display-md": ["EB Garamond"],
+                        "body-md": ["Be Vietnam Pro"],
+                        "headline-md": ["EB Garamond"],
+                        "headline-lg": ["EB Garamond"],
+                        "display-lg": ["EB Garamond"],
+                        "headline-lg-mobile": ["EB Garamond"],
+                        "body-lg": ["Be Vietnam Pro"]
+                    },
+                    "fontSize": {
+                        "caption": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "display-md": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "500"}],
+                        "display-lg": ["56px", {"lineHeight": "64px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "500"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>.paper-texture {
+    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuAMG5b01ADbqfmJYrKjWVRvZ3k_QqBqjRkvB86HFUdU8dFwdP7jo9TfpEFCAa4jgr_WanAIuiK39SiRwZlr_3TArC3oF8S5dfiMcmCpMQJU5c3pWxsNSZdG-A7JEVnatx8w9VAPKignDj1VCqOoleFiOAsIuhuAUEORuMNh3-pbpu95BCIQbh4Dq-27qF0RQuqAKxVPNb6XnQqj_ChVyVkEOcgGNfxmisbBlfDuniJWCDFrZPUVt6VoP-QyLBtZ4XLAe4Nu7etrKqQ4);
+    background-blend-mode: multiply
+    }
+.lotus-bg {
+    background-image: radial-gradient(circle at 10% 20%, rgba(128, 19, 24, 0.05) 0%, transparent 40%), radial-gradient(circle at 90% 80%, rgba(204, 168, 48, 0.05) 0%, transparent 40%)
+    }
+.bamboo-line {
+    background: linear-gradient(to bottom, transparent, #cca830 20%, #cca830 80%, transparent);
+    width: 1px
+    }</style>
+</head>
+<body class="bg-background text-on-background lotus-bg paper-texture selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md border-b border-outline-variant/30">
+<div class="flex justify-between items-center h-20 px-gutter max-w-container-max mx-auto">
+<div class="font-display-md text-display-md text-primary tracking-tight">Ký Ức Văn Hóa</div>
+<div class="hidden md:flex items-center gap-lg">
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors duration-300" href="#">Trang chủ</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors duration-300" href="#">Trắc nghiệm</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors duration-300" href="#">Bản đồ số</a>
+<div class="relative flex items-center group">
+<input class="bg-surface-container border-none rounded-full px-sm py-xs font-label-md focus:ring-2 focus:ring-primary w-48 transition-all duration-300 group-hover:w-64" placeholder="Tìm kiếm..." type="text"/>
+<span class="material-symbols-outlined absolute right-3 text-on-surface-variant">search</span>
+</div>
+<button class="bg-primary text-on-primary px-md py-sm rounded-lg font-label-md hover:opacity-90 transition-all active:scale-95">Đăng nhập</button>
+</div>
+<!-- Mobile Menu Icon -->
+<button class="md:hidden text-primary">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+</nav>
+<main class="mt-xl pt-xl pb-xl px-gutter max-w-container-max mx-auto">
+<!-- Hộp thư Ký ức Hero Section -->
+<header class="text-center mb-xl">
+<h1 class="font-display-lg text-display-lg text-primary mb-sm">Hộp thư Ký ức</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">Mỗi ngày một lời dạy của Bác về Văn hóa, Đạo đức và Giáo dục để soi sáng hành trình học tập của chúng ta.</p>
+</header>
+<!-- Central Quote Card -->
+<section class="mb-xl relative">
+<div class="absolute -left-4 top-1/2 -translate-y-1/2 hidden lg:block">
+<div class="flex flex-col items-center gap-xs">
+<div class="bamboo-line h-32"></div>
+<span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">eco</span>
+<div class="bamboo-line h-32"></div>
+</div>
+</div>
+<div class="bg-surface-container-low border border-outline-variant/30 p-lg md:p-xl rounded-xl relative overflow-hidden flex flex-col md:flex-row gap-lg items-center shadow-sm">
+<div class="w-full md:w-1/2 space-y-md">
+<span class="material-symbols-outlined text-tertiary-container text-6xl opacity-40">format_quote</span>
+<blockquote class="border-l-4 border-tertiary-container pl-md">
+<p class="font-display-md text-display-md text-on-surface italic leading-relaxed" id="current-quote">
+                            "Vì lợi ích mười năm thì phải trồng cây, vì lợi ích trăm năm thì phải trồng người."
+                        </p>
+<cite class="block mt-sm font-label-md text-label-md text-primary tracking-widest">— CHỦ TỊCH HỒ CHÍ MINH</cite>
+</blockquote>
+<div class="flex gap-sm pt-md">
+<button class="flex items-center gap-xs px-md py-sm bg-surface-container-high border border-outline-variant rounded-lg font-label-md text-on-surface hover:bg-secondary-container transition-colors" onclick="refreshQuote()">
+<span class="material-symbols-outlined text-sm">refresh</span> Đổi danh ngôn
+                        </button>
+</div>
+</div>
+<div class="w-full md:w-1/2">
+<div class="relative group">
+<div class="aspect-[4/5] w-full rounded-lg overflow-hidden border border-outline shadow-lg relative flex items-center justify-center p-md text-center" id="share-card-preview">
+<img class="absolute inset-0 w-full h-auto object-cover opacity-60" data-alt="A high-quality, atmospheric photography of Ho Chi Minh's stilt house in Hanoi, captured during a golden hour with soft sunlight filtering through the dense foliage of the garden. The visual style is contemporary cultural minimalism, featuring a warm, ivory-toned color palette and a soft focus that evokes a sense of historical reverence and peaceful nostalgia. The lighting is low-key and natural, highlighting the tactile wooden texture of the house." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCIxuibB1juNLcT1f7S4nynvCvsxjTJn7rm0c2CRvgTaJmgwcBs2ev3lrH8-3VDLp1HUUttNRNf9nvvyPqowj0phmtICEGlLTWkAkR8Vt_XSTmC0HV2jl_GyHGfktFi7BKwgN7QEbeU0joEU7esLmuIW2I956TkpBdYRfLoTTRUEgTGoxtRybzWp195uSmoDxV8Czc7ssZd9gqDxn0UJ0cwO32Z_aWV-ixeXZNpL8TT5Ct1juAceUpEUbtWGKXOX8hM4B6tMuP9GaEi"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/40 to-transparent"></div>
+<div class="relative z-10 space-y-sm">
+<p class="font-display-md text-headline-md text-white px-md drop-shadow-md" id="preview-text">"Vì lợi ích mười năm thì phải trồng cây, vì lợi ích trăm năm thì phải trồng người."</p>
+<p class="font-label-md text-caption text-white/90 tracking-tighter">— Hồ Chí Minh —</p>
+</div>
+</div>
+<div class="mt-md flex justify-center gap-base">
+<button class="flex-1 bg-primary text-on-primary py-sm rounded-lg font-label-md flex items-center justify-center gap-xs hover:shadow-lg transition-all active:scale-95">
+<span class="material-symbols-outlined">download</span> Tải về
+                            </button>
+<button class="flex-1 border border-primary text-primary py-sm rounded-lg font-label-md flex items-center justify-center gap-xs hover:bg-primary-fixed transition-all active:scale-95">
+<span class="material-symbols-outlined">share</span> Chia sẻ
+                            </button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Other Quotes Grid -->
+<section class="mt-xl">
+<div class="flex justify-between items-end mb-lg border-b border-outline-variant/20 pb-base">
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Các danh ngôn khác</h2>
+<a class="font-label-md text-primary flex items-center gap-xs group" href="#">
+                    Xem tất cả <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg">
+<!-- Quote Item 1 -->
+<div class="p-md border border-outline-variant/30 rounded-lg hover:border-tertiary-container transition-all cursor-pointer group bg-surface-container-lowest">
+<span class="font-caption text-caption text-tertiary mb-base block uppercase tracking-widest">Đạo đức</span>
+<p class="font-headline-md text-headline-md text-on-surface mb-md leading-snug">"Người có đức mà không có tài thì làm việc gì cũng khó; người có tài mà không có đức là người vô dụng."</p>
+<div class="flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="text-caption font-caption text-on-surface-variant">Thư gửi thanh niên, 1955</span>
+<span class="material-symbols-outlined text-primary">content_copy</span>
+</div>
+</div>
+<!-- Quote Item 2 -->
+<div class="p-md border border-outline-variant/30 rounded-lg hover:border-tertiary-container transition-all cursor-pointer group bg-surface-container-lowest">
+<span class="font-caption text-caption text-tertiary mb-base block uppercase tracking-widest">Văn hóa</span>
+<p class="font-headline-md text-headline-md text-on-surface mb-md leading-snug">"Văn hoá nghệ thuật cũng là một mặt trận. Anh chị em là chiến sĩ trên mặt trận ấy."</p>
+<div class="flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="text-caption font-caption text-on-surface-variant">Gửi các nghệ sĩ, 1951</span>
+<span class="material-symbols-outlined text-primary">content_copy</span>
+</div>
+</div>
+<!-- Quote Item 3 -->
+<div class="p-md border border-outline-variant/30 rounded-lg hover:border-tertiary-container transition-all cursor-pointer group bg-surface-container-lowest">
+<span class="font-caption text-caption text-tertiary mb-base block uppercase tracking-widest">Học tập</span>
+<p class="font-headline-md text-headline-md text-on-surface mb-md leading-snug">"Học hỏi là một việc phải tiếp tục suốt đời. Suốt đời phải học tập, không bao giờ được dừng lại."</p>
+<div class="flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="text-caption font-caption text-on-surface-variant">Lớp huấn luyện cán bộ, 1949</span>
+<span class="material-symbols-outlined text-primary">content_copy</span>
+</div>
+</div>
+<!-- Quote Item 4 -->
+<div class="p-md border border-outline-variant/30 rounded-lg hover:border-tertiary-container transition-all cursor-pointer group bg-surface-container-lowest">
+<span class="font-caption text-caption text-tertiary mb-base block uppercase tracking-widest">Nhân cách</span>
+<p class="font-headline-md text-headline-md text-on-surface mb-md leading-snug">"Hiểu chủ nghĩa Mác - Lênin là phải sống với nhau có tình có nghĩa."</p>
+<div class="flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="text-caption font-caption text-on-surface-variant">Sửa đổi lối làm việc, 1947</span>
+<span class="material-symbols-outlined text-primary">content_copy</span>
+</div>
+</div>
+<!-- Quote Item 5 -->
+<div class="p-md border border-outline-variant/30 rounded-lg hover:border-tertiary-container transition-all cursor-pointer group bg-surface-container-lowest">
+<span class="font-caption text-caption text-tertiary mb-base block uppercase tracking-widest">Văn hóa soi đường</span>
+<p class="font-headline-md text-headline-md text-on-surface mb-md leading-snug">"Văn hóa soi đường cho quốc dân đi."</p>
+<div class="flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="text-caption font-caption text-on-surface-variant">Hội nghị văn hóa toàn quốc, 1946</span>
+<span class="material-symbols-outlined text-primary">content_copy</span>
+</div>
+</div>
+<!-- Quote Item 6 -->
+<div class="p-md border border-outline-variant/30 rounded-lg hover:border-tertiary-container transition-all cursor-pointer group bg-surface-container-lowest">
+<span class="font-caption text-caption text-tertiary mb-base block uppercase tracking-widest">Đoàn kết</span>
+<p class="font-headline-md text-headline-md text-on-surface mb-md leading-snug">"Đoàn kết, đoàn kết, đại đoàn kết. Thành công, thành công, đại thành công."</p>
+<div class="flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="text-caption font-caption text-on-surface-variant">Đại hội thống nhất, 1951</span>
+<span class="material-symbols-outlined text-primary">content_copy</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-secondary-container dark:bg-inverse-surface w-full py-xl mt-xl border-t border-outline-variant/20">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-lg max-w-container-max mx-auto px-gutter">
+<div>
+<div class="font-headline-md text-headline-md text-primary mb-md">Ký Ức Văn Hóa</div>
+<p class="font-caption text-caption text-on-secondary-container/80">Hành trình di sản, kết nối tri thức và nuôi dưỡng tâm hồn qua những giá trị văn hóa Hồ Chí Minh bền vững.</p>
+</div>
+<div>
+<h4 class="font-label-md text-on-secondary-container mb-md">Liên kết nhanh</h4>
+<div class="flex flex-col gap-sm">
+<a class="font-caption text-caption text-on-secondary-container/80 hover:text-primary underline underline-offset-4 transition-opacity" href="#">Về dự án</a>
+<a class="font-caption text-caption text-on-secondary-container/80 hover:text-primary underline underline-offset-4 transition-opacity" href="#">Chính sách bảo mật</a>
+<a class="font-caption text-caption text-on-secondary-container/80 hover:text-primary underline underline-offset-4 transition-opacity" href="#">Liên hệ</a>
+<a class="font-caption text-caption text-on-secondary-container/80 hover:text-primary underline underline-offset-4 transition-opacity" href="#">Tư liệu tham khảo</a>
+</div>
+</div>
+<div class="flex flex-col justify-between">
+<div>
+<h4 class="font-label-md text-on-secondary-container mb-md">Theo dõi chúng tôi</h4>
+<div class="flex gap-md">
+<span class="material-symbols-outlined text-on-secondary-container cursor-pointer hover:text-primary">social_leaderboard</span>
+<span class="material-symbols-outlined text-on-secondary-container cursor-pointer hover:text-primary">video_library</span>
+<span class="material-symbols-outlined text-on-secondary-container cursor-pointer hover:text-primary">mail</span>
+</div>
+</div>
+<p class="font-caption text-caption text-on-secondary-container/60 mt-md">© 2024 Ký Ức Văn Hóa - Hành trình Di sản Hồ Chí Minh</p>
+</div>
+</div>
+</footer>
+<script>
+        const quotes = [
+            {
+                text: "Vì lợi ích mười năm thì phải trồng cây, vì lợi ích trăm năm thì phải trồng người.",
+                category: "Giáo dục"
+            },
+            {
+                text: "Người có đức mà không có tài thì làm việc gì cũng khó; người có tài mà không có đức là người vô dụng.",
+                category: "Đạo đức"
+            },
+            {
+                text: "Văn hoá nghệ thuật cũng là một mặt trận. Anh chị em là chiến sĩ trên mặt trận ấy.",
+                category: "Văn hóa"
+            },
+            {
+                text: "Học hỏi là một việc phải tiếp tục suốt đời. Suốt đời phải học tập, không bao giờ được dừng lại.",
+                category: "Học tập"
+            },
+            {
+                text: "Văn hóa soi đường cho quốc dân đi.",
+                category: "Văn hóa"
+            }
+        ];
+
+        function refreshQuote() {
+            const randomIndex = Math.floor(Math.random() * quotes.length);
+            const quote = quotes[randomIndex];
+            
+            const mainQuote = document.getElementById('current-quote');
+            const previewText = document.getElementById('preview-text');
+            
+            mainQuote.classList.add('opacity-0');
+            previewText.classList.add('opacity-0');
+            
+            setTimeout(() => {
+                mainQuote.innerText = `"${quote.text}"`;
+                previewText.innerText = `"${quote.text}"`;
+                mainQuote.classList.remove('opacity-0');
+                previewText.classList.remove('opacity-0');
+            }, 300);
+        }
+
+        // Add CSS transition for smooth fade
+        const style = document.createElement('style');
+        style.textContent = `
+            #current-quote, #preview-text {
+                transition: opacity 0.3s ease-in-out;
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body></html>
