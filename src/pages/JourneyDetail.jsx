@@ -120,7 +120,7 @@ export default function JourneyDetail() {
             <div className="mt-sm flex gap-xs opacity-40">
               <div className="w-1 h-1 bg-primary rounded-full"></div>
               <div className="w-8 h-px bg-primary self-center"></div>
-              <div class="w-1 h-1 bg-primary rounded-full"></div>
+              <div className="w-1 h-1 bg-primary rounded-full"></div>
             </div>
           </Link>
         </section>
