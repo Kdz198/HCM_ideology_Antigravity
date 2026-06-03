@@ -71,6 +71,21 @@
   .sticky-note:hover { transform: scale(1.05) rotate(1deg); z-index: 10; }
   .line-input { border: none; border-bottom: 1px solid #dfbfbc; background: transparent; border-radius: 0; }
   .line-input:focus { outline: none; border-bottom: 2px solid #801318; box-shadow: none; }
+  
+  /* Flip Card Utilities */
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+  .backface-hidden {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+  .rotate-y-180 {
+    transform: rotateY(180deg);
+  }
 }
 @keyframes bloom {
   0% { transform: scale(0.9); opacity: 0; }

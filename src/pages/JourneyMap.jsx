@@ -67,8 +67,6 @@ export default function JourneyMap() {
           <nav className="hidden md:flex items-center gap-md">
             <Link className={getLinkClass('/')} to="/">Trang chủ</Link>
             <Link className={getLinkClass('/map')} to="/map">Bản đồ số</Link>
-            <Link className={getLinkClass('/heritage-map')} to="/heritage-map">Bản đồ di sản</Link>
-            <Link className={getLinkClass('/notebook')} to="/notebook">Tư liệu</Link>
             <Link className={getLinkClass('/mailbox')} to="/mailbox">Hộp thư ký ức</Link>
             <Link className={getLinkClass('/quiz')} to="/quiz">Trắc nghiệm</Link>
           </nav>
@@ -77,9 +75,7 @@ export default function JourneyMap() {
               <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
               <input className="pl-10 pr-4 py-2 bg-surface-container-low border-none rounded-full text-body-md focus:ring-1 focus:ring-primary w-64 transition-all" placeholder="Tìm kiếm di sản..." type="text"/>
             </div>
-            <button className="p-2 hover:bg-surface-container-low rounded-full transition-colors">
-              <span className="material-symbols-outlined text-primary">menu</span>
-            </button>
+            <div className="w-4"></div> {/* Spacer */}
           </div>
         </div>
       </header>

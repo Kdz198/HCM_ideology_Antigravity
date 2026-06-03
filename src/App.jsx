@@ -1,10 +1,8 @@
 import { Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
-import JourneyMap from './pages/JourneyMap';
 import JourneyDetail from './pages/JourneyDetail';
 import MemoryMailbox from './pages/MemoryMailbox';
 import Quiz from './pages/Quiz';
-import Notebook from './pages/Notebook';
 import GlobeMap from './pages/GlobeMap';
 
 function App() {
@@ -13,11 +11,9 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/map" element={<GlobeMap />} />
-        <Route path="/heritage-map" element={<JourneyMap />} />
         <Route path="/detail" element={<JourneyDetail />} />
         <Route path="/mailbox" element={<MemoryMailbox />} />
         <Route path="/quiz" element={<Quiz />} />
-        <Route path="/notebook" element={<Notebook />} />
       </Routes>
     </div>
   );
