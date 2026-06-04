@@ -1,5 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=EB+Garamond:wght@400;500;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=EB+Garamond:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -9,7 +9,12 @@
   body {
     @apply bg-background text-on-background font-sans;
   }
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-serif;
   }
 }
@@ -32,7 +37,11 @@
     background: linear-gradient(to right, rgba(252, 249, 248, 1) 40%, rgba(252, 249, 248, 0) 100%);
   }
   .material-symbols-outlined {
-    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+    font-variation-settings:
+      "FILL" 0,
+      "wght" 400,
+      "GRAD" 0,
+      "opsz" 24;
   }
   .quiz-transition {
     transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
@@ -59,19 +68,51 @@
     transform: scale(1.5);
     color: #735c00;
   }
-  .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-  .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-  .custom-scrollbar::-webkit-scrollbar-thumb { background: #dfbfbc; border-radius: 10px; }
-  
-  .ink-effect { filter: grayscale(100%) contrast(120%) brightness(90%); mix-blend-mode: multiply; }
-  .wax-seal { box-shadow: inset -2px -2px 4px rgba(0, 0, 0, 0.3), 2px 2px 5px rgba(0, 0, 0, 0.2); background: radial-gradient(circle at 30% 30%, #a12c2c, #801318); }
-  .scrolling-bg { background-size: cover; background-position: center; }
-  
-  .sticky-note { transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-  .sticky-note:hover { transform: scale(1.05) rotate(1deg); z-index: 10; }
-  .line-input { border: none; border-bottom: 1px solid #dfbfbc; background: transparent; border-radius: 0; }
-  .line-input:focus { outline: none; border-bottom: 2px solid #801318; box-shadow: none; }
-  
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #dfbfbc;
+    border-radius: 10px;
+  }
+
+  .ink-effect {
+    filter: grayscale(100%) contrast(120%) brightness(90%);
+    mix-blend-mode: multiply;
+  }
+  .wax-seal {
+    box-shadow:
+      inset -2px -2px 4px rgba(0, 0, 0, 0.3),
+      2px 2px 5px rgba(0, 0, 0, 0.2);
+    background: radial-gradient(circle at 30% 30%, #a12c2c, #801318);
+  }
+  .scrolling-bg {
+    background-size: cover;
+    background-position: center;
+  }
+
+  .sticky-note {
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  .sticky-note:hover {
+    transform: scale(1.05) rotate(1deg);
+    z-index: 10;
+  }
+  .line-input {
+    border: none;
+    border-bottom: 1px solid #dfbfbc;
+    background: transparent;
+    border-radius: 0;
+  }
+  .line-input:focus {
+    outline: none;
+    border-bottom: 2px solid #801318;
+    box-shadow: none;
+  }
+
   /* Flip Card Utilities */
   .perspective-1000 {
     perspective: 1000px;
@@ -88,6 +129,37 @@
   }
 }
 @keyframes bloom {
-  0% { transform: scale(0.9); opacity: 0; }
-  100% { transform: scale(1); opacity: 1; }
+  0% {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Text shimmer effect for headings */
+@keyframes text-shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+/* Quiz result entrance animation */
+.quiz-result-enter {
+  animation: result-slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes result-slide-up {
+  0% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }

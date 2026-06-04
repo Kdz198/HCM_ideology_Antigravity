@@ -1,13 +1,13 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import digitalAgeImg from '../assets/digital_age_hcm.png';
+import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
+import digitalAgeImg from "../assets/digital_age_hcm.png";
 
 const quotes = [
   "Văn hóa soi đường cho quốc dân đi.",
   "Vì lợi ích mười năm thì phải trồng cây, vì lợi ích trăm năm thì phải trồng người.",
   "Văn hóa nghệ thuật cũng là một mặt trận. Anh chị em là chiến sĩ trên mặt trận ấy.",
   "Muốn xây dựng chủ nghĩa xã hội, trước hết cần có những con người xã hội chủ nghĩa.",
-  "Sức mạnh của dân tộc chủ yếu là ở sự đoàn kết và văn hoá."
+  "Sức mạnh của dân tộc chủ yếu là ở sự đoàn kết và văn hoá.",
 ];
 
 export default function Home() {
@@ -15,7 +15,7 @@ export default function Home() {
   const [opacity, setOpacity] = useState(1);
 
   // States for Digital Book
-  const [activePoint, setActivePoint] = useState('dongluc'); // 'dongluc' | 'muctieu' | 'doisongmoi'
+  const [activePoint, setActivePoint] = useState("dongluc"); // 'dongluc' | 'muctieu' | 'doisongmoi'
   const [digitalAspect, setDigitalAspect] = useState(null); // null | 'tri' | 'duc' | 'the' | 'my'
   const [showDigitalAge, setShowDigitalAge] = useState(false);
   const [activeLH, setActiveLH] = useState(null); // null | 1 | 2 | 3 | 4 | 5
@@ -27,6 +27,102 @@ export default function Home() {
   // Flip states for open questions in 1.1
   const [flippedQ1, setFlippedQ1] = useState(false);
   const [flippedQ2, setFlippedQ2] = useState(false);
+
+  // AI Chat widget state
+  const [showChat, setShowChat] = useState(false);
+  const [chatInput, setChatInput] = useState("");
+  const [chatMessages, setChatMessages] = useState([]);
+  const [chatLoading, setChatLoading] = useState(false);
+  const [lastRequestTime, setLastRequestTime] = useState(0);
+  const chatMessagesEndRef = useRef(null);
+
+  // Gemini API config — key from env variable for security
+  const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent";
+  const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || "";
+  const RATE_LIMIT_MS = 7000; // 10s minimum delay between API requests
+  const SYSTEM_PROMPT = `Bạn là "AI Trợ lý Văn hóa" – chuyên gia về tư tưởng Hồ Chí Minh về văn hóa. 
+Trả lời ngắn gọn, dễ hiểu bằng tiếng Việt, sử dụng emoji vừa phải. 
+Chỉ trả lời các câu hỏi liên quan đến: tư tưởng Hồ Chí Minh, văn hóa Việt Nam, lịch sử, giáo dục, lối sống hiện đại, và các chủ đề liên quan đến di sản Bác Hồ.
+Nếu câu hỏi ngoài phạm vi, lịch sự từ chối và gợi ý câu hỏi phù hợp.
+Giữ câu trả lời dưới 150 từ để tiện đọc trên widget chat.`;
+
+  const callGemini = async (userMessage) => {
+    if (!GEMINI_API_KEY) {
+      return "⚠️ Hệ thống AI chưa được cấu hình. Vui lòng liên hệ quản trị viên.";
+    }
+
+    const historyForApi = chatMessages.slice(-10).flatMap((m) => [{ role: m.role === "user" ? "user" : "model", parts: [{ text: m.text }] }]);
+
+    const contents = [
+      { role: "user", parts: [{ text: SYSTEM_PROMPT }] },
+      {
+        role: "model",
+        parts: [
+          { text: "Xin chào! Tôi là AI Trợ lý Văn hóa, sẵn sàng giúp bạn tìm hiểu về tư tưởng Hồ Chí Minh về văn hóa. Hãy đặt câu hỏi nhé! 🇻🇳" },
+        ],
+      },
+      ...historyForApi,
+      { role: "user", parts: [{ text: userMessage }] },
+    ];
+
+    try {
+      const res = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contents }),
+      });
+      const data = await res.json();
+      if (data.error) {
+        return `⚠️ Lỗi: ${data.error.message || "API key không hợp lệ hoặc hết quota."}`;
+      }
+      return data.candidates?.[0]?.content?.parts?.[0]?.text || "Xin lỗi, tôi không thể trả lời lúc này. Vui lòng thử lại.";
+    } catch (err) {
+      return "⚠️ Lỗi kết nối mạng. Vui lòng kiểm tra internet và thử lại.";
+    }
+  };
+
+  const handleSendChat = async () => {
+    const msg = chatInput.trim();
+    if (!msg || chatLoading) return;
+
+    // Rate limiting: enforce minimum delay between requests
+    const now = Date.now();
+    const timeSinceLastRequest = now - lastRequestTime;
+    if (timeSinceLastRequest < RATE_LIMIT_MS) {
+      await new Promise((resolve) => setTimeout(resolve, RATE_LIMIT_MS - timeSinceLastRequest));
+    }
+
+    const userMsg = { role: "user", text: msg };
+    setChatMessages((prev) => [...prev, userMsg]);
+    setChatInput("");
+    setChatLoading(true);
+    setLastRequestTime(Date.now());
+
+    const reply = await callGemini(msg);
+
+    // Delay 10s before showing the response so it feels like AI is thinking
+    const THINKING_DELAY_MS = 7000;
+    await new Promise((resolve) => setTimeout(resolve, THINKING_DELAY_MS));
+
+    setChatMessages((prev) => [...prev, { role: "assistant", text: reply }]);
+    setChatLoading(false);
+  };
+
+  // Auto-scroll chat to bottom
+  useEffect(() => {
+    chatMessagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [chatMessages]);
+
+  // Refs for scroll-to-content behavior
+  const contentRef = useRef(null);
+  const hasInteracted = useRef(false);
+
+  // Smooth scroll to content when user clicks a card
+  useEffect(() => {
+    if (hasInteracted.current && contentRef.current) {
+      contentRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [activePoint]);
 
   const handleRefreshQuote = () => {
     setOpacity(0);
@@ -41,12 +137,22 @@ export default function Home() {
       {/* Top Navigation Bar */}
       <header className="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md border-b border-outline-variant/30">
         <nav className="flex justify-between items-center h-20 px-gutter max-w-container-max mx-auto">
-          <Link to="/" className="font-display-md text-display-md text-primary tracking-tight">Ký Ức Văn Hóa</Link>
+          <Link to="/" className="font-display-md text-display-md text-primary tracking-tight">
+            Ký Ức Văn Hóa
+          </Link>
           <div className="hidden md:flex items-center gap-lg">
-            <Link className="text-primary border-b-2 border-primary pb-1 font-bold font-body-md text-body-md" to="/">Trang chủ</Link>
-            <Link className="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" to="/map">Bản đồ số</Link>
-            <Link className="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" to="/mailbox">Hộp thư ký ức</Link>
-            <Link className="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" to="/quiz">Trắc nghiệm</Link>
+            <Link className="text-primary border-b-2 border-primary pb-1 font-bold font-body-md text-body-md" to="/">
+              Trang chủ
+            </Link>
+            <Link className="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" to="/map">
+              Bản đồ số
+            </Link>
+            <Link className="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" to="/mailbox">
+              Hộp thư ký ức
+            </Link>
+            <Link className="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" to="/quiz">
+              Trắc nghiệm
+            </Link>
           </div>
           <div className="flex items-center gap-md">
             <span className="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary">search</span>
@@ -54,28 +160,41 @@ export default function Home() {
           </div>
         </nav>
       </header>
-      
+
       <main className="pt-20">
         {/* Hero Section */}
         <section className="relative min-h-[80vh] flex items-center overflow-hidden">
           <div className="absolute inset-0 z-0">
-            <img className="w-full h-full object-cover" alt="Hero background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZHFUnZhziLFYiN9nmpteewpwPw0h8cC9qnoda2dhRJ_DtnoDNe0moB3_uuOf3oJ9KbVVVq9fy587NTtFiitySQ5MqECXIx4h5Csbd3_gSZp5qilbey0CYbDI6w1PSl3xVHDNkg9EOJ-NgFEME-I0UKPKDB3EEbPPb8TLqp7clJDhZnyLnjLSXkmHD3skG2ElkoZVAnAOd3NAVEw8GIwF1k2LcY0MK6imb9HUuQRrrplUZAzBl86lsjD6KW_9fW3wA9KRK3aEppjaZ" />
+            <img
+              className="w-full h-full object-cover"
+              alt="Hero background"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZHFUnZhziLFYiN9nmpteewpwPw0h8cC9qnoda2dhRJ_DtnoDNe0moB3_uuOf3oJ9KbVVVq9fy587NTtFiitySQ5MqECXIx4h5Csbd3_gSZp5qilbey0CYbDI6w1PSl3xVHDNkg9EOJ-NgFEME-I0UKPKDB3EEbPPb8TLqp7clJDhZnyLnjLSXkmHD3skG2ElkoZVAnAOd3NAVEw8GIwF1k2LcY0MK6imb9HUuQRrrplUZAzBl86lsjD6KW_9fW3wA9KRK3aEppjaZ"
+            />
             <div className="absolute inset-0 hero-gradient"></div>
           </div>
           <div className="relative z-10 max-w-container-max mx-auto px-gutter w-full">
             <div className="max-w-2xl">
-              <span className="inline-block px-md py-xs bg-primary/10 text-primary font-label-md text-label-md rounded-full mb-md">Dự án Di sản Kỹ thuật số</span>
+              <span className="inline-block px-md py-xs bg-primary/10 text-primary font-label-md text-label-md rounded-full mb-md">
+                Dự án Di sản Kỹ thuật số
+              </span>
               <h1 className="font-display-lg text-display-lg text-on-surface mb-md">
                 Tư tưởng Hồ Chí Minh về Văn hóa - <span className="text-primary italic font-medium">Ngọn đuốc soi đường</span> cho thế hệ trẻ
               </h1>
               <p className="font-body-lg text-body-lg text-on-surface-variant mb-lg leading-relaxed">
-                Khám phá chiều sâu di sản tư tưởng của Bác, nơi truyền thống hòa quyện cùng hiện đại để định hình bản sắc Việt Nam trong kỷ nguyên mới.
+                Khám phá chiều sâu di sản tư tưởng của Bác, nơi truyền thống hòa quyện cùng hiện đại để định hình bản sắc Việt Nam trong kỷ nguyên
+                mới.
               </p>
               <div className="flex flex-wrap gap-md">
-                <Link to="/map" className="bg-primary text-on-primary px-xl py-md font-label-md text-label-md rounded-lg flex items-center gap-sm hover:shadow-lg transition-all">
+                <Link
+                  to="/map"
+                  className="bg-primary text-on-primary px-xl py-md font-label-md text-label-md rounded-lg flex items-center gap-sm hover:shadow-lg transition-all"
+                >
                   Bắt đầu hành trình <span className="material-symbols-outlined">arrow_forward</span>
                 </Link>
-                <a href="#digital-book" className="border border-primary text-primary px-xl py-md font-label-md text-label-md rounded-lg hover:bg-primary/5 transition-all flex items-center justify-center">
+                <a
+                  href="#digital-book"
+                  className="border border-primary text-primary px-xl py-md font-label-md text-label-md rounded-lg hover:bg-primary/5 transition-all flex items-center justify-center"
+                >
                   Tìm hiểu thêm
                 </a>
               </div>
@@ -100,7 +219,10 @@ export default function Home() {
                     </div>
                   </div>
                   <blockquote className="mb-xl min-h-[120px]">
-                    <p className="font-display-md text-display-md text-on-surface leading-tight italic" style={{ opacity, transition: 'opacity 0.3s ease-in-out' }}>
+                    <p
+                      className="font-display-md text-display-md text-on-surface leading-tight italic"
+                      style={{ opacity, transition: "opacity 0.3s ease-in-out" }}
+                    >
                       "{quotes[quoteIndex]}"
                     </p>
                   </blockquote>
@@ -129,7 +251,8 @@ export default function Home() {
             <div className="order-1 md:order-2 space-y-md relative z-10">
               <h2 className="font-display-md text-display-md text-primary">Hộp thư Ký ức</h2>
               <p className="font-body-lg text-body-lg text-on-surface-variant">
-                Mỗi lần mở hộp thư là một lời nhắn nhủ từ quá khứ mang hơi thở thời đại. Những đúc kết tinh túy về vai trò của văn hóa đối với sự sinh tồn và phát triển của dân tộc.
+                Mỗi lần mở hộp thư là một lời nhắn nhủ từ quá khứ mang hơi thở thời đại. Những đúc kết tinh túy về vai trò của văn hóa đối với sự sinh
+                tồn và phát triển của dân tộc.
               </p>
               <button onClick={handleRefreshQuote} className="flex items-center gap-sm text-primary font-label-md text-label-md group">
                 <span className="material-symbols-outlined group-hover:rotate-180 transition-transform duration-500">refresh</span>
@@ -148,10 +271,12 @@ export default function Home() {
             </h2>
             <div className="h-1 w-20 bg-primary mx-auto mb-md"></div>
             <p className="font-body-md text-body-md text-on-surface-variant italic">
-              "Khám phá chiều sâu di sản tư tưởng của Bác, nơi truyền thống hòa quyện cùng hiện đại để định hình bản sắc Việt Nam trong kỷ nguyên mới."
+              "Khám phá chiều sâu di sản tư tưởng của Bác, nơi truyền thống hòa quyện cùng hiện đại để định hình bản sắc Việt Nam trong kỷ nguyên
+              mới."
             </p>
             <p className="font-body-sm text-body-sm text-secondary-variant mt-xs">
-              Hệ thống tư tưởng toàn diện, định hướng xây dựng một nền văn hóa mới mang đậm bản sắc dân tộc và tinh thần sâu sắc. (Nhấp chọn các luận điểm cốt lõi dưới đây để khám phá chi tiết)
+              Hệ thống tư tưởng toàn diện, định hướng xây dựng một nền văn hóa mới mang đậm bản sắc dân tộc và tinh thần sâu sắc. (Nhấp chọn các luận
+              điểm cốt lõi dưới đây để khám phá chi tiết)
             </p>
           </div>
 
@@ -159,28 +284,37 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-lg mb-xl">
             {/* Card 1 */}
             <div
-              onClick={() => setActivePoint('dongluc')}
+              onClick={() => {
+                hasInteracted.current = true;
+                setActivePoint("dongluc");
+              }}
               className={`group relative bg-surface border p-lg rounded-lg transition-all duration-300 cursor-pointer ${
-                activePoint === 'dongluc'
-                  ? 'border-primary shadow-lg bg-surface-container-low ring-1 ring-primary/20 scale-102'
-                  : 'border-outline-variant hover:border-primary hover:shadow-md'
+                activePoint === "dongluc"
+                  ? "border-primary shadow-lg bg-surface-container-low ring-1 ring-primary/20 scale-102"
+                  : "border-outline-variant hover:border-primary hover:shadow-md"
               }`}
             >
-              <div className={`w-12 h-12 rounded-lg flex items-center justify-center mb-md transition-colors ${
-                activePoint === 'dongluc' ? 'bg-primary text-on-primary' : 'bg-primary/5 text-primary group-hover:bg-primary group-hover:text-on-primary'
-              }`}>
+              <div
+                className={`w-12 h-12 rounded-lg flex items-center justify-center mb-md transition-colors ${
+                  activePoint === "dongluc"
+                    ? "bg-primary text-on-primary"
+                    : "bg-primary/5 text-primary group-hover:bg-primary group-hover:text-on-primary"
+                }`}
+              >
                 <span className="material-symbols-outlined">trending_up</span>
               </div>
               <h3 className="font-headline-md text-headline-md mb-sm flex items-center gap-xs justify-between">
                 <span>1.1. Văn hóa là động lực</span>
-                {activePoint === 'dongluc' && <span className="w-2.5 h-2.5 rounded-full bg-primary animate-ping"></span>}
+                {activePoint === "dongluc" && <span className="w-2.5 h-2.5 rounded-full bg-primary animate-ping"></span>}
               </h3>
               <p className="font-body-md text-body-md text-on-surface-variant mb-md">
                 Văn hóa không đứng ngoài mà ở trong kinh tế và chính trị. Nó là sức mạnh tinh thần khơi dậy tinh thần yêu nước và sáng tạo.
               </p>
               <span className="inline-flex items-center gap-xs font-label-md text-label-md text-primary font-bold">
-                {activePoint === 'dongluc' ? 'Đang đọc chương này' : 'Bấm để đọc ngay'}
-                <span className={`material-symbols-outlined text-sm transition-transform duration-300 ${activePoint === 'dongluc' ? 'rotate-90' : 'group-hover:translate-x-1'}`}>
+                {activePoint === "dongluc" ? "Đang đọc chương này" : "Bấm để đọc ngay"}
+                <span
+                  className={`material-symbols-outlined text-sm transition-transform duration-300 ${activePoint === "dongluc" ? "rotate-90" : "group-hover:translate-x-1"}`}
+                >
                   arrow_right_alt
                 </span>
               </span>
@@ -188,28 +322,37 @@ export default function Home() {
 
             {/* Card 2 */}
             <div
-              onClick={() => setActivePoint('muctieu')}
+              onClick={() => {
+                hasInteracted.current = true;
+                setActivePoint("muctieu");
+              }}
               className={`group relative bg-surface border p-lg rounded-lg transition-all duration-300 cursor-pointer ${
-                activePoint === 'muctieu'
-                  ? 'border-primary shadow-lg bg-surface-container-low ring-1 ring-primary/20 scale-102'
-                  : 'border-outline-variant hover:border-primary hover:shadow-md'
+                activePoint === "muctieu"
+                  ? "border-primary shadow-lg bg-surface-container-low ring-1 ring-primary/20 scale-102"
+                  : "border-outline-variant hover:border-primary hover:shadow-md"
               }`}
             >
-              <div className={`w-12 h-12 rounded-lg flex items-center justify-center mb-md transition-colors ${
-                activePoint === 'muctieu' ? 'bg-primary text-on-primary' : 'bg-primary/5 text-primary group-hover:bg-primary group-hover:text-on-primary'
-              }`}>
+              <div
+                className={`w-12 h-12 rounded-lg flex items-center justify-center mb-md transition-colors ${
+                  activePoint === "muctieu"
+                    ? "bg-primary text-on-primary"
+                    : "bg-primary/5 text-primary group-hover:bg-primary group-hover:text-on-primary"
+                }`}
+              >
                 <span className="material-symbols-outlined">ads_click</span>
               </div>
               <h3 className="font-headline-md text-headline-md mb-sm flex items-center gap-xs justify-between">
                 <span>1.2. Văn hóa là mục tiêu</span>
-                {activePoint === 'muctieu' && <span className="w-2.5 h-2.5 rounded-full bg-primary animate-ping"></span>}
+                {activePoint === "muctieu" && <span className="w-2.5 h-2.5 rounded-full bg-primary animate-ping"></span>}
               </h3>
               <p className="font-body-md text-body-md text-on-surface-variant mb-md">
                 Xây dựng một xã hội văn minh, nơi con người phát triển toàn diện về Đức, Trí, Thể, Mỹ là đích đến cuối cùng của cách mạng.
               </p>
               <span className="inline-flex items-center gap-xs font-label-md text-label-md text-primary font-bold">
-                {activePoint === 'muctieu' ? 'Đang đọc chương này' : 'Bấm để đọc ngay'}
-                <span className={`material-symbols-outlined text-sm transition-transform duration-300 ${activePoint === 'muctieu' ? 'rotate-90' : 'group-hover:translate-x-1'}`}>
+                {activePoint === "muctieu" ? "Đang đọc chương này" : "Bấm để đọc ngay"}
+                <span
+                  className={`material-symbols-outlined text-sm transition-transform duration-300 ${activePoint === "muctieu" ? "rotate-90" : "group-hover:translate-x-1"}`}
+                >
                   arrow_right_alt
                 </span>
               </span>
@@ -217,28 +360,37 @@ export default function Home() {
 
             {/* Card 3 */}
             <div
-              onClick={() => setActivePoint('doisongmoi')}
+              onClick={() => {
+                hasInteracted.current = true;
+                setActivePoint("doisongmoi");
+              }}
               className={`group relative bg-surface border p-lg rounded-lg transition-all duration-300 cursor-pointer ${
-                activePoint === 'doisongmoi'
-                  ? 'border-primary shadow-lg bg-surface-container-low ring-1 ring-primary/20 scale-102'
-                  : 'border-outline-variant hover:border-primary hover:shadow-md'
+                activePoint === "doisongmoi"
+                  ? "border-primary shadow-lg bg-surface-container-low ring-1 ring-primary/20 scale-102"
+                  : "border-outline-variant hover:border-primary hover:shadow-md"
               }`}
             >
-              <div className={`w-12 h-12 rounded-lg flex items-center justify-center mb-md transition-colors ${
-                activePoint === 'doisongmoi' ? 'bg-primary text-on-primary' : 'bg-primary/5 text-primary group-hover:bg-primary group-hover:text-on-primary'
-              }`}>
+              <div
+                className={`w-12 h-12 rounded-lg flex items-center justify-center mb-md transition-colors ${
+                  activePoint === "doisongmoi"
+                    ? "bg-primary text-on-primary"
+                    : "bg-primary/5 text-primary group-hover:bg-primary group-hover:text-on-primary"
+                }`}
+              >
                 <span className="material-symbols-outlined">eco</span>
               </div>
               <h3 className="font-headline-md text-headline-md mb-sm flex items-center gap-xs justify-between">
                 <span>1.3. Đời sống văn hóa mới</span>
-                {activePoint === 'doisongmoi' && <span className="w-2.5 h-2.5 rounded-full bg-primary animate-ping"></span>}
+                {activePoint === "doisongmoi" && <span className="w-2.5 h-2.5 rounded-full bg-primary animate-ping"></span>}
               </h3>
               <p className="font-body-md text-body-md text-on-surface-variant mb-md">
                 Cải tạo những thói quen cũ lạc hậu, xây dựng lối sống khoa học, cần kiệm, liêm chính để làm giàu vốn quý dân tộc.
               </p>
               <span className="inline-flex items-center gap-xs font-label-md text-label-md text-primary font-bold">
-                {activePoint === 'doisongmoi' ? 'Đang đọc chương này' : 'Bấm để đọc ngay'}
-                <span className={`material-symbols-outlined text-sm transition-transform duration-300 ${activePoint === 'doisongmoi' ? 'rotate-90' : 'group-hover:translate-x-1'}`}>
+                {activePoint === "doisongmoi" ? "Đang đọc chương này" : "Bấm để đọc ngay"}
+                <span
+                  className={`material-symbols-outlined text-sm transition-transform duration-300 ${activePoint === "doisongmoi" ? "rotate-90" : "group-hover:translate-x-1"}`}
+                >
                   arrow_right_alt
                 </span>
               </span>
@@ -246,7 +398,11 @@ export default function Home() {
           </div>
 
           {/* Interactive Digital Book Display (Paper Texture Container) */}
-          <div className="bg-surface-container-lowest border border-outline-variant/60 rounded-xl shadow-xl overflow-hidden relative animate-bloom">
+          <div
+            ref={contentRef}
+            id="digital-book-content"
+            className="bg-surface-container-lowest border border-outline-variant/60 rounded-xl shadow-xl overflow-hidden relative animate-bloom scroll-mt-24"
+          >
             <div className="absolute top-4 right-4 flex gap-xs">
               <div className="w-3 h-3 rounded-full bg-primary/20"></div>
               <div className="w-3 h-3 rounded-full bg-tertiary/20"></div>
@@ -255,7 +411,7 @@ export default function Home() {
 
             <div className="p-md md:p-xl">
               {/* Point 1.1: Văn hóa là động lực */}
-              {activePoint === 'dongluc' && (
+              {activePoint === "dongluc" && (
                 <div className="space-y-lg">
                   <div className="border-b border-outline-variant/30 pb-md">
                     <span className="text-primary font-label-md text-label-md uppercase tracking-wider block mb-xs">Luận điểm 1.1</span>
@@ -275,28 +431,36 @@ export default function Home() {
                       <div className="bg-surface-container-low p-md border border-outline-variant/30 rounded-lg hover:border-primary/50 transition-colors">
                         <h5 className="font-label-md text-label-md text-primary font-bold uppercase mb-xs">1. Nền tảng tinh thần xã hội</h5>
                         <p className="font-body-md text-body-md text-on-surface-variant">
-                          Văn hóa là nền tảng tinh thần vững chắc của xã hội. Nó vừa là mục tiêu, vừa là động lực thúc đẩy kinh tế - xã hội phát triển, tạo nên bản sắc, ý chí kiên cường và sức sống bền bỉ của một quốc gia.
+                          Văn hóa là nền tảng tinh thần vững chắc của xã hội. Nó vừa là mục tiêu, vừa là động lực thúc đẩy kinh tế - xã hội phát
+                          triển, tạo nên bản sắc, ý chí kiên cường và sức sống bền bỉ của một quốc gia.
                         </p>
                       </div>
 
                       <div className="bg-surface-container-low p-md border border-outline-variant/30 rounded-lg hover:border-primary/50 transition-colors">
                         <h5 className="font-label-md text-label-md text-primary font-bold uppercase mb-xs">2. Không tách rời Kinh tế & Chính trị</h5>
                         <p className="font-body-md text-body-md text-on-surface-variant">
-                          Hồ Chí Minh khẳng định: <span className="italic">"Văn hóa, nghệ thuật cũng như mọi hoạt động khác, không thể đứng ngoài, mà phải ở trong kinh tế và chính trị."</span> Văn hóa tác động trực tiếp đến cách con người lao động, quản lý và hành xử. Kinh tế muốn bền vững cần có trách nhiệm xã hội và đạo đức làm nền móng.
+                          Hồ Chí Minh khẳng định:{" "}
+                          <span className="italic">
+                            "Văn hóa, nghệ thuật cũng như mọi hoạt động khác, không thể đứng ngoài, mà phải ở trong kinh tế và chính trị."
+                          </span>{" "}
+                          Văn hóa tác động trực tiếp đến cách con người lao động, quản lý và hành xử. Kinh tế muốn bền vững cần có trách nhiệm xã hội
+                          và đạo đức làm nền móng.
                         </p>
                       </div>
 
                       <div className="bg-surface-container-low p-md border border-outline-variant/30 rounded-lg hover:border-primary/50 transition-colors">
                         <h5 className="font-label-md text-label-md text-primary font-bold uppercase mb-xs">3. Khơi dậy lòng yêu nước & Tự cường</h5>
                         <p className="font-body-md text-body-md text-on-surface-variant">
-                          Nền văn hóa Việt Nam trường tồn nhờ nuôi dưỡng tinh thần đoàn kết sâu sắc, lòng yêu nước nồng nàn, khát vọng độc lập, tự do và ý chí tự lực tự cường vững vàng qua nhiều thế hệ.
+                          Nền văn hóa Việt Nam trường tồn nhờ nuôi dưỡng tinh thần đoàn kết sâu sắc, lòng yêu nước nồng nàn, khát vọng độc lập, tự do
+                          và ý chí tự lực tự cường vững vàng qua nhiều thế hệ.
                         </p>
                       </div>
 
                       <div className="bg-surface-container-low p-md border border-outline-variant/30 rounded-lg hover:border-primary/50 transition-colors">
                         <h5 className="font-label-md text-label-md text-primary font-bold uppercase mb-xs">4. Thúc đẩy sáng tạo & Con người</h5>
                         <p className="font-body-md text-body-md text-on-surface-variant">
-                          Văn hóa định hình và phát triển con người toàn diện có tri thức rộng mở, đạo đức chuẩn mực và ý thức trách nhiệm. Bác Hồ luôn coi con người vừa là chủ thể sáng tạo văn hóa, vừa là động lực quyết định thúc đẩy sự tiến bộ xã hội.
+                          Văn hóa định hình và phát triển con người toàn diện có tri thức rộng mở, đạo đức chuẩn mực và ý thức trách nhiệm. Bác Hồ
+                          luôn coi con người vừa là chủ thể sáng tạo văn hóa, vừa là động lực quyết định thúc đẩy sự tiến bộ xã hội.
                         </p>
                       </div>
                     </div>
@@ -317,32 +481,89 @@ export default function Home() {
                   {/* Modern Connection & Reflective Questions */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-lg pt-md">
                     <div className="space-y-md">
-                      <h4 className="font-headline-md text-headline-md text-tertiary flex items-center gap-xs">
+                      <h4 className="font-headline-md text-headline-md text-primary flex items-center gap-xs">
                         <span className="material-symbols-outlined">link</span>
                         Liên hệ hiện đại
                       </h4>
-                      
-                      <div className="space-y-sm">
-                        <div className="bg-secondary-container/40 p-md border-l-4 border-tertiary rounded-r-lg">
-                          <h5 className="font-label-md text-label-md text-tertiary font-bold mb-xs">LH1: Sức mạnh nội sinh thời đại mới</h5>
-                          <p className="font-body-md text-body-md text-on-surface-variant">
-                            Một dân tộc mạnh không chỉ mạnh về kinh tế mà còn ở ý thức xã hội, đạo đức cộng đồng và bản sắc văn hóa đặc trưng. 
-                            <br />
-                            <span className="text-sm font-semibold text-primary block mt-xs">
-                              • Ví dụ thực tế: Nhật Bản sau chiến tranh vươn lên thần kỳ nhờ kỷ luật sắt và ý thức tập thể cao độ. Việt Nam kiên cường vượt đại dịch COVID-19 nhờ phát huy cao độ tinh thần tương thân tương ái, đoàn kết dân tộc.
-                            </span>
-                          </p>
+
+                      <div className="space-y-md">
+                        {/* LH1: Sức mạnh nội sinh thời đại mới */}
+                        <div className="bg-surface border border-outline-variant/50 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow p-md md:p-lg">
+                          <div className="grid grid-cols-1 lg:grid-cols-5 gap-md items-center">
+                            {/* Hàng 1: Đoạn văn chính + Ảnh 1 */}
+                            <div className="lg:col-span-3">
+                              <h5 className="font-headline-sm text-headline-sm text-primary font-bold mb-sm">LH1: Sức mạnh nội sinh thời đại mới</h5>
+                              <p className="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                                Một dân tộc mạnh không chỉ mạnh về kinh tế mà còn ở ý thức xã hội, đạo đức cộng đồng và bản sắc văn hóa đặc trưng.
+                              </p>
+                            </div>
+                            <div className="lg:col-span-2 flex justify-center w-full">
+                              <img
+                                src="https://www.tapchicongsan.org.vn/image/journal/article?img_id=68096112&t=1601591513547"
+                                alt="Nhật Bản hiện đại"
+                                className="w-full h-auto max-h-[200px] lg:max-h-none rounded-lg object-contain"
+                              />
+                            </div>
+
+                            {/* Hàng 2: Khối ví dụ thực tế + Ảnh 2 */}
+                            <div className="lg:col-span-3">
+                              <div className="bg-primary/5 p-sm rounded-lg border-l-3 border-primary">
+                                <span className="text-sm font-semibold text-on-surface-variant">
+                                  <span className="text-primary">• Ví dụ thực tế:</span> Nhật Bản sau chiến tranh vươn lên thần kỳ nhờ kỷ luật sắt và
+                                  ý thức tập thể cao độ. Việt Nam kiên cường vượt đại dịch COVID-19 nhờ phát huy cao độ tinh thần tương thân tương ái,
+                                  đoàn kết dân tộc.
+                                </span>
+                              </div>
+                            </div>
+                            <div className="lg:col-span-2 flex justify-center w-full">
+                              <img
+                                src="https://suckhoedoisong.qltns.mediacdn.vn/324455921873985536/2023/11/30/covid-17013121750601278942624.jpg"
+                                alt="Đoàn kết Việt Nam"
+                                className="w-full h-auto max-h-[200px] lg:max-h-none rounded-lg object-contain"
+                              />
+                            </div>
+                          </div>
                         </div>
 
-                        <div className="bg-secondary-container/40 p-md border-l-4 border-tertiary rounded-r-lg">
-                          <h5 className="font-label-md text-label-md text-tertiary font-bold mb-xs">LH2: Nguy cơ suy thoái ứng xử ở giới trẻ</h5>
-                          <p className="font-body-md text-body-md text-on-surface-variant">
-                            Nếu thế hệ trẻ đánh mất văn hóa ứng xử văn minh và tinh thần dân tộc sâu sắc, sự phát triển chung của toàn xã hội sẽ lung lay, khó có thể bền vững.
-                            <br />
-                            <span className="text-sm font-semibold text-primary block mt-xs">
-                              • Ví dụ báo động: Vấn nạn bạo lực mạng, phát ngôn thiếu chuẩn mực trên MXH; xu hướng sính ngoại, thờ ơ với cội nguồn văn hóa truyền thống dân tộc; thiếu ý thức trách nhiệm với cộng đồng và môi trường sống.
-                            </span>
-                          </p>
+                        {/* LH2: Nguy cơ suy thoái ứng xử ở giới trẻ */}
+                        <div className="bg-surface border border-outline-variant/50 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow p-md md:p-lg">
+                          <div className="grid grid-cols-1 lg:grid-cols-5 gap-md items-center">
+                            {/* Hàng 1: Đoạn văn chính + Ảnh 1 */}
+                            <div className="lg:col-span-3">
+                              <h5 className="font-headline-sm text-headline-sm text-primary font-bold mb-sm">
+                                LH2: Nguy cơ suy thoái ứng xử ở giới trẻ
+                              </h5>
+                              <p className="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                                Nếu thế hệ trẻ đánh mất văn hóa ứng xử văn minh và tinh thần dân tộc sâu sắc, sự phát triển chung của toàn xã hội sẽ
+                                lung lay, khó có thể bền vững.
+                              </p>
+                            </div>
+                            <div className="lg:col-span-2 flex justify-center w-full">
+                              <img
+                                src="https://thanhnien.mediacdn.vn/Uploaded/minhnguyet/2017_02_04/nguoitre_HEDG.jpg"
+                                alt="Bạo lực mạng"
+                                className="w-full h-auto max-h-[200px] lg:max-h-none rounded-lg object-contain"
+                              />
+                            </div>
+
+                            {/* Hàng 2: Khối ví dụ báo động + Ảnh 2 */}
+                            <div className="lg:col-span-3">
+                              <div className="bg-error/5 p-sm rounded-lg border-l-3 border-error">
+                                <span className="text-sm font-semibold text-on-surface-variant">
+                                  <span className="text-error">• Ví dụ báo động:</span> Vấn nạn bạo lực mạng, phát ngôn thiếu chuẩn mực trên MXH; xu
+                                  hướng sính ngoại, thờ ơ với cội nguồn văn hóa truyền thống dân tộc; thiếu ý thức trách nhiệm với cộng đồng và môi
+                                  trường sống.
+                                </span>
+                              </div>
+                            </div>
+                            <div className="lg:col-span-2 flex justify-center w-full">
+                              <img
+                                src="https://image.plo.vn/1200x630/Uploaded/2026/jqkpcgmv/2023_11_09/p12-02-9442.jpg"
+                                alt="Sính ngoại"
+                                className="w-full h-auto max-h-[200px] lg:max-h-none rounded-lg object-contain"
+                              />
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -355,8 +576,7 @@ export default function Home() {
                       <div className="space-y-md">
                         {/* Card 1 */}
                         <div className="perspective-1000 w-full h-[350px]">
-                          <div className={`relative w-full h-full duration-700 preserve-3d transition-transform ${flippedQ1 ? 'rotate-y-180' : ''}`}>
-                            
+                          <div className={`relative w-full h-full duration-700 preserve-3d transition-transform ${flippedQ1 ? "rotate-y-180" : ""}`}>
                             {/* Card 1 Front */}
                             <div className="absolute inset-0 w-full h-full backface-hidden bg-surface p-md rounded-lg border border-outline-variant/40 shadow-xs hover:border-primary hover:shadow-md transition-all duration-300 flex flex-col justify-between group/card">
                               <div>
@@ -365,10 +585,13 @@ export default function Home() {
                                     <span className="material-symbols-outlined text-sm">psychology</span>
                                     Câu hỏi 1
                                   </span>
-                                  <span className="material-symbols-outlined text-sm text-outline opacity-40 group-hover/card:opacity-100 group-hover/card:text-primary transition-opacity">visibility</span>
+                                  <span className="material-symbols-outlined text-sm text-outline opacity-40 group-hover/card:opacity-100 group-hover/card:text-primary transition-opacity">
+                                    visibility
+                                  </span>
                                 </div>
                                 <p className="font-body-md text-body-md text-on-surface leading-relaxed mt-sm font-serif">
-                                  Một đất nước có thể cực kỳ giàu có về mặt vật chất kinh tế, nhưng con người lại thiếu thốn tinh thần trách nhiệm và suy thoái đạo đức, thì liệu đất nước đó có thể phát triển phồn vinh bền vững được hay không?
+                                  Một đất nước có thể cực kỳ giàu có về mặt vật chất kinh tế, nhưng con người lại thiếu thốn tinh thần trách nhiệm và
+                                  suy thoái đạo đức, thì liệu đất nước đó có thể phát triển phồn vinh bền vững được hay không?
                                 </p>
                               </div>
                               <button
@@ -398,15 +621,26 @@ export default function Home() {
                               <div className="flex-1 overflow-y-auto custom-scrollbar my-sm space-y-xs pr-xs text-[12px] text-on-surface-variant leading-relaxed text-left">
                                 <div className="bg-secondary-container/40 p-xs px-sm rounded border-l-2 border-primary">
                                   <span className="font-bold text-primary block mb-0.5">💡 Bản chất của Sự phát triển:</span>
-                                  <span>Kinh tế được ví như bộ khung xương cung cấp nền tảng vật chất, còn văn hóa đạo đức chính là sinh khí, là linh hồn của xã hội. Nếu linh hồn rệu rã, lòng tin xã hội bị đổ vỡ do tham lam và ích kỷ, hệ thống kinh tế cũng sớm muộn sẽ sụp đổ từ bên trong.</span>
+                                  <span>
+                                    Kinh tế được ví như bộ khung xương cung cấp nền tảng vật chất, còn văn hóa đạo đức chính là sinh khí, là linh hồn
+                                    của xã hội. Nếu linh hồn rệu rã, lòng tin xã hội bị đổ vỡ do tham lam và ích kỷ, hệ thống kinh tế cũng sớm muộn sẽ
+                                    sụp đổ từ bên trong.
+                                  </span>
                                 </div>
                                 <div className="bg-secondary-container/40 p-xs px-sm rounded border-l-2 border-primary">
                                   <span className="font-bold text-primary block mb-0.5">💡 Lời dạy cốt lõi của Bác:</span>
-                                  <span>Hồ Chí Minh từng khuyên răn: <span className="italic">"Có tài mà không có đức là người vô dụng..."</span>. Việc chấn hưng văn hóa, nuôi dưỡng tinh thần trách nhiệm luôn phải đồng hành mật thiết với xây dựng và phát triển kinh tế.</span>
+                                  <span>
+                                    Hồ Chí Minh từng khuyên răn: <span className="italic">"Có tài mà không có đức là người vô dụng..."</span>. Việc
+                                    chấn hưng văn hóa, nuôi dưỡng tinh thần trách nhiệm luôn phải đồng hành mật thiết với xây dựng và phát triển kinh
+                                    tế.
+                                  </span>
                                 </div>
                                 <div className="bg-secondary-container/40 p-xs px-sm rounded border-l-2 border-primary">
                                   <span className="font-bold text-primary block mb-0.5">💡 Định hướng hành động Gen Z:</span>
-                                  <span>Mỗi bạn trẻ cần rèn luyện ý thức thượng tôn luật pháp, sống trung thực, yêu thương đồng bào và thực hành lối sống tử tế từ những hành động giản đơn nhất hằng ngày (như tắt điện tiết kiệm, giữ vệ sinh, nhường nhịn).</span>
+                                  <span>
+                                    Mỗi bạn trẻ cần rèn luyện ý thức thượng tôn luật pháp, sống trung thực, yêu thương đồng bào và thực hành lối sống
+                                    tử tế từ những hành động giản đơn nhất hằng ngày (như tắt điện tiết kiệm, giữ vệ sinh, nhường nhịn).
+                                  </span>
                                 </div>
                               </div>
 
@@ -417,14 +651,12 @@ export default function Home() {
                                 <span>Quay lại câu hỏi ↺</span>
                               </button>
                             </div>
-
                           </div>
                         </div>
 
                         {/* Card 2 */}
                         <div className="perspective-1000 w-full h-[350px]">
-                          <div className={`relative w-full h-full duration-700 preserve-3d transition-transform ${flippedQ2 ? 'rotate-y-180' : ''}`}>
-                            
+                          <div className={`relative w-full h-full duration-700 preserve-3d transition-transform ${flippedQ2 ? "rotate-y-180" : ""}`}>
                             {/* Card 2 Front */}
                             <div className="absolute inset-0 w-full h-full backface-hidden bg-surface p-md rounded-lg border border-outline-variant/40 shadow-xs hover:border-primary hover:shadow-md transition-all duration-300 flex flex-col justify-between group/card">
                               <div>
@@ -433,10 +665,13 @@ export default function Home() {
                                     <span className="material-symbols-outlined text-sm">psychology</span>
                                     Câu hỏi 2
                                   </span>
-                                  <span className="material-symbols-outlined text-sm text-outline opacity-40 group-hover/card:opacity-100 group-hover/card:text-primary transition-opacity">visibility</span>
+                                  <span className="material-symbols-outlined text-sm text-outline opacity-40 group-hover/card:opacity-100 group-hover/card:text-primary transition-opacity">
+                                    visibility
+                                  </span>
                                 </div>
                                 <p className="font-body-md text-body-md text-on-surface leading-relaxed mt-sm font-serif">
-                                  Trong kỷ nguyên trí tuệ nhân tạo (AI) phát triển bão táp và toàn cầu hóa mạnh mẽ ngày nay, làm thế nào để giới trẻ chúng ta hội nhập quốc tế toàn diện mà vẫn giữ vững và tỏa sáng bản sắc văn hóa Việt Nam độc bản?
+                                  Trong kỷ nguyên trí tuệ nhân tạo (AI) phát triển bão táp và toàn cầu hóa mạnh mẽ ngày nay, làm thế nào để giới trẻ
+                                  chúng ta hội nhập quốc tế toàn diện mà vẫn giữ vững và tỏa sáng bản sắc văn hóa Việt Nam độc bản?
                                 </p>
                               </div>
                               <button
@@ -466,15 +701,25 @@ export default function Home() {
                               <div className="flex-1 overflow-y-auto custom-scrollbar my-sm space-y-xs pr-xs text-[12px] text-on-surface-variant leading-relaxed text-left">
                                 <div className="bg-secondary-container/40 p-xs px-sm rounded border-l-2 border-primary">
                                   <span className="font-bold text-primary block mb-0.5">💡 Nguyên tắc "Hòa nhập nhưng không hòa tan":</span>
-                                  <span>Giới trẻ cần chủ động làm chủ các công cụ công nghệ mới nhất (AI, ChatGPT, khoa học dữ liệu...) để gia tăng tối đa sức mạnh tri thức cạnh tranh với bạn bè quốc tế, nhưng luôn dùng công nghệ như một chiếc cầu nối truyền tải và quảng bá vẻ đẹp cội nguồn bản sắc Việt.</span>
+                                  <span>
+                                    Giới trẻ cần chủ động làm chủ các công cụ công nghệ mới nhất (AI, ChatGPT, khoa học dữ liệu...) để gia tăng tối đa
+                                    sức mạnh tri thức cạnh tranh với bạn bè quốc tế, nhưng luôn dùng công nghệ như một chiếc cầu nối truyền tải và
+                                    quảng bá vẻ đẹp cội nguồn bản sắc Việt.
+                                  </span>
                                 </div>
                                 <div className="bg-secondary-container/40 p-xs px-sm rounded border-l-2 border-primary">
                                   <span className="font-bold text-primary block mb-0.5">💡 Gìn giữ cội nguồn tinh thần:</span>
-                                  <span>Luôn kiêu hãnh tìm hiểu sâu sắc về lịch sử dân tộc đấu tranh kiên cường, trân trọng và bảo tồn tiếng Việt trong sáng, nâng niu kho tàng văn hóa dân gian (âm nhạc cổ truyền, trang phục, ẩm thực Việt độc đáo).</span>
+                                  <span>
+                                    Luôn kiêu hãnh tìm hiểu sâu sắc về lịch sử dân tộc đấu tranh kiên cường, trân trọng và bảo tồn tiếng Việt trong
+                                    sáng, nâng niu kho tàng văn hóa dân gian (âm nhạc cổ truyền, trang phục, ẩm thực Việt độc đáo).
+                                  </span>
                                 </div>
                                 <div className="bg-secondary-container/40 p-xs px-sm rounded border-l-2 border-primary">
                                   <span className="font-bold text-primary block mb-0.5">💡 Tinh thần chọn lọc thông thái:</span>
-                                  <span>Học hỏi cởi mở tinh hoa tri thức nhân loại một cách có chọn lọc thông minh, kiên quyết phản bác các lối sống độc hại, thờ ơ hay các luồng văn hóa lai căng, phản tiến bộ trực tuyến.</span>
+                                  <span>
+                                    Học hỏi cởi mở tinh hoa tri thức nhân loại một cách có chọn lọc thông minh, kiên quyết phản bác các lối sống độc
+                                    hại, thờ ơ hay các luồng văn hóa lai căng, phản tiến bộ trực tuyến.
+                                  </span>
                                 </div>
                               </div>
 
@@ -485,7 +730,6 @@ export default function Home() {
                                 <span>Quay lại câu hỏi ↺</span>
                               </button>
                             </div>
-
                           </div>
                         </div>
                       </div>
@@ -495,35 +739,40 @@ export default function Home() {
               )}
 
               {/* Point 1.2: Văn hóa là mục tiêu */}
-              {activePoint === 'muctieu' && (
+              {activePoint === "muctieu" && (
                 <div className="space-y-lg">
                   <div className="border-b border-outline-variant/30 pb-md">
                     <span className="text-primary font-label-md text-label-md uppercase tracking-wider block mb-xs">Luận điểm 1.2</span>
                     <h3 className="font-display-md text-display-md text-primary mb-sm">Văn hóa là mục tiêu phát triển của con người</h3>
                     <p className="font-body-lg text-body-lg text-on-surface-variant leading-relaxed">
-                      <span className="font-bold text-primary">Khái niệm cốt lõi:</span> Xây dựng một xã hội văn minh, tiến bộ, nơi mỗi con người được tạo điều kiện tối đa để phát triển toàn diện về <span className="font-bold text-primary">Đức, Trí, Thể, Mỹ</span> chính là mục tiêu, là đích đến cuối cùng của sự nghiệp cách mạng vĩ đại.
+                      <span className="font-bold text-primary">Khái niệm cốt lõi:</span> Xây dựng một xã hội văn minh, tiến bộ, nơi mỗi con người được
+                      tạo điều kiện tối đa để phát triển toàn diện về <span className="font-bold text-primary">Đức, Trí, Thể, Mỹ</span> chính là mục
+                      tiêu, là đích đến cuối cùng của sự nghiệp cách mạng vĩ đại.
                     </p>
                     <p className="font-body-md text-body-md text-on-surface-variant mt-sm">
-                      Theo Hồ Chí Minh, mục tiêu cách mạng không chỉ dừng lại ở độc lập dân tộc, mà phải đi tới xây dựng một xã hội tự do, ấm no, hạnh phúc. Nơi mà đời sống vật chất lẫn tinh thần của người dân không ngừng được nâng cao, thực hiện đúng khát khao cháy bỏng của Người: <span className="italic">"ai cũng có cơm ăn áo mặc, ai cũng được học hành"</span>, lấy con người làm trung tâm cốt lõi của sự phát triển.
+                      Theo Hồ Chí Minh, mục tiêu cách mạng không chỉ dừng lại ở độc lập dân tộc, mà phải đi tới xây dựng một xã hội tự do, ấm no, hạnh
+                      phúc. Nơi mà đời sống vật chất lẫn tinh thần của người dân không ngừng được nâng cao, thực hiện đúng khát khao cháy bỏng của
+                      Người: <span className="italic">"ai cũng có cơm ăn áo mặc, ai cũng được học hành"</span>, lấy con người làm trung tâm cốt lõi
+                      của sự phát triển.
                     </p>
                   </div>
 
                   {/* Đức - Trí - Thể - Mỹ Interactive Block */}
                   <div>
-                    <h4 className="font-headline-md text-headline-md text-on-surface mb-md">
-                      Bốn mặt phát triển toàn diện của Con người
-                    </h4>
+                    <h4 className="font-headline-md text-headline-md text-on-surface mb-md">Bốn mặt phát triển toàn diện của Con người</h4>
                     <p className="font-caption text-caption text-secondary-variant mb-sm">Nhấp vào từng khối để xem định nghĩa giá trị kinh điển:</p>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-sm">
                       <div
-                        onClick={() => setDigitalAspect(digitalAspect === 'duc_classic' ? null : 'duc_classic')}
+                        onClick={() => setDigitalAspect(digitalAspect === "duc_classic" ? null : "duc_classic")}
                         className={`p-md border rounded-lg text-center cursor-pointer transition-all duration-300 ${
-                          digitalAspect === 'duc_classic' ? 'bg-primary text-on-primary border-primary shadow-md' : 'bg-surface hover:bg-surface-container border-outline-variant/60'
+                          digitalAspect === "duc_classic"
+                            ? "bg-primary text-on-primary border-primary shadow-md"
+                            : "bg-surface hover:bg-surface-container border-outline-variant/60"
                         }`}
                       >
                         <span className="text-3xl block mb-xs">❤️</span>
                         <h5 className="font-label-md text-label-md font-bold uppercase">ĐỨC</h5>
-                        {digitalAspect === 'duc_classic' && (
+                        {digitalAspect === "duc_classic" && (
                           <p className="text-xs mt-sm text-on-primary leading-normal animate-bloom">
                             Đạo đức cách mạng, lòng nhân ái rộng mở, tính trung thực, liêm khiết và trách nhiệm xã hội cao cả.
                           </p>
@@ -531,14 +780,16 @@ export default function Home() {
                       </div>
 
                       <div
-                        onClick={() => setDigitalAspect(digitalAspect === 'tri_classic' ? null : 'tri_classic')}
+                        onClick={() => setDigitalAspect(digitalAspect === "tri_classic" ? null : "tri_classic")}
                         className={`p-md border rounded-lg text-center cursor-pointer transition-all duration-300 ${
-                          digitalAspect === 'tri_classic' ? 'bg-primary text-on-primary border-primary shadow-md' : 'bg-surface hover:bg-surface-container border-outline-variant/60'
+                          digitalAspect === "tri_classic"
+                            ? "bg-primary text-on-primary border-primary shadow-md"
+                            : "bg-surface hover:bg-surface-container border-outline-variant/60"
                         }`}
                       >
                         <span className="text-3xl block mb-xs">🧠</span>
                         <h5 className="font-label-md text-label-md font-bold uppercase">TRÍ</h5>
-                        {digitalAspect === 'tri_classic' && (
+                        {digitalAspect === "tri_classic" && (
                           <p className="text-xs mt-sm text-on-primary leading-normal animate-bloom">
                             Tri thức vững vàng, năng lực tư duy nhạy bén, tinh thần khoa học hiện đại và sự tự học suốt đời.
                           </p>
@@ -546,14 +797,16 @@ export default function Home() {
                       </div>
 
                       <div
-                        onClick={() => setDigitalAspect(digitalAspect === 'the_classic' ? null : 'the_classic')}
+                        onClick={() => setDigitalAspect(digitalAspect === "the_classic" ? null : "the_classic")}
                         className={`p-md border rounded-lg text-center cursor-pointer transition-all duration-300 ${
-                          digitalAspect === 'the_classic' ? 'bg-primary text-on-primary border-primary shadow-md' : 'bg-surface hover:bg-surface-container border-outline-variant/60'
+                          digitalAspect === "the_classic"
+                            ? "bg-primary text-on-primary border-primary shadow-md"
+                            : "bg-surface hover:bg-surface-container border-outline-variant/60"
                         }`}
                       >
                         <span className="text-3xl block mb-xs">🏃</span>
                         <h5 className="font-label-md text-label-md font-bold uppercase">THỂ</h5>
-                        {digitalAspect === 'the_classic' && (
+                        {digitalAspect === "the_classic" && (
                           <p className="text-xs mt-sm text-on-primary leading-normal animate-bloom">
                             Sức khỏe thể chất bền bỉ, thói quen thể thao rèn luyện lành mạnh và lối sống năng động, tích cực.
                           </p>
@@ -561,14 +814,16 @@ export default function Home() {
                       </div>
 
                       <div
-                        onClick={() => setDigitalAspect(digitalAspect === 'my_classic' ? null : 'my_classic')}
+                        onClick={() => setDigitalAspect(digitalAspect === "my_classic" ? null : "my_classic")}
                         className={`p-md border rounded-lg text-center cursor-pointer transition-all duration-300 ${
-                          digitalAspect === 'my_classic' ? 'bg-primary text-on-primary border-primary shadow-md' : 'bg-surface hover:bg-surface-container border-outline-variant/60'
+                          digitalAspect === "my_classic"
+                            ? "bg-primary text-on-primary border-primary shadow-md"
+                            : "bg-surface hover:bg-surface-container border-outline-variant/60"
                         }`}
                       >
                         <span className="text-3xl block mb-xs">🎨</span>
                         <h5 className="font-label-md text-label-md font-bold uppercase">MỸ</h5>
-                        {digitalAspect === 'my_classic' && (
+                        {digitalAspect === "my_classic" && (
                           <p className="text-xs mt-sm text-on-primary leading-normal animate-bloom">
                             Đời sống tinh thần phong phú, thị hiếu thẩm mỹ văn minh và khả năng cảm thụ sâu sắc cái đẹp Chân-Thiện-Mỹ.
                           </p>
@@ -592,44 +847,65 @@ export default function Home() {
                       <div className="flex-1 space-y-md">
                         <div className="flex items-center gap-sm">
                           <span className="material-symbols-outlined text-primary text-3xl">terminal</span>
-                          <h4 className="font-headline-md text-headline-md text-primary font-bold">
-                            Nếu Hồ Chí Minh sống trong thời đại số?
-                          </h4>
+                          <h4 className="font-headline-md text-headline-md text-primary font-bold">Nếu Hồ Chí Minh sống trong thời đại số?</h4>
                         </div>
                         <p className="font-body-md text-body-md text-on-surface-variant">
-                          Tư tưởng lớn của Bác luôn mang hơi thở thời đại. Khi áp dụng các giá trị nhân văn Đức - Trí - Thể - Mỹ vào kỷ nguyên số 4.0 và trí tuệ nhân tạo (AI), chúng ta sẽ có những biểu hiện đột phá nào?
+                          Tư tưởng lớn của Bác luôn mang hơi thở thời đại. Khi áp dụng các giá trị nhân văn Đức - Trí - Thể - Mỹ vào kỷ nguyên số 4.0
+                          và trí tuệ nhân tạo (AI), chúng ta sẽ có những biểu hiện đột phá nào?
                         </p>
-                        <p className="font-caption text-caption text-primary font-bold">Bấm chọn các mặt phát triển để xem chuyển đổi số của giới trẻ:</p>
+                        <p className="font-caption text-caption text-primary font-bold">
+                          Bấm chọn các mặt phát triển để xem chuyển đổi số của giới trẻ:
+                        </p>
 
                         <div className="grid grid-cols-2 gap-sm">
                           <button
-                            onClick={() => { setDigitalAspect('tri'); setShowDigitalAge(true); }}
+                            onClick={() => {
+                              setDigitalAspect("tri");
+                              setShowDigitalAge(true);
+                            }}
                             className={`p-sm font-label-md text-label-md rounded-lg flex items-center justify-center gap-xs transition-all ${
-                              digitalAspect === 'tri' ? 'bg-primary text-on-primary shadow-md scale-102' : 'bg-surface hover:bg-surface-container-high border border-outline-variant text-on-surface'
+                              digitalAspect === "tri"
+                                ? "bg-primary text-on-primary shadow-md scale-102"
+                                : "bg-surface hover:bg-surface-container-high border border-outline-variant text-on-surface"
                             }`}
                           >
                             <span>🧠 Trí</span>
                           </button>
                           <button
-                            onClick={() => { setDigitalAspect('duc'); setShowDigitalAge(true); }}
+                            onClick={() => {
+                              setDigitalAspect("duc");
+                              setShowDigitalAge(true);
+                            }}
                             className={`p-sm font-label-md text-label-md rounded-lg flex items-center justify-center gap-xs transition-all ${
-                              digitalAspect === 'duc' ? 'bg-primary text-on-primary shadow-md scale-102' : 'bg-surface hover:bg-surface-container-high border border-outline-variant text-on-surface'
+                              digitalAspect === "duc"
+                                ? "bg-primary text-on-primary shadow-md scale-102"
+                                : "bg-surface hover:bg-surface-container-high border border-outline-variant text-on-surface"
                             }`}
                           >
                             <span>❤️ Đức</span>
                           </button>
                           <button
-                            onClick={() => { setDigitalAspect('the'); setShowDigitalAge(true); }}
+                            onClick={() => {
+                              setDigitalAspect("the");
+                              setShowDigitalAge(true);
+                            }}
                             className={`p-sm font-label-md text-label-md rounded-lg flex items-center justify-center gap-xs transition-all ${
-                              digitalAspect === 'the' ? 'bg-primary text-on-primary shadow-md scale-102' : 'bg-surface hover:bg-surface-container-high border border-outline-variant text-on-surface'
+                              digitalAspect === "the"
+                                ? "bg-primary text-on-primary shadow-md scale-102"
+                                : "bg-surface hover:bg-surface-container-high border border-outline-variant text-on-surface"
                             }`}
                           >
                             <span>🏃 Thể</span>
                           </button>
                           <button
-                            onClick={() => { setDigitalAspect('my'); setShowDigitalAge(true); }}
+                            onClick={() => {
+                              setDigitalAspect("my");
+                              setShowDigitalAge(true);
+                            }}
                             className={`p-sm font-label-md text-label-md rounded-lg flex items-center justify-center gap-xs transition-all ${
-                              digitalAspect === 'my' ? 'bg-primary text-on-primary shadow-md scale-102' : 'bg-surface hover:bg-surface-container-high border border-outline-variant text-on-surface'
+                              digitalAspect === "my"
+                                ? "bg-primary text-on-primary shadow-md scale-102"
+                                : "bg-surface hover:bg-surface-container-high border border-outline-variant text-on-surface"
                             }`}
                           >
                             <span>🎨 Mỹ</span>
@@ -637,44 +913,48 @@ export default function Home() {
                         </div>
 
                         {/* Display message based on clicked digital aspect */}
-                        {showDigitalAge && digitalAspect && ['tri', 'duc', 'the', 'my'].includes(digitalAspect) && (
+                        {showDigitalAge && digitalAspect && ["tri", "duc", "the", "my"].includes(digitalAspect) && (
                           <div className="bg-surface p-md rounded-lg border-l-4 border-primary shadow-sm animate-bloom mt-md">
-                            {digitalAspect === 'tri' && (
+                            {digitalAspect === "tri" && (
                               <div>
                                 <h5 className="font-label-md text-label-md text-primary font-bold uppercase mb-xs">🧠 Trí thời đại số</h5>
                                 <p className="font-body-md text-body-md text-on-surface-variant font-medium">
-                                  "Học tập suốt đời, chủ động tự học sâu sắc và làm chủ hoàn toàn các công cụ AI, công nghệ số để phục vụ lý tưởng tốt đẹp."
+                                  "Học tập suốt đời, chủ động tự học sâu sắc và làm chủ hoàn toàn các công cụ AI, công nghệ số để phục vụ lý tưởng tốt
+                                  đẹp."
                                 </p>
                               </div>
                             )}
-                            {digitalAspect === 'duc' && (
+                            {digitalAspect === "duc" && (
                               <div>
                                 <h5 className="font-label-md text-label-md text-primary font-bold uppercase mb-xs">❤️ Đức thời đại số</h5>
                                 <p className="font-body-md text-body-md text-on-surface-variant font-medium">
-                                  "Ứng xử cực kỳ văn minh, trách nhiệm trên không gian mạng xã hội, lên tiếng chống bắt nạt online và bài trừ tin giả tiêu cực."
+                                  "Ứng xử cực kỳ văn minh, trách nhiệm trên không gian mạng xã hội, lên tiếng chống bắt nạt online và bài trừ tin giả
+                                  tiêu cực."
                                 </p>
                               </div>
                             )}
-                            {digitalAspect === 'the' && (
+                            {digitalAspect === "the" && (
                               <div>
                                 <h5 className="font-label-md text-label-md text-primary font-bold uppercase mb-xs">🏃 Thể thời đại số</h5>
                                 <p className="font-body-md text-body-md text-on-surface-variant font-medium">
-                                  "Không chỉ khỏe mạnh về cơ bắp, mà luôn chú trọng chăm sóc rèn luyện sức khỏe tinh thần lành mạnh trước áp lực số hóa khổng lồ."
+                                  "Không chỉ khỏe mạnh về cơ bắp, mà luôn chú trọng chăm sóc rèn luyện sức khỏe tinh thần lành mạnh trước áp lực số
+                                  hóa khổng lồ."
                                 </p>
                               </div>
                             )}
-                            {digitalAspect === 'my' && (
+                            {digitalAspect === "my" && (
                               <div>
                                 <h5 className="font-label-md text-label-md text-primary font-bold uppercase mb-xs">🎨 Mỹ thời đại số</h5>
                                 <p className="font-body-md text-body-md text-on-surface-variant font-medium">
-                                  "Xây dựng một đời sống tinh thần phong phú, lành mạnh trên mạng; tiếp nhận chủ động và chọn lọc thông minh các luồng văn hóa thế giới."
+                                  "Xây dựng một đời sống tinh thần phong phú, lành mạnh trên mạng; tiếp nhận chủ động và chọn lọc thông minh các luồng
+                                  văn hóa thế giới."
                                 </p>
                               </div>
                             )}
                           </div>
                         )}
                       </div>
-                      
+
                       {/* Premium AI Generated Image Display */}
                       <div className="w-full lg:w-72 flex-shrink-0">
                         <div className="relative group rounded-lg overflow-hidden border border-outline-variant shadow-lg bg-surface">
@@ -684,7 +964,9 @@ export default function Home() {
                             src={digitalAgeImg}
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/75 to-transparent flex flex-col justify-end p-sm">
-                            <span className="font-label-md text-label-md text-on-primary-container font-bold text-xs uppercase">Di sản trong kỷ nguyên số</span>
+                            <span className="font-label-md text-label-md text-on-primary-container font-bold text-xs uppercase">
+                              Di sản trong kỷ nguyên số
+                            </span>
                             <p className="font-caption text-caption text-white/90 text-[11px] leading-tight mt-xs">
                               Sự giao thoa hoàn mỹ giữa đóa sen truyền thống kiêu hãnh và các tinh hoa công nghệ AI toàn cầu.
                             </p>
@@ -696,10 +978,10 @@ export default function Home() {
 
                   {/* 5 Gen Z Accordion links */}
                   <div>
-                    <h4 className="font-headline-md text-headline-md text-on-surface mb-md">
-                      Tư tưởng "Trồng Người" và Kết Nối Gen Z thời đại 4.0
-                    </h4>
-                    <p className="font-caption text-caption text-secondary-variant mb-base">Nhấp vào từng tiêu đề (LH1 - LH5) để mở rộng bài học thực tiễn:</p>
+                    <h4 className="font-headline-md text-headline-md text-on-surface mb-md">Tư tưởng "Trồng Người" và Kết Nối Gen Z thời đại 4.0</h4>
+                    <p className="font-caption text-caption text-secondary-variant mb-base">
+                      Nhấp vào từng tiêu đề (LH1 - LH5) để mở rộng bài học thực tiễn:
+                    </p>
                     <div className="space-y-sm">
                       {/* LH1 */}
                       <div className="border border-outline-variant/60 rounded-lg overflow-hidden bg-surface">
@@ -711,13 +993,14 @@ export default function Home() {
                             LH1: "Trồng người" – Đầu tư dài hạn cho tương lai dân tộc
                           </span>
                           <span className="material-symbols-outlined transition-transform duration-300 text-primary">
-                            {activeLH === 1 ? 'expand_less' : 'expand_more'}
+                            {activeLH === 1 ? "expand_less" : "expand_more"}
                           </span>
                         </div>
                         {activeLH === 1 && (
                           <div className="p-md bg-surface-container-lowest border-t border-outline-variant/30 text-on-surface-variant font-body-md text-body-md space-y-sm animate-bloom">
                             <p>
-                              Hồ Chí Minh đặt con người là vốn quý nhất của quốc gia. Muốn xây dựng quốc gia bền vững, việc đầu tiên cần chú trọng chính là giáo dục nâng tầm và bồi dưỡng chiều sâu thế hệ trẻ.
+                              Hồ Chí Minh đặt con người là vốn quý nhất của quốc gia. Muốn xây dựng quốc gia bền vững, việc đầu tiên cần chú trọng
+                              chính là giáo dục nâng tầm và bồi dưỡng chiều sâu thế hệ trẻ.
                             </p>
                             <p className="font-bold text-primary">⚡ Kết nối Gen Z:</p>
                             <ul className="list-disc pl-md space-y-xs">
@@ -739,13 +1022,15 @@ export default function Home() {
                             LH2: Đạo đức – Nền móng vững chãi của một xã hội văn minh
                           </span>
                           <span className="material-symbols-outlined transition-transform duration-300 text-primary">
-                            {activeLH === 2 ? 'expand_less' : 'expand_more'}
+                            {activeLH === 2 ? "expand_less" : "expand_more"}
                           </span>
                         </div>
                         {activeLH === 2 && (
                           <div className="p-md bg-surface-container-lowest border-t border-outline-variant/30 text-on-surface-variant font-body-md text-body-md space-y-sm animate-bloom">
                             <p>
-                              Đạo đức chính là "gốc rễ" sâu xa của nhân cách con người. Một xã hội văn minh thực sự không chỉ đòi hỏi những người tài giỏi vượt trội mà cốt yếu cần những người có phông văn hóa đạo đức tốt đẹp: Trung thực, Trách nhiệm, Yêu thương đồng loại, Cần, Kiệm, Liêm, Chính.
+                              Đạo đức chính là "gốc rễ" sâu xa của nhân cách con người. Một xã hội văn minh thực sự không chỉ đòi hỏi những người tài
+                              giỏi vượt trội mà cốt yếu cần những người có phông văn hóa đạo đức tốt đẹp: Trung thực, Trách nhiệm, Yêu thương đồng
+                              loại, Cần, Kiệm, Liêm, Chính.
                             </p>
                             <p className="font-bold text-primary">🌐 Đối thoại Gen Z trong môi trường số:</p>
                             <ul className="list-disc pl-md space-y-xs">
@@ -755,7 +1040,10 @@ export default function Home() {
                             </ul>
                             <div className="bg-primary/5 p-sm rounded border border-primary/20 mt-sm">
                               <p className="font-semibold text-primary">❓ Câu hỏi mở suy ngẫm:</p>
-                              <p className="italic">Một người vô cùng tài giỏi nhưng lại thiếu thốn tinh thần trách nhiệm và lòng trung thực liệu có thể coi là thành công thực sự hay không?</p>
+                              <p className="italic">
+                                Một người vô cùng tài giỏi nhưng lại thiếu thốn tinh thần trách nhiệm và lòng trung thực liệu có thể coi là thành công
+                                thực sự hay không?
+                              </p>
                             </div>
                           </div>
                         )}
@@ -767,17 +1055,16 @@ export default function Home() {
                           onClick={() => setActiveLH(activeLH === 3 ? null : 3)}
                           className="flex justify-between items-center p-md cursor-pointer hover:bg-surface-container-low transition-colors"
                         >
-                          <span className="font-body-md text-body-md text-primary font-bold">
-                            LH3: Giáo dục – Chìa khóa vàng khai mở bản thân
-                          </span>
+                          <span className="font-body-md text-body-md text-primary font-bold">LH3: Giáo dục – Chìa khóa vàng khai mở bản thân</span>
                           <span className="material-symbols-outlined transition-transform duration-300 text-primary">
-                            {activeLH === 3 ? 'expand_less' : 'expand_more'}
+                            {activeLH === 3 ? "expand_less" : "expand_more"}
                           </span>
                         </div>
                         {activeLH === 3 && (
                           <div className="p-md bg-surface-container-lowest border-t border-outline-variant/30 text-on-surface-variant font-body-md text-body-md space-y-sm animate-bloom">
                             <p>
-                              Bác Hồ đề cao dân trí và khao khát: "Ai cũng được học hành." Giáo dục là nấc thang mở rộng tri thức, nâng tầm năng lực lao động sáng tạo, bồi đắp nhân cách tử tế và kiến tạo cơ hội phát triển công bằng cho toàn dân.
+                              Bác Hồ đề cao dân trí và khao khát: "Ai cũng được học hành." Giáo dục là nấc thang mở rộng tri thức, nâng tầm năng lực
+                              lao động sáng tạo, bồi đắp nhân cách tử tế và kiến tạo cơ hội phát triển công bằng cho toàn dân.
                             </p>
                             <p className="font-bold text-primary">⚡ Kết nối Gen Z:</p>
                             <ul className="list-disc pl-md space-y-xs">
@@ -798,13 +1085,14 @@ export default function Home() {
                             LH4: Văn hóa đời sống – Khởi nguồn từ những hành động nhỏ nhặt
                           </span>
                           <span className="material-symbols-outlined transition-transform duration-300 text-primary">
-                            {activeLH === 4 ? 'expand_less' : 'expand_more'}
+                            {activeLH === 4 ? "expand_less" : "expand_more"}
                           </span>
                         </div>
                         {activeLH === 4 && (
                           <div className="p-md bg-surface-container-lowest border-t border-outline-variant/30 text-on-surface-variant font-body-md text-body-md space-y-sm animate-bloom">
                             <p>
-                              Xây dựng văn hóa không nằm ở những khẩu hiệu vĩ mô xa vời mà thể hiện rõ nét ngay trong cách ứng xử, lối sống sinh hoạt nhỏ nhặt hàng ngày của mỗi cá nhân: biết sống vì cộng đồng, tôn trọng người khác, tiết kiệm, kỷ luật.
+                              Xây dựng văn hóa không nằm ở những khẩu hiệu vĩ mô xa vời mà thể hiện rõ nét ngay trong cách ứng xử, lối sống sinh hoạt
+                              nhỏ nhặt hàng ngày của mỗi cá nhân: biết sống vì cộng đồng, tôn trọng người khác, tiết kiệm, kỷ luật.
                             </p>
                             <p className="font-bold text-primary">☘️ Lối sống văn minh Gen Z ngày nay:</p>
                             <ul className="list-disc pl-md space-y-xs">
@@ -813,7 +1101,10 @@ export default function Home() {
                             </ul>
                             <div className="bg-primary/5 p-sm rounded border border-primary/20 mt-sm">
                               <p className="font-semibold text-primary">❓ Câu hỏi mở suy ngẫm:</p>
-                              <p className="italic">Bạn có tin rằng mình đang góp phần kiến tạo một xã hội văn minh vượt bậc từ chính những thói quen hành động nhỏ bé tử tế mỗi ngày không?</p>
+                              <p className="italic">
+                                Bạn có tin rằng mình đang góp phần kiến tạo một xã hội văn minh vượt bậc từ chính những thói quen hành động nhỏ bé tử
+                                tế mỗi ngày không?
+                              </p>
                             </div>
                           </div>
                         )}
@@ -829,17 +1120,19 @@ export default function Home() {
                             LH5: Hạnh phúc đích thực của Con người là đích đến sau cùng
                           </span>
                           <span className="material-symbols-outlined transition-transform duration-300 text-primary">
-                            {activeLH === 5 ? 'expand_less' : 'expand_more'}
+                            {activeLH === 5 ? "expand_less" : "expand_more"}
                           </span>
                         </div>
                         {activeLH === 5 && (
                           <div className="p-md bg-surface-container-lowest border-t border-outline-variant/30 text-on-surface-variant font-body-md text-body-md space-y-sm animate-bloom">
                             <p>
-                              Bác Hồ từng nhấn mạnh nền độc lập tự do chỉ thực sự trọn vẹn và có ý nghĩa thiêng liêng khi mang lại cho toàn dân cuộc sống cơm no áo ấm, bình yên và hạnh phúc trọn vẹn. Con người chính là mục tiêu phụng sự sau cùng của cách mạng.
+                              Bác Hồ từng nhấn mạnh nền độc lập tự do chỉ thực sự trọn vẹn và có ý nghĩa thiêng liêng khi mang lại cho toàn dân cuộc
+                              sống cơm no áo ấm, bình yên và hạnh phúc trọn vẹn. Con người chính là mục tiêu phụng sự sau cùng của cách mạng.
                             </p>
                             <p className="font-bold text-primary">⚡ Trải nghiệm Hạnh phúc Gen Z hiện đại:</p>
                             <p>
-                              Trong vòng xoay áp lực xã hội hiện đại, hạnh phúc đích thực không chỉ giới hạn ở tiền tài hay thành công vật chất, mà cốt yếu nằm ở:
+                              Trong vòng xoay áp lực xã hội hiện đại, hạnh phúc đích thực không chỉ giới hạn ở tiền tài hay thành công vật chất, mà
+                              cốt yếu nằm ở:
                             </p>
                             <ul className="list-disc pl-md space-y-xs">
                               <li>Sức khỏe tâm hồn thư thái, bình yên.</li>
@@ -848,7 +1141,10 @@ export default function Home() {
                             </ul>
                             <div className="bg-primary/5 p-sm rounded border border-primary/20 mt-sm">
                               <p className="font-semibold text-primary">❓ Câu hỏi mở suy ngẫm:</p>
-                              <p className="italic">Một xã hội sở hữu gia sản kinh tế cực kỳ giàu có nhưng trong lòng nhiều người lại cô đơn và trầm cảm nặng nề, thì liệu đó có thể gọi là một xã hội thực sự hạnh phúc?</p>
+                              <p className="italic">
+                                Một xã hội sở hữu gia sản kinh tế cực kỳ giàu có nhưng trong lòng nhiều người lại cô đơn và trầm cảm nặng nề, thì liệu
+                                đó có thể gọi là một xã hội thực sự hạnh phúc?
+                              </p>
                             </div>
                           </div>
                         )}
@@ -859,16 +1155,20 @@ export default function Home() {
               )}
 
               {/* Point 1.3: Đời sống văn hóa mới */}
-              {activePoint === 'doisongmoi' && (
+              {activePoint === "doisongmoi" && (
                 <div className="space-y-lg">
                   <div className="border-b border-outline-variant/30 pb-md">
                     <span className="text-primary font-label-md text-label-md uppercase tracking-wider block mb-xs">Luận điểm 1.3</span>
                     <h3 className="font-display-md text-display-md text-primary mb-sm">Xây dựng đời sống văn hóa mới văn minh, tiến bộ</h3>
                     <p className="font-body-lg text-body-lg text-on-surface-variant leading-relaxed">
-                      <span className="font-bold text-primary">Khái quát luận điểm:</span> Theo Hồ Chí Minh, xây dựng đời sống văn hóa mới là cuộc cách mạng bền bỉ nhằm loại bỏ triệt để những hủ tục, thói quen lạc hậu cũ để bồi đắp, kiến tạo một lối sống khoa học, cần kiệm, liêm chính, phù hợp với sự tiến bộ của xã hội mới.
+                      <span className="font-bold text-primary">Khái quát luận điểm:</span> Theo Hồ Chí Minh, xây dựng đời sống văn hóa mới là cuộc
+                      cách mạng bền bỉ nhằm loại bỏ triệt để những hủ tục, thói quen lạc hậu cũ để bồi đắp, kiến tạo một lối sống khoa học, cần kiệm,
+                      liêm chính, phù hợp với sự tiến bộ của xã hội mới.
                     </p>
                     <p className="font-body-md text-body-md text-on-surface-variant mt-sm">
-                      <span className="font-bold">Vì sao cần thiết?</span> Độc lập chính trị phải song hành cùng sự văn minh tinh thần. Những thói hư tật xấu, hủ tục cổ hủ trì trệ sẽ níu chân xã hội phát triển. Muốn chấn hưng đất nước văn minh, quyết định đầu tiên là phải bồi dưỡng rèn luyện nên những con người văn minh thực thụ.
+                      <span className="font-bold">Vì sao cần thiết?</span> Độc lập chính trị phải song hành cùng sự văn minh tinh thần. Những thói hư
+                      tật xấu, hủ tục cổ hủ trì trệ sẽ níu chân xã hội phát triển. Muốn chấn hưng đất nước văn minh, quyết định đầu tiên là phải bồi
+                      dưỡng rèn luyện nên những con người văn minh thực thụ.
                     </p>
                   </div>
 
@@ -882,12 +1182,24 @@ export default function Home() {
                       Bác Hồ thẳng thắn chỉ rõ và phê phán gay gắt các thói hư tật xấu kìm hãm nhân cách xã hội:
                     </p>
                     <div className="flex flex-wrap gap-xs">
-                      <span className="bg-surface border border-error/20 text-error font-label-md text-xs px-sm py-xs rounded-full">🚫 Mê tín dị đoan</span>
-                      <span className="bg-surface border border-error/20 text-error font-label-md text-xs px-sm py-xs rounded-full">🚫 Lười lao động</span>
-                      <span className="bg-surface border border-error/20 text-error font-label-md text-xs px-sm py-xs rounded-full">🚫 Tham ô lãng phí</span>
-                      <span className="bg-surface border border-error/20 text-error font-label-md text-xs px-sm py-xs rounded-full">🚫 Quan liêu hách dịch</span>
-                      <span className="bg-surface border border-error/20 text-error font-label-md text-xs px-sm py-xs rounded-full">🚫 Xa hoa, hình thức trống rỗng</span>
-                      <span className="bg-surface border border-error/20 text-error font-label-md text-xs px-sm py-xs rounded-full">🚫 Hủ tục cổ hủ trong sinh hoạt</span>
+                      <span className="bg-surface border border-error/20 text-error font-label-md text-xs px-sm py-xs rounded-full">
+                        🚫 Mê tín dị đoan
+                      </span>
+                      <span className="bg-surface border border-error/20 text-error font-label-md text-xs px-sm py-xs rounded-full">
+                        🚫 Lười lao động
+                      </span>
+                      <span className="bg-surface border border-error/20 text-error font-label-md text-xs px-sm py-xs rounded-full">
+                        🚫 Tham ô lãng phí
+                      </span>
+                      <span className="bg-surface border border-error/20 text-error font-label-md text-xs px-sm py-xs rounded-full">
+                        🚫 Quan liêu hách dịch
+                      </span>
+                      <span className="bg-surface border border-error/20 text-error font-label-md text-xs px-sm py-xs rounded-full">
+                        🚫 Xa hoa, hình thức trống rỗng
+                      </span>
+                      <span className="bg-surface border border-error/20 text-error font-label-md text-xs px-sm py-xs rounded-full">
+                        🚫 Hủ tục cổ hủ trong sinh hoạt
+                      </span>
                     </div>
                     <p className="font-caption text-caption text-secondary mt-sm italic">
                       Ý nghĩa: Những tệ nạn, thói quen lạc hậu này trực tiếp tàn phá đạo đức con người và kìm hãm sự trỗi dậy của đất nước.
@@ -913,7 +1225,9 @@ export default function Home() {
                           <span className="text-3xl block mb-xs">💰</span>
                           <h5 className="font-label-md text-label-md text-primary font-bold uppercase mb-xs">Kiệm</h5>
                         </div>
-                        <p className="font-caption text-caption text-on-surface-variant">Tiết kiệm thời gian, tiền bạc, tài sản công, tránh xa lãng phí hình thức.</p>
+                        <p className="font-caption text-caption text-on-surface-variant">
+                          Tiết kiệm thời gian, tiền bạc, tài sản công, tránh xa lãng phí hình thức.
+                        </p>
                       </div>
 
                       <div className="bg-surface-container-low p-sm border border-outline-variant/40 rounded-lg hover:border-primary transition-all duration-300 text-center flex flex-col justify-between">
@@ -921,7 +1235,9 @@ export default function Home() {
                           <span className="text-3xl block mb-xs">🤝</span>
                           <h5 className="font-label-md text-label-md text-primary font-bold uppercase mb-xs">Liêm</h5>
                         </div>
-                        <p className="font-caption text-caption text-on-surface-variant">Trung thực tuyệt đối, giữ tâm hồn trong sạch, không tham lam vị ích.</p>
+                        <p className="font-caption text-caption text-on-surface-variant">
+                          Trung thực tuyệt đối, giữ tâm hồn trong sạch, không tham lam vị ích.
+                        </p>
                       </div>
 
                       <div className="bg-surface-container-low p-sm border border-outline-variant/40 rounded-lg hover:border-primary transition-all duration-300 text-center flex flex-col justify-between">
@@ -929,7 +1245,9 @@ export default function Home() {
                           <span className="text-3xl block mb-xs">⚖️</span>
                           <h5 className="font-label-md text-label-md text-primary font-bold uppercase mb-xs">Chính</h5>
                         </div>
-                        <p className="font-caption text-caption text-on-surface-variant">Ngay thẳng, trượng nghĩa, bảo vệ công lý và tôn trọng sự thật.</p>
+                        <p className="font-caption text-caption text-on-surface-variant">
+                          Ngay thẳng, trượng nghĩa, bảo vệ công lý và tôn trọng sự thật.
+                        </p>
                       </div>
 
                       <div className="col-span-2 md:col-span-1 bg-primary/5 p-sm border border-primary/20 rounded-lg hover:border-primary transition-all duration-300 text-center flex flex-col justify-between">
@@ -937,7 +1255,9 @@ export default function Home() {
                           <span className="text-3xl block mb-xs">🎯</span>
                           <h5 className="font-label-md text-label-md text-primary font-bold uppercase mb-xs">Trách nhiệm</h5>
                         </div>
-                        <p className="font-caption text-caption text-on-surface-variant">Có trách nhiệm với bản thân, cộng đồng xã hội và tiền đồ Tổ quốc.</p>
+                        <p className="font-caption text-caption text-on-surface-variant">
+                          Có trách nhiệm với bản thân, cộng đồng xã hội và tiền đồ Tổ quốc.
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -975,9 +1295,15 @@ export default function Home() {
                     </p>
                     <div className="flex flex-wrap gap-xs mt-xs text-xs font-semibold text-tertiary">
                       <span className="bg-surface px-sm py-xs rounded-full border border-tertiary/20">🌟 Tinh thần tự học suốt đời</span>
-                      <span className="bg-surface px-sm py-xs rounded-full border border-tertiary/20">🌟 Phong trào tình nguyện tích cực vì cộng đồng</span>
-                      <span className="bg-surface px-sm py-xs rounded-full border border-tertiary/20">🌟 Ý thức bảo vệ môi trường, giảm thiểu rác thải</span>
-                      <span className="bg-surface px-sm py-xs rounded-full border border-tertiary/20">🌟 Chia sẻ kiến thức rộng rãi, giúp đỡ bạn bè</span>
+                      <span className="bg-surface px-sm py-xs rounded-full border border-tertiary/20">
+                        🌟 Phong trào tình nguyện tích cực vì cộng đồng
+                      </span>
+                      <span className="bg-surface px-sm py-xs rounded-full border border-tertiary/20">
+                        🌟 Ý thức bảo vệ môi trường, giảm thiểu rác thải
+                      </span>
+                      <span className="bg-surface px-sm py-xs rounded-full border border-tertiary/20">
+                        🌟 Chia sẻ kiến thức rộng rãi, giúp đỡ bạn bè
+                      </span>
                     </div>
                   </div>
 
@@ -990,7 +1316,8 @@ export default function Home() {
                       </h4>
                     </div>
                     <p className="font-body-md text-body-md text-on-surface-variant mb-md">
-                      Hãy trả lời 2 câu hỏi tình huống siêu nhỏ dưới đây để xem mức độ hòa nhịp của lối sống của bạn đối với tư tưởng Cần - Kiệm - Liêm - Chính của Bác nhé!
+                      Hãy trả lời 2 câu hỏi tình huống siêu nhỏ dưới đây để xem mức độ hòa nhịp của lối sống của bạn đối với tư tưởng Cần - Kiệm -
+                      Liêm - Chính của Bác nhé!
                     </p>
 
                     <div className="space-y-md">
@@ -1001,17 +1328,21 @@ export default function Home() {
                         </p>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-sm">
                           <button
-                            onClick={() => setQuizQ1('A')}
+                            onClick={() => setQuizQ1("A")}
                             className={`p-sm rounded-lg text-left transition-all text-sm font-medium ${
-                              quizQ1 === 'A' ? 'bg-primary text-on-primary shadow-xs' : 'bg-surface-container-low hover:bg-surface-container-high text-on-surface'
+                              quizQ1 === "A"
+                                ? "bg-primary text-on-primary shadow-xs"
+                                : "bg-surface-container-low hover:bg-surface-container-high text-on-surface"
                             }`}
                           >
                             <span>A. Mua ngay món đồ đang hot từ lâu vì "thích là phải nhích"!</span>
                           </button>
                           <button
-                            onClick={() => setQuizQ1('B')}
+                            onClick={() => setQuizQ1("B")}
                             className={`p-sm rounded-lg text-left transition-all text-sm font-medium ${
-                              quizQ1 === 'B' ? 'bg-primary text-on-primary shadow-xs' : 'bg-surface-container-low hover:bg-surface-container-high text-on-surface'
+                              quizQ1 === "B"
+                                ? "bg-primary text-on-primary shadow-xs"
+                                : "bg-surface-container-low hover:bg-surface-container-high text-on-surface"
                             }`}
                           >
                             <span>B. Cân nhắc kỹ lưỡng nhu cầu thực tế rồi mới phân bổ chi tiêu thông minh.</span>
@@ -1026,17 +1357,21 @@ export default function Home() {
                         </p>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-sm">
                           <button
-                            onClick={() => setQuizQ2('A')}
+                            onClick={() => setQuizQ2("A")}
                             className={`p-sm rounded-lg text-left transition-all text-sm font-medium ${
-                              quizQ2 === 'A' ? 'bg-primary text-on-primary shadow-xs' : 'bg-surface-container-low hover:bg-surface-container-high text-on-surface'
+                              quizQ2 === "A"
+                                ? "bg-primary text-on-primary shadow-xs"
+                                : "bg-surface-container-low hover:bg-surface-container-high text-on-surface"
                             }`}
                           >
                             <span>A. Lập tức tranh cãi gay gắt nảy lửa hoặc công kích cá nhân để bảo vệ lý lẽ.</span>
                           </button>
                           <button
-                            onClick={() => setQuizQ2('B')}
+                            onClick={() => setQuizQ2("B")}
                             className={`p-sm rounded-lg text-left transition-all text-sm font-medium ${
-                              quizQ2 === 'B' ? 'bg-primary text-on-primary shadow-xs' : 'bg-surface-container-low hover:bg-surface-container-high text-on-surface'
+                              quizQ2 === "B"
+                                ? "bg-primary text-on-primary shadow-xs"
+                                : "bg-surface-container-low hover:bg-surface-container-high text-on-surface"
                             }`}
                           >
                             <span>B. Tôn trọng góc nhìn khác biệt, bình tĩnh trao đổi cực kỳ văn minh, thiện chí.</span>
@@ -1049,20 +1384,26 @@ export default function Home() {
                         <div className="bg-primary/5 p-lg rounded-xl border border-primary/20 shadow-inner space-y-md animate-bloom">
                           <div className="flex items-center gap-xs border-b border-primary/20 pb-xs">
                             <span className="material-symbols-outlined text-primary">verified</span>
-                            <span className="font-label-md text-label-md text-primary font-bold uppercase tracking-wider">Đánh giá Lối sống của Bác dành cho bạn</span>
+                            <span className="font-label-md text-label-md text-primary font-bold uppercase tracking-wider">
+                              Đánh giá Lối sống của Bác dành cho bạn
+                            </span>
                           </div>
 
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-md text-sm">
                             {/* Q1 Answer Detail */}
                             <div className="space-y-xs">
                               <p className="font-bold text-primary">Về Chi tiêu (Q1):</p>
-                              {quizQ1 === 'A' ? (
+                              {quizQ1 === "A" ? (
                                 <p className="text-on-surface-variant leading-relaxed">
-                                  Bạn có xu hướng tiêu dùng nghiêng nhiều về cảm xúc tức thời. Bác luôn đề cao đức tính <span className="font-bold text-primary">KIỆM</span> - không phải hà tiện kiệt sỉ mà là biết cách quản lý tiền bạc khoa học, hợp lý, tránh lãng phí tiền bạc vào việc chạy theo xu hướng hình thức trống rỗng.
+                                  Bạn có xu hướng tiêu dùng nghiêng nhiều về cảm xúc tức thời. Bác luôn đề cao đức tính{" "}
+                                  <span className="font-bold text-primary">KIỆM</span> - không phải hà tiện kiệt sỉ mà là biết cách quản lý tiền bạc
+                                  khoa học, hợp lý, tránh lãng phí tiền bạc vào việc chạy theo xu hướng hình thức trống rỗng.
                                 </p>
                               ) : (
                                 <p className="text-on-surface-variant leading-relaxed">
-                                  Tuyệt vời! Bạn đang thực hành xuất sắc đức tính <span className="font-bold text-primary">KIỆM</span> của Bác trong đời sống thường nhật. Biết chi dùng hợp lý, có trách nhiệm với thành quả lao động chính là biểu hiện văn hóa chi tiêu thông thái.
+                                  Tuyệt vời! Bạn đang thực hành xuất sắc đức tính <span className="font-bold text-primary">KIỆM</span> của Bác trong
+                                  đời sống thường nhật. Biết chi dùng hợp lý, có trách nhiệm với thành quả lao động chính là biểu hiện văn hóa chi
+                                  tiêu thông thái.
                                 </p>
                               )}
                             </div>
@@ -1070,13 +1411,15 @@ export default function Home() {
                             {/* Q2 Answer Detail */}
                             <div className="space-y-xs">
                               <p className="font-bold text-primary">Về Ứng xử (Q2):</p>
-                              {quizQ2 === 'A' ? (
+                              {quizQ2 === "A" ? (
                                 <p className="text-on-surface-variant leading-relaxed">
-                                  Bạn đang phản ứng theo cảm xúc nỏng nảy tức thời. Bác luôn răn dạy tinh thần tôn trọng, chân thành và đoàn kết tương ái làm gốc. Văn hóa ứng xử giao tiếp chuẩn mực, khôn khéo chính là linh hồn cốt lõi của đời sống văn hóa mới.
+                                  Bạn đang phản ứng theo cảm xúc nỏng nảy tức thời. Bác luôn răn dạy tinh thần tôn trọng, chân thành và đoàn kết tương
+                                  ái làm gốc. Văn hóa ứng xử giao tiếp chuẩn mực, khôn khéo chính là linh hồn cốt lõi của đời sống văn hóa mới.
                                 </p>
                               ) : (
                                 <p className="text-on-surface-variant leading-relaxed">
-                                  Tuyệt vời! Bạn đang chưng cất hoàn hảo đức tính <span className="font-bold text-primary">CHÍNH</span> - luôn ngay thẳng, biết tôn trọng người khác, giữ thái độ ôn hòa và ứng xử có chừng mực văn minh trên không gian số.
+                                  Tuyệt vời! Bạn đang chưng cất hoàn hảo đức tính <span className="font-bold text-primary">CHÍNH</span> - luôn ngay
+                                  thẳng, biết tôn trọng người khác, giữ thái độ ôn hòa và ứng xử có chừng mực văn minh trên không gian số.
                                 </p>
                               )}
                             </div>
@@ -1086,22 +1429,25 @@ export default function Home() {
                           <div className="flex flex-col items-center justify-center pt-md border-t border-primary/10">
                             <div className="wax-seal text-on-primary font-bold text-sm px-lg py-md rounded-full shadow-lg text-center flex flex-col items-center justify-center select-none rotate-2">
                               <span className="text-xs uppercase tracking-widest text-on-primary/80">Ký ức Văn hóa</span>
-                              {quizQ1 === 'B' && quizQ2 === 'B' && (
+                              {quizQ1 === "B" && quizQ2 === "B" && (
                                 <span className="font-serif text-lg font-bold mt-xs">🏆 Tấm Gương Sáng Cần Kiệm Liêm Chính!</span>
                               )}
-                              {quizQ1 === 'B' && quizQ2 === 'A' && (
+                              {quizQ1 === "B" && quizQ2 === "A" && (
                                 <span className="font-serif text-lg font-bold mt-xs">🌱 Cần rèn thêm tinh thần CHÍNH (Ứng xử số)</span>
                               )}
-                              {quizQ1 === 'A' && quizQ2 === 'B' && (
+                              {quizQ1 === "A" && quizQ2 === "B" && (
                                 <span className="font-serif text-lg font-bold mt-xs">🌱 Cần rèn thêm tinh thần KIỆM (Tiết kiệm chi tiêu)</span>
                               )}
-                              {quizQ1 === 'A' && quizQ2 === 'A' && (
+                              {quizQ1 === "A" && quizQ2 === "A" && (
                                 <span className="font-serif text-lg font-bold mt-xs">⚠️ Hãy tự ngẫm thêm về chữ KIỆM và CHÍNH!</span>
                               )}
                             </div>
-                            
+
                             <button
-                              onClick={() => { setQuizQ1(null); setQuizQ2(null); }}
+                              onClick={() => {
+                                setQuizQ1(null);
+                                setQuizQ2(null);
+                              }}
                               className="mt-md text-xs text-primary underline hover:text-primary-container font-semibold"
                             >
                               Làm trắc nghiệm lại ↺
@@ -1117,10 +1463,39 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Video YouTube Section */}
+        <section className="py-xl max-w-container-max mx-auto px-gutter">
+          <div className="text-center mb-lg">
+            <span className="font-label-md text-label-md text-primary uppercase tracking-widest block mb-xs">Video minh họa</span>
+            <h2 className="font-display-md text-display-md text-on-surface mb-base">Tư tưởng Hồ Chí Minh về Văn hóa — Khám phá qua Video</h2>
+            <div className="h-1 w-20 bg-primary mx-auto mb-md"></div>
+            <p className="font-body-md text-body-md text-on-surface-variant italic max-w-2xl mx-auto">
+              Xem video để hiểu rõ hơn về tư tưởng văn hóa của Hồ Chí Minh và ý nghĩa sâu sắc đối với thế hệ trẻ hôm nay.
+            </p>
+          </div>
+          <div className="max-w-4xl mx-auto">
+            <div className="relative w-full aspect-video rounded-xl overflow-hidden shadow-xl border border-outline-variant/30" style={{ zIndex: 0 }}>
+              <iframe
+                className="absolute inset-0 w-full h-full"
+                src="https://www.youtube.com/embed/WQ0jE1rtai4?si=t4xLay-bqt77lyb1"
+                title="YouTube video player"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
+                referrerPolicy="strict-origin-when-cross-origin"
+                allowFullScreen
+              ></iframe>
+            </div>
+          </div>
+        </section>
+
         {/* CTA Section */}
         <section className="py-xl bg-primary relative overflow-hidden">
           <div className="absolute inset-0 opacity-10">
-            <img className="w-full h-full object-cover" alt="Background pattern" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNONah54eYxm1GiJTjKFvXZKrXCNbSAo7B_ntdEpJOPDI0dabs6v1HuHhPJwclw7m-Ot8i0-qmJei-Fkr82jZEkDMkqdNENirOCdKja4Rr1ITIO_Ci0vodg759dF494qH3O78ZWh_mlZ2AFfSf53_EOWuHEA3snaxHG1ymirOcb-rv_8BD8mvWKX8t2c_0LbWZi79H-c0QKHnMDgcFDDn5eqnpw8_cvl0-f7s6R-1AnxRs6q9RLstucxx2Tpr01NcCA8z-R69GqLZo" />
+            <img
+              className="w-full h-full object-cover"
+              alt="Background pattern"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNONah54eYxm1GiJTjKFvXZKrXCNbSAo7B_ntdEpJOPDI0dabs6v1HuHhPJwclw7m-Ot8i0-qmJei-Fkr82jZEkDMkqdNENirOCdKja4Rr1ITIO_Ci0vodg759dF494qH3O78ZWh_mlZ2AFfSf53_EOWuHEA3snaxHG1ymirOcb-rv_8BD8mvWKX8t2c_0LbWZi79H-c0QKHnMDgcFDDn5eqnpw8_cvl0-f7s6R-1AnxRs6q9RLstucxx2Tpr01NcCA8z-R69GqLZo"
+            />
           </div>
           <div className="relative z-10 max-w-container-max mx-auto px-gutter text-center text-on-primary">
             <h2 className="font-display-md text-display-md mb-md">Trải nghiệm tương tác ngay hôm nay</h2>
@@ -1128,10 +1503,16 @@ export default function Home() {
               Kiểm tra kiến thức với các bộ trắc nghiệm sinh động hoặc khám phá các địa danh lịch sử văn hóa qua bản đồ số tích hợp.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-md">
-              <Link to="/quiz" className="bg-surface text-primary px-xl py-md font-label-md text-label-md rounded-lg flex items-center justify-center gap-sm hover:scale-105 transition-transform shadow-lg">
+              <Link
+                to="/quiz"
+                className="bg-surface text-primary px-xl py-md font-label-md text-label-md rounded-lg flex items-center justify-center gap-sm hover:scale-105 transition-transform shadow-lg"
+              >
                 <span className="material-symbols-outlined">quiz</span> Làm trắc nghiệm
               </Link>
-              <Link to="/map" className="bg-transparent border border-surface text-on-primary px-xl py-md font-label-md text-label-md rounded-lg flex items-center justify-center gap-sm hover:bg-surface/10 transition-colors">
+              <Link
+                to="/map"
+                className="bg-transparent border border-surface text-on-primary px-xl py-md font-label-md text-label-md rounded-lg flex items-center justify-center gap-sm hover:bg-surface/10 transition-colors"
+              >
                 <span className="material-symbols-outlined">map</span> Khám phá Bản đồ số
               </Link>
             </div>
@@ -1139,34 +1520,121 @@ export default function Home() {
         </section>
       </main>
 
+      {/* Team & AI Tools Section */}
+      <section className="py-xl bg-surface-container-low border-t border-outline-variant/20">
+        <div className="max-w-container-max mx-auto px-gutter">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-xl">
+            {/* Đội ngũ thực hiện */}
+            <div className="space-y-md">
+              <div className="text-center md:text-left">
+                <span className="font-label-md text-label-md text-primary uppercase tracking-widest block mb-xs">Đội ngũ thực hiện</span>
+                <h3 className="font-display-md text-display-md text-on-surface">Thành viên nhóm</h3>
+                <div className="h-1 w-16 bg-primary mx-auto md:mx-0 mb-md"></div>
+              </div>
+              <div className="grid grid-cols-2 gap-md">
+                {[
+                  { mssv: "SA180251", name: "Trương Huỳnh Hương", initials: "TH" },
+                  { mssv: "SE184031", name: "Quách Hữu Khang", initials: "QK" },
+                  { mssv: "SE184055", name: "Trần Nhật Tân", initials: "TN" },
+                  { mssv: "SE184261", name: "Nguyễn Phạm Thu Hà", initials: "NH" },
+                ].map((member) => (
+                  <div
+                    key={member.mssv}
+                    className="flex items-center gap-sm bg-surface p-sm rounded-lg border border-outline-variant/40 hover:border-primary/50 transition-colors"
+                  >
+                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                      <span className="font-label-md text-label-md text-primary font-bold">{member.initials}</span>
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-label-md text-label-md text-on-surface font-bold truncate">{member.name}</p>
+                      <p className="font-caption text-caption text-on-surface-variant">{member.mssv}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Công cụ AI hỗ trợ */}
+            <div className="space-y-md">
+              <div className="text-center md:text-left">
+                <span className="font-label-md text-label-md text-primary uppercase tracking-widest block mb-xs">Công cụ hỗ trợ</span>
+                <h3 className="font-display-md text-display-md text-on-surface">AI & Tools</h3>
+                <div className="h-1 w-16 bg-primary mx-auto md:mx-0 mb-md"></div>
+              </div>
+              <div className="space-y-sm">
+                {[
+                  { icon: "code", name: "GitHub Copilot", desc: "Trợ lý AI lập trình, hỗ trợ viết code và debug" },
+                  { icon: "chat", name: "ChatGPT", desc: "Tìm kiếm thông tin, xử lý nội dung và ý tưởng" },
+                ].map((tool) => (
+                  <div
+                    key={tool.name}
+                    className="flex items-center gap-md bg-surface p-md rounded-lg border border-outline-variant/40 hover:border-primary/50 transition-colors"
+                  >
+                    <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                      <span className="material-symbols-outlined text-primary text-2xl">{tool.icon}</span>
+                    </div>
+                    <div>
+                      <p className="font-label-md text-label-md text-on-surface font-bold">{tool.name}</p>
+                      <p className="font-caption text-caption text-on-surface-variant">{tool.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="bg-secondary-container text-on-secondary-container py-xl mt-xl border-t border-outline-variant/20">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-lg max-w-container-max mx-auto px-gutter">
           <div className="space-y-md">
             <h2 className="font-headline-md text-headline-md text-primary">Ký Ức Văn Hóa</h2>
-            <p className="font-body-md text-body-md opacity-80">Dự án số hóa và lan tỏa giá trị tư tưởng Hồ Chí Minh về văn hóa cho cộng đồng sinh viên và thanh niên Việt Nam.</p>
+            <p className="font-body-md text-body-md opacity-80">
+              Dự án số hóa và lan tỏa giá trị tư tưởng Hồ Chí Minh về văn hóa cho cộng đồng sinh viên và thanh niên Việt Nam.
+            </p>
             <div className="flex gap-md">
-              <a className="material-symbols-outlined opacity-80 hover:opacity-100 hover:text-primary transition-all" href="#">public</a>
-              <a className="material-symbols-outlined opacity-80 hover:opacity-100 hover:text-primary transition-all" href="#">mail</a>
-              <a className="material-symbols-outlined opacity-80 hover:opacity-100 hover:text-primary transition-all" href="#">share</a>
+              <a className="material-symbols-outlined opacity-80 hover:opacity-100 hover:text-primary transition-all" href="#">
+                public
+              </a>
+              <a className="material-symbols-outlined opacity-80 hover:opacity-100 hover:text-primary transition-all" href="#">
+                mail
+              </a>
+              <a className="material-symbols-outlined opacity-80 hover:opacity-100 hover:text-primary transition-all" href="#">
+                share
+              </a>
             </div>
           </div>
           <div className="space-y-md md:pl-xl">
             <h4 className="font-label-md text-label-md font-bold uppercase tracking-wider">Khám phá</h4>
             <ul className="space-y-sm font-caption text-caption">
-              <li><Link className="hover:text-primary underline-offset-4 hover:underline opacity-80" to="/">Về dự án</Link></li>
-              <li><Link className="hover:text-primary underline-offset-4 hover:underline opacity-80" to="/notebook">Tư liệu tham khảo</Link></li>
-              <li><Link className="hover:text-primary underline-offset-4 hover:underline opacity-80" to="/">Chính sách bảo mật</Link></li>
+              <li>
+                <Link className="hover:text-primary underline-offset-4 hover:underline opacity-80" to="/">
+                  Về dự án
+                </Link>
+              </li>
+              <li>
+                <Link className="hover:text-primary underline-offset-4 hover:underline opacity-80" to="/notebook">
+                  Tư liệu tham khảo
+                </Link>
+              </li>
+              <li>
+                <Link className="hover:text-primary underline-offset-4 hover:underline opacity-80" to="/">
+                  Chính sách bảo mật
+                </Link>
+              </li>
             </ul>
           </div>
           <div className="space-y-md">
             <h4 className="font-label-md text-label-md font-bold uppercase tracking-wider">Đăng ký bản tin</h4>
             <p className="font-caption text-caption opacity-80">Nhận những bài viết mới nhất về di sản văn hóa.</p>
             <div className="flex">
-              <input className="bg-surface border-b border-outline focus:border-primary focus:ring-0 outline-none p-sm flex-1 text-sm rounded-l-lg" placeholder="Email của bạn" type="email" />
-              <button className="bg-primary text-on-primary px-md rounded-r-lg hover:bg-primary-container transition-colors">
-                Gửi
-              </button>
+              <input
+                className="bg-surface border-b border-outline focus:border-primary focus:ring-0 outline-none p-sm flex-1 text-sm rounded-l-lg"
+                placeholder="Email của bạn"
+                type="email"
+              />
+              <button className="bg-primary text-on-primary px-md rounded-r-lg hover:bg-primary-container transition-colors">Gửi</button>
             </div>
           </div>
         </div>
@@ -1175,7 +1643,136 @@ export default function Home() {
         </div>
       </footer>
 
+      {/* AI Chat Floating Widget */}
+      <div className="fixed bottom-6 right-6 z-50">
+        {/* Chat Panel */}
+        {showChat && (
+          <div className="mb-4 w-96 max-h-[560px] bg-surface rounded-2xl shadow-2xl border border-outline-variant/60 overflow-hidden flex flex-col animate-bloom">
+            {/* Chat Header */}
+            <div className="bg-gradient-to-r from-primary to-primary-container p-md flex items-center justify-between flex-shrink-0">
+              <div className="flex items-center gap-sm">
+                <div className="w-10 h-10 rounded-full bg-on-primary/20 flex items-center justify-center">
+                  <span className="material-symbols-outlined text-on-primary">smart_toy</span>
+                </div>
+                <div>
+                  <p className="font-label-md text-label-md text-on-primary font-bold">AI Trợ lý Văn hóa</p>
+                  <div className="flex items-center gap-xs">
+                    <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></div>
+                    <p className="font-caption text-caption text-on-primary/80">Sẵn sàng hỗ trợ</p>
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowChat(false)}
+                className="w-8 h-8 rounded-full hover:bg-on-primary/20 flex items-center justify-center transition-colors"
+              >
+                <span className="material-symbols-outlined text-on-primary text-sm">close</span>
+              </button>
+            </div>
 
+            {/* Chat Messages Area */}
+            <div className="flex-1 overflow-y-auto custom-scrollbar bg-surface-container-low" style={{ maxHeight: "380px" }}>
+              <div className="p-md space-y-md">
+                {/* Welcome message */}
+                {chatMessages.length === 0 && (
+                  <>
+                    <div className="bg-primary/10 p-sm rounded-lg rounded-tl-none max-w-[85%]">
+                      <p className="font-body-md text-body-md text-on-surface text-sm">
+                        👋 Xin chào! Tôi là AI Trợ lý Văn hóa, giúp bạn tìm hiểu về tư tưởng Hồ Chí Minh về văn hóa.
+                      </p>
+                      <p className="font-body-md text-body-md text-on-surface text-sm mt-xs">Hãy đặt câu hỏi hoặc chọn gợi ý bên dưới!</p>
+                    </div>
+                    <div className="flex flex-wrap gap-xs">
+                      {["Tư tưởng HCM về văn hóa là gì?", "Vì sao văn hóa là động lực?", "Gen Z cần làm gì?"].map((q) => (
+                        <button
+                          key={q}
+                          onClick={() => {
+                            setChatInput(q);
+                          }}
+                          className="text-xs bg-surface border border-primary/30 text-primary px-sm py-xs rounded-full hover:bg-primary/5 transition-colors"
+                        >
+                          {q}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+
+                {/* Chat messages */}
+                {chatMessages.map((msg, i) => (
+                  <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+                    <div
+                      className={`p-sm rounded-lg max-w-[85%] ${
+                        msg.role === "user"
+                          ? "bg-primary text-on-primary rounded-br-none"
+                          : "bg-surface border border-outline-variant/40 text-on-surface rounded-bl-none"
+                      }`}
+                    >
+                      {msg.role === "assistant" && (
+                        <div className="flex items-center gap-xs mb-xs">
+                          <span className="material-symbols-outlined text-primary text-xs">smart_toy</span>
+                          <span className="font-label-md text-xs text-primary font-bold">Trợ lý AI</span>
+                        </div>
+                      )}
+                      <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.text}</p>
+                    </div>
+                  </div>
+                ))}
+
+                {/* Loading indicator */}
+                {chatLoading && (
+                  <div className="flex justify-start">
+                    <div className="bg-surface border border-outline-variant/40 p-sm rounded-lg rounded-bl-none">
+                      <div className="flex items-center gap-xs">
+                        <span className="material-symbols-outlined text-primary text-xs animate-spin">progress_activity</span>
+                        <span className="text-xs text-on-surface-variant">Đang suy nghĩ...</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                <div ref={chatMessagesEndRef} />
+              </div>
+            </div>
+
+            {/* Chat Input */}
+            <div className="p-sm border-t border-outline-variant/30 bg-surface flex-shrink-0">
+              <div className="flex gap-xs">
+                <input
+                  type="text"
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSendChat();
+                    }
+                  }}
+                  placeholder="Nhập câu hỏi về tư tưởng HCM..."
+                  disabled={chatLoading}
+                  className="flex-1 bg-surface-container-low border border-outline-variant/40 rounded-lg px-sm py-xs text-sm outline-none focus:border-primary transition-colors disabled:opacity-50"
+                />
+                <button
+                  onClick={handleSendChat}
+                  disabled={chatLoading || !chatInput.trim()}
+                  className="w-10 h-10 bg-primary text-on-primary rounded-lg flex items-center justify-center hover:bg-primary-container transition-colors flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <span className="material-symbols-outlined text-lg">{chatLoading ? "progress_activity" : "send"}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Chat Toggle Button */}
+        <button
+          onClick={() => setShowChat(!showChat)}
+          className={`w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 ${
+            showChat ? "bg-surface-container-high border border-outline-variant" : "bg-primary text-on-primary"
+          }`}
+        >
+          <span className="material-symbols-outlined text-2xl">{showChat ? "close" : "chat"}</span>
+        </button>
+      </div>
     </div>
   );
 }
