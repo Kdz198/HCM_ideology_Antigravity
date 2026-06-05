@@ -1,3 +1,4 @@
+import { QRCodeSVG } from "qrcode.react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -147,6 +148,9 @@ export default function Quiz() {
   const [answers, setAnswers] = useState([]); // Array of option indexes chosen (0, 1, 2, 3)
   const [finished, setFinished] = useState(false);
   const [animating, setAnimating] = useState(false);
+  const [showQR, setShowQR] = useState(false);
+
+  const quizUrl = typeof window !== "undefined" ? window.location.href : "";
 
   const startQuiz = () => {
     setStarted(true);
@@ -299,6 +303,17 @@ export default function Quiz() {
             <p className="font-caption text-caption text-on-surface-variant/60 mt-lg relative z-10">
               ⏱ Khoảng 5 phút · 10 câu hỏi · Kết quả phân tích chi tiết
             </p>
+
+            {/* QR Code Button */}
+            <div className="mt-xl relative z-10">
+              <button
+                onClick={() => setShowQR(true)}
+                className="inline-flex items-center gap-sm bg-surface border border-outline-variant/50 text-on-surface-variant hover:text-primary hover:border-primary px-md py-sm rounded-full font-label-md text-label-sm transition-all cursor-pointer hover:shadow-md hover:bg-primary/5"
+              >
+                <span className="material-symbols-outlined text-xl">qr_code_2</span>
+                Chia sẻ trắc nghiệm
+              </button>
+            </div>
           </header>
         )}
 
@@ -479,6 +494,50 @@ export default function Quiz() {
           </div>
         </div>
       </footer>
+      {/* QR Code Full-Screen Modal */}
+      {showQR && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in"
+          onClick={() => setShowQR(false)}
+        >
+          <div className="bg-surface rounded-2xl p-xl max-w-sm w-[90%] mx-auto text-center shadow-2xl relative" onClick={(e) => e.stopPropagation()}>
+            {/* Close button */}
+            <button
+              onClick={() => setShowQR(false)}
+              className="absolute top-3 right-3 w-10 h-10 rounded-full bg-surface-variant/50 hover:bg-primary/10 flex items-center justify-center transition-colors cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-on-surface-variant">close</span>
+            </button>
+
+            {/* Header */}
+            <div className="mb-lg">
+              <span className="material-symbols-outlined text-primary text-4xl mb-sm block">qr_code_2</span>
+              <h3 className="font-headline-md text-headline-md text-on-surface font-serif">Quét mã QR</h3>
+              <p className="font-body-sm text-body-sm text-on-surface-variant mt-xs">để tham gia trắc nghiệm cùng bạn bè</p>
+            </div>
+
+            {/* QR Code */}
+            <div className="bg-white rounded-xl inline-block mb-lg shadow-inner">
+              <QRCodeSVG value={quizUrl} size={220} level="M" includeMargin={false} fgColor="#1a1a1a" bgColor="#ffffff" />
+            </div>
+
+            {/* URL display */}
+            <p className="font-caption text-caption text-on-surface-variant/70 break-all px-md">{quizUrl}</p>
+
+            {/* Copy button */}
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(quizUrl);
+                alert("Đã sao chép liên kết!");
+              }}
+              className="mt-md inline-flex items-center gap-xs bg-primary text-on-primary px-lg py-sm rounded-full font-label-md text-label-sm cursor-pointer hover:bg-primary-container transition-all"
+            >
+              <span className="material-symbols-outlined text-base">content_copy</span>
+              Sao chép liên kết
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
