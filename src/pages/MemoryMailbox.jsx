@@ -1,20 +1,23 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useState, useEffect, useRef, useCallback } from "react";
+import { Link, useLocation } from "react-router-dom";
 
 const quotesData = [
   {
     id: 1,
     text: "Gạo đem vào giã bao đau đớn,\nGạo giã xong rồi trắng tựa bông.\nSống ở trên đời người cũng vậy,\nGian nan rèn luyện mới thành công.",
     theme: "Rèn luyện",
-    source: "Bài thơ \"Nghe tiếng giã gạo\" — Nhật ký trong tù, 1942",
+    source: 'Bài thơ "Nghe tiếng giã gạo" — Nhật ký trong tù, 1942',
     hasStory: true,
     storyTitle: "Sự hủy diệt để tái sinh",
     epigraph: "Năm 1942, giữa ngục tối Quảng Tây, tiếng chày giã gạo vậng về như một lời nhắn gửi từ quá khứ...",
-    takeaway: "Hãy nhớ: Viên kim cương phải chịu áp lực hàng triệu năm mới tỏa sáng. Bạn cũng vậy — mỗi lần bị cuộc đời 'giã' là một lần bạn được mài sáng hơn.",
+    takeaway:
+      "Hãy nhớ: Viên kim cương phải chịu áp lực hàng triệu năm mới tỏa sáng. Bạn cũng vậy — mỗi lần bị cuộc đời 'giã' là một lần bạn được mài sáng hơn.",
     polaroidImg: "https://images.unsplash.com/photo-1474552226712-ac0f0961a954?q=80&w=600&auto=format&fit=crop",
     polaroidCaption: "Hạt gạo qua lửa thử...",
-    context: "Thưa thầy cô và các bạn, bài thơ này được Bác viết năm 1942, từ trong ngục tối Quảng Tây. Khi nghe tiếng chày giã gạo chát chúa nện xuống cối đá, Bác nhìn thấy thân phận con người. Hạt gạo bị đập nát lớp vỏ sần sùi, chịu lực ép nghiền nát để lộ ra phần lõi trắng. Sự trưởng thành không bao giờ là một con đường êm ái, nó là một quá trình bị cuộc đời 'giã' liên tục, bị chèn ép đến mức tưởng chừng tan nát cả thể xác lẫn tinh thần.",
-    modern: "Ngày nay, chúng ta thường nói với nhau những lời hoa mỹ về việc 'bước ra khỏi vùng an toàn'. Nhưng thực chất, đó là việc bạn phải chấp nhận để cho áp lực cuộc sống, những deadline nghẹt thở, những lần thất bại trần trụi... 'đập' nát cái tôi yếu ớt của mình. Đừng sợ hãi sự đau đớn. Bởi vì chỉ khi lớp vỏ ngây thơ bị nghiền nát, bản thể cứng cáp và sắc bén nhất của bạn mới thực sự được sinh ra."
+    context:
+      "Thưa thầy cô và các bạn, bài thơ này được Bác viết năm 1942, từ trong ngục tối Quảng Tây. Khi nghe tiếng chày giã gạo chát chúa nện xuống cối đá, Bác nhìn thấy thân phận con người. Hạt gạo bị đập nát lớp vỏ sần sùi, chịu lực ép nghiền nát để lộ ra phần lõi trắng. Sự trưởng thành không bao giờ là một con đường êm ái, nó là một quá trình bị cuộc đời 'giã' liên tục, bị chèn ép đến mức tưởng chừng tan nát cả thể xác lẫn tinh thần.",
+    modern:
+      "Ngày nay, chúng ta thường nói với nhau những lời hoa mỹ về việc 'bước ra khỏi vùng an toàn'. Nhưng thực chất, đó là việc bạn phải chấp nhận để cho áp lực cuộc sống, những deadline nghẹt thở, những lần thất bại trần trụi... 'đập' nát cái tôi yếu ớt của mình. Đừng sợ hãi sự đau đớn. Bởi vì chỉ khi lớp vỏ ngây thơ bị nghiền nát, bản thể cứng cáp và sắc bén nhất của bạn mới thực sự được sinh ra.",
   },
   {
     id: 2,
@@ -27,8 +30,10 @@ const quotesData = [
     takeaway: "Công nghệ thay đổi mỗi ngày, nhưng giá trị 'người' thì vĩnh cửu. Hãy đầu tư vào phân bản dài hạn nhất: chính bạn.",
     polaroidImg: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=600&auto=format&fit=crop",
     polaroidCaption: "Giáo dục là giá trị trường tồn...",
-    context: "Mùa xuân năm 1958, Bác đã mượn ý của người xưa để nhấn mạnh chữ 'Trồng'. Trồng cây cần đất tốt, nước trong. 'Trồng người' cũng cần một môi trường văn minh, không độc hại. Đối với Bác, con người luôn là trung tâm của mọi sự phát triển, mọi cuộc cách mạng cuối cùng đều phải hướng tới hạnh phúc thực sự của nhân dân.",
-    modern: "Sự nghiệp 'trồng người' của thế kỷ 21 chính là quá trình chúng ta không ngừng tự nâng cấp bản thân. Trong kỷ nguyên công nghệ phát triển vũ bão, máy móc có thể tính toán nhanh hơn, code giỏi hơn chúng ta. Nhưng tri thức, đạo đức, sự thấu cảm và trách nhiệm – những giá trị 'người' nhất – là thứ công nghệ không bao giờ thay thế được."
+    context:
+      "Mùa xuân năm 1958, Bác đã mượn ý của người xưa để nhấn mạnh chữ 'Trồng'. Trồng cây cần đất tốt, nước trong. 'Trồng người' cũng cần một môi trường văn minh, không độc hại. Đối với Bác, con người luôn là trung tâm của mọi sự phát triển, mọi cuộc cách mạng cuối cùng đều phải hướng tới hạnh phúc thực sự của nhân dân.",
+    modern:
+      "Sự nghiệp 'trồng người' của thế kỷ 21 chính là quá trình chúng ta không ngừng tự nâng cấp bản thân. Trong kỷ nguyên công nghệ phát triển vũ bão, máy móc có thể tính toán nhanh hơn, code giỏi hơn chúng ta. Nhưng tri thức, đạo đức, sự thấu cảm và trách nhiệm – những giá trị 'người' nhất – là thứ công nghệ không bao giờ thay thế được.",
   },
   {
     id: 3,
@@ -38,64 +43,68 @@ const quotesData = [
     hasStory: true,
     storyTitle: "Mã nguồn đạo đức cốt lõi",
     epigraph: "Giữa chiến trường khói lửa 1949, Bác không nói về súng đạn — Bác nói về Trời, Đất, và Người...",
-    takeaway: "4 chữ Cần – Kiệm – Liêm – Chính không phải khẩu hiệu. Nó là hệ điều hành của một con người hoàn chỉnh. Thiếu một món, hệ thống sụp đổ.",
+    takeaway:
+      "4 chữ Cần – Kiệm – Liêm – Chính không phải khẩu hiệu. Nó là hệ điều hành của một con người hoàn chỉnh. Thiếu một món, hệ thống sụp đổ.",
     polaroidImg: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=600&auto=format&fit=crop",
     polaroidCaption: "Những trang sách không phai...",
-    context: "Giữa lúc cuộc kháng chiến năm 1949 đang vô cùng cam go, Bác không dùng những lý luận chính trị khô khan. Bác mượn ngay quy luật bất biến của vũ trụ – Trời ắt phải có 4 mùa, Đất ắt phải có 4 phương – để khẳng định: Cần, Kiệm, Liêm, Chính là cấu trúc nền tảng của một con người. Mất đi một yếu tố, toàn bộ cấu trúc đó sẽ sụp đổ.",
-    modern: "4 chữ này không hề cũ, nó chính là bộ kỹ năng sinh tồn trong thời đại số:\n\n• Cần: Là sự chủ động cập nhật kiến thức liên tục để không bị tụt hậu.\n\n• Kiệm: Là tư duy tối ưu hóa. Tiết kiệm quỹ thời gian thay vì lướt mạng vô thức. Nó giống như nguyên tắc giữ mọi thứ đơn giản và gọn gàng, loại bỏ sự rườm rà để tập trung vào giá trị cốt lõi.\n\n• Liêm: Là sự minh bạch, không 'sống ảo' hay chạy theo những giá trị vật chất phù phiếm.\n\n• Chính: Là tính chính trực, dám bảo vệ cái đúng và hành xử văn minh, có trách nhiệm với từng cú click chuột của mình trên không gian mạng."
+    context:
+      "Giữa lúc cuộc kháng chiến năm 1949 đang vô cùng cam go, Bác không dùng những lý luận chính trị khô khan. Bác mượn ngay quy luật bất biến của vũ trụ – Trời ắt phải có 4 mùa, Đất ắt phải có 4 phương – để khẳng định: Cần, Kiệm, Liêm, Chính là cấu trúc nền tảng của một con người. Mất đi một yếu tố, toàn bộ cấu trúc đó sẽ sụp đổ.",
+    modern:
+      "4 chữ này không hề cũ, nó chính là bộ kỹ năng sinh tồn trong thời đại số:\n\n• Cần: Là sự chủ động cập nhật kiến thức liên tục để không bị tụt hậu.\n\n• Kiệm: Là tư duy tối ưu hóa. Tiết kiệm quỹ thời gian thay vì lướt mạng vô thức. Nó giống như nguyên tắc giữ mọi thứ đơn giản và gọn gàng, loại bỏ sự rườm rà để tập trung vào giá trị cốt lõi.\n\n• Liêm: Là sự minh bạch, không 'sống ảo' hay chạy theo những giá trị vật chất phù phiếm.\n\n• Chính: Là tính chính trực, dám bảo vệ cái đúng và hành xử văn minh, có trách nhiệm với từng cú click chuột của mình trên không gian mạng.",
   },
   {
     id: 4,
     text: "Nước độc lập mà dân không hưởng hạnh phúc tự do, thì độc lập cũng chẳng có nghĩa lý gì.",
     theme: "Con người",
-    source: "Thư gửi Ủy ban nhân dân các bộ, tỉnh, huyện và làng, 1945"
+    source: "Thư gửi Ủy ban nhân dân các bộ, tỉnh, huyện và làng, 1945",
   },
   {
     id: 5,
     text: "Có tài mà không có đức là người vô dụng, có đức mà không có tài thì làm việc gì cũng khó.",
     theme: "Con người",
-    source: "Bài nói chuyện tại Trường Sư phạm Trung ương, 1956"
+    source: "Bài nói chuyện tại Trường Sư phạm Trung ương, 1956",
   },
   {
     id: 6,
     text: "Đời sống mới không phải cái gì cũ cũng bỏ hết, không phải cái gì mới cũng làm theo.",
     theme: "Đạo đức",
-    source: "Tác phẩm \"Đời sống mới\", 1947"
+    source: 'Tác phẩm "Đời sống mới", 1947',
   },
   {
     id: 7,
     text: "Mình đánh giá người khác thế nào thì người khác cũng đánh giá mình thế ấy.",
     theme: "Đạo đức",
-    source: "Bài nói tại lớp chỉnh huấn cán bộ, 1953"
+    source: "Bài nói tại lớp chỉnh huấn cán bộ, 1953",
   },
   {
     id: 8,
     text: "Văn hóa phải soi đường cho quốc dân đi.",
     theme: "Văn hóa",
-    source: "Hội nghị Văn hóa toàn quốc lần thứ nhất, 1946"
+    source: "Hội nghị Văn hóa toàn quốc lần thứ nhất, 1946",
   },
   {
     id: 9,
     text: "Học hỏi là một việc phải tiếp tục suốt đời. Không ai có thể tự cho mình đã biết đủ rồi, biết hết rồi.",
     theme: "Văn hóa",
-    source: "Bài nói tại lớp bổ túc văn hóa cán bộ Trung ương, 1959"
+    source: "Bài nói tại lớp bổ túc văn hóa cán bộ Trung ương, 1959",
   },
   {
     id: 10,
     text: "Thực tiễn không có lý luận hướng dẫn thì thành thực tiễn mù quáng. Lý luận mà không liên hệ với thực tiễn là lý luận suông.",
     theme: "Văn hóa",
-    source: "Bài nói tại lớp học chính trị khóa I Trường Đại học Nhân dân Việt Nam, 1955"
-  }
+    source: "Bài nói tại lớp học chính trị khóa I Trường Đại học Nhân dân Việt Nam, 1955",
+  },
 ];
 
 export default function MemoryMailbox() {
   const [selectedQuote, setSelectedQuote] = useState(null);
   const [countdown, setCountdown] = useState(3);
-  const [modalState, setModalState] = useState('closed');
+  const [modalState, setModalState] = useState("closed");
   const [copied, setCopied] = useState(false);
   const [stamped, setStamped] = useState(false);
   const [transformStyle, setTransformStyle] = useState({});
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [showMenu, setShowMenu] = useState(false);
   const rightPageRef = useRef(null);
   const location = useLocation();
 
@@ -113,16 +122,16 @@ export default function MemoryMailbox() {
       : "text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md";
   };
 
-  const storyQuotes = quotesData.filter(q => q.hasStory);
-  const otherQuotes = quotesData.filter(q => !q.hasStory);
+  const storyQuotes = quotesData.filter((q) => q.hasStory);
+  const otherQuotes = quotesData.filter((q) => !q.hasStory);
 
   // Animation Sequence Logic
   useEffect(() => {
     let t;
-    if (modalState === 'flying_in') {
+    if (modalState === "flying_in") {
       t = setTimeout(() => {
-        setTransformStyle({ transform: 'translate(-50%, -50%) scale(1)', opacity: 1 });
-        setModalState('countdown');
+        setTransformStyle({ transform: "translate(-50%, -50%) scale(1)", opacity: 1 });
+        setModalState("countdown");
         setCountdown(3);
       }, 50); // Small delay to let browser paint starting position
     }
@@ -131,12 +140,12 @@ export default function MemoryMailbox() {
 
   useEffect(() => {
     let timer;
-    if (modalState === 'countdown') {
+    if (modalState === "countdown") {
       timer = setInterval(() => {
         setCountdown((prev) => {
           if (prev <= 1) {
             clearInterval(timer);
-            setModalState('opening');
+            setModalState("opening");
             return 0;
           }
           return prev - 1;
@@ -148,14 +157,17 @@ export default function MemoryMailbox() {
 
   useEffect(() => {
     let t1, t2;
-    if (modalState === 'opening') {
+    if (modalState === "opening") {
       // Đợi nắp thư mở ra và thư lướt lên trên rồi chuyển sang book modal (1 giây)
-      t1 = setTimeout(() => setModalState('flying'), 1000); 
-    } else if (modalState === 'flying') {
+      t1 = setTimeout(() => setModalState("flying"), 1000);
+    } else if (modalState === "flying") {
       // Kích hoạt transition phóng to cuốn sổ
-      t2 = setTimeout(() => setModalState('reading'), 50); 
+      t2 = setTimeout(() => setModalState("reading"), 50);
     }
-    return () => { clearTimeout(t1); clearTimeout(t2); };
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
   }, [modalState]);
 
   const handleOpenQuote = (quote, event) => {
@@ -163,7 +175,7 @@ export default function MemoryMailbox() {
     setCopied(false);
     setStamped(false);
     setScrollProgress(0);
-    
+
     if (event && quote.hasStory) {
       const rect = event.currentTarget.getBoundingClientRect();
       const cx = window.innerWidth / 2;
@@ -176,21 +188,21 @@ export default function MemoryMailbox() {
 
       setTransformStyle({
         transform: `translate(calc(-50% + ${deltaX}px), calc(-50% + ${deltaY}px)) scale(${scale})`,
-        opacity: 0
+        opacity: 0,
       });
-      setModalState('flying_in');
+      setModalState("flying_in");
     } else if (quote.hasStory) {
-      setTransformStyle({ transform: 'translate(-50%, -50%) scale(1)', opacity: 1 });
-      setModalState('countdown');
+      setTransformStyle({ transform: "translate(-50%, -50%) scale(1)", opacity: 1 });
+      setModalState("countdown");
       setCountdown(3);
     } else {
-      setModalState('reading'); // Instant open
+      setModalState("reading"); // Instant open
     }
   };
 
   const handleCloseModal = () => {
     setSelectedQuote(null);
-    setModalState('closed');
+    setModalState("closed");
   };
 
   const handleCopy = (text) => {
@@ -201,13 +213,12 @@ export default function MemoryMailbox() {
 
   return (
     <div className="bg-background text-on-background lotus-bg paper-texture min-h-screen flex flex-col pt-20 relative overflow-hidden">
-      
       {/* Warm Spotlight */}
       <div className="spotlight-bg"></div>
-      
+
       {/* Vignette Overlay */}
       <div className="vignette-overlay"></div>
-      
+
       {/* Floating Dust Particles */}
       <div className="dust-particle"></div>
       <div className="dust-particle"></div>
@@ -873,40 +884,70 @@ export default function MemoryMailbox() {
       {/* Navigation Header */}
       <nav className="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md border-b border-outline-variant/30">
         <div className="flex justify-between items-center h-20 px-gutter max-w-container-max mx-auto">
-          <Link to="/" className="font-display-md text-display-md text-primary tracking-tight">Ký Ức Văn Hóa</Link>
+          <Link to="/" className="font-display-md text-display-md text-primary tracking-tight">
+            Ký Ức Văn Hóa
+          </Link>
           <div className="hidden md:flex items-center gap-lg">
-            <Link className={getLinkClass('/')} to="/">Trang chủ</Link>
-            <Link className={getLinkClass('/map')} to="/map">Bản đồ số</Link>
-            <Link className={getLinkClass('/mailbox')} to="/mailbox">Hộp thư ký ức</Link>
-            <Link className={getLinkClass('/quiz')} to="/quiz">Trắc nghiệm</Link>
+            <Link className={getLinkClass("/")} to="/">
+              Trang chủ
+            </Link>
+            <Link className={getLinkClass("/map")} to="/map">
+              Bản đồ số
+            </Link>
+            <Link className={getLinkClass("/mailbox")} to="/mailbox">
+              Hộp thư ký ức
+            </Link>
+            <Link className={getLinkClass("/quiz")} to="/quiz">
+              Trắc nghiệm
+            </Link>
           </div>
-          <div className="w-10"></div>
+          <button
+            className="md:hidden flex items-center justify-center w-10 h-10 rounded-lg hover:bg-primary/10 transition-colors cursor-pointer"
+            onClick={() => setShowMenu(!showMenu)}
+          >
+            <span className="material-symbols-outlined text-on-surface-variant">{showMenu ? "close" : "menu"}</span>
+          </button>
         </div>
       </nav>
+      {showMenu && (
+        <div className="fixed top-20 left-0 right-0 z-40 bg-surface/95 backdrop-blur-md border-b border-outline-variant/30 md:hidden animate-fade-in">
+          <div className="flex flex-col px-gutter py-md gap-sm">
+            <Link className={getLinkClass("/")} to="/" onClick={() => setShowMenu(false)}>
+              Trang chủ
+            </Link>
+            <Link className={getLinkClass("/map")} to="/map" onClick={() => setShowMenu(false)}>
+              Bản đồ số
+            </Link>
+            <Link className={getLinkClass("/mailbox")} to="/mailbox" onClick={() => setShowMenu(false)}>
+              Hộp thư ký ức
+            </Link>
+            <Link className={getLinkClass("/quiz")} to="/quiz" onClick={() => setShowMenu(false)}>
+              Trắc nghiệm
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* Main Content */}
       <main className="max-w-6xl mx-auto px-gutter w-full relative z-10 flex flex-col justify-between h-[calc(100vh-80px)] pt-6 pb-4">
-        
         {/* Compact Header */}
-        <header className="flex items-center justify-center gap-4 flex-shrink-0" style={{ animation: 'fadeSlideUp 1s ease-out forwards' }}>
+        <header className="flex items-center justify-center gap-4 flex-shrink-0" style={{ animation: "fadeSlideUp 1s ease-out forwards" }}>
           <div className="h-px w-12 bg-primary/30"></div>
-          <div className="wax-seal header-seal-pulse" style={{width: '28px', height: '28px', position: 'relative'}}>
+          <div className="wax-seal header-seal-pulse" style={{ width: "28px", height: "28px", position: "relative" }}>
             <span className="material-symbols-outlined text-[14px] relative z-10">history_edu</span>
           </div>
-          <h1 className="vintage-title font-serif text-2xl md:text-3xl font-bold text-primary drop-shadow-sm">
-            Hộp Thư Ký Ức
-          </h1>
+          <h1 className="vintage-title font-serif text-2xl md:text-3xl font-bold text-primary drop-shadow-sm">Hộp Thư Ký Ức</h1>
           <div className="h-px w-12 bg-primary/30"></div>
         </header>
 
         {/* Featured Story Postcards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-20 px-4 md:px-0 flex-shrink-0">
           {storyQuotes.map((quote) => (
-            <div 
-              key={quote.id} 
+            <div
+              key={quote.id}
               onClick={(e) => handleOpenQuote(quote, e)}
               className="vintage-postcard"
-              style={{ animation: 'fadeSlideUp 1s ease-out forwards' }}
+              style={{ animation: "fadeSlideUp 1s ease-out forwards" }}
             >
               <div className="postage-stamp">
                 <span className="material-symbols-outlined text-[24px]">local_florist</span>
@@ -914,21 +955,17 @@ export default function MemoryMailbox() {
               <div className="postmark">
                 <span className="font-serif text-[10px] uppercase font-bold tracking-widest">1945</span>
               </div>
-              
+
               <div className="relative z-10 flex flex-col h-full">
                 <div className="mb-4">
                   <span className="text-[10px] text-primary/80 font-bold uppercase tracking-[0.2em] block mb-4 bg-white/60 inline-block px-2 py-1 rounded">
                     {quote.theme}
                   </span>
-                  <h3 className="font-serif text-xl md:text-2xl text-primary font-medium leading-snug mb-2 drop-shadow-sm">
-                    {quote.storyTitle}
-                  </h3>
+                  <h3 className="font-serif text-xl md:text-2xl text-primary font-medium leading-snug mb-2 drop-shadow-sm">{quote.storyTitle}</h3>
                 </div>
-                
+
                 <div className="mt-auto pt-6 flex justify-between items-center text-tertiary">
-                  <p className="font-serif text-sm text-on-surface-variant/70 italic">
-                    Nhấp để mở thư...
-                  </p>
+                  <p className="font-serif text-sm text-on-surface-variant/70 italic">Nhấp để mở thư...</p>
                   <div className="flex items-center gap-1">
                     <span className="material-symbols-outlined text-lg">auto_awesome</span>
                     <span className="text-[10px] font-bold uppercase tracking-widest">Kể chuyện</span>
@@ -941,20 +978,18 @@ export default function MemoryMailbox() {
 
         {/* Marquee Paper Strips */}
         {otherQuotes.length > 0 && (
-          <div className="relative z-10 flex-shrink-0" style={{ animation: 'fadeSlideUp 1.5s ease-out forwards' }}>
+          <div className="relative z-10 flex-shrink-0" style={{ animation: "fadeSlideUp 1.5s ease-out forwards" }}>
             <div className="flex items-center justify-center gap-4 mb-8">
               <div className="h-px w-12 bg-outline-variant/30"></div>
-              <h3 className="text-center font-label-md text-sm text-on-surface-variant uppercase tracking-[0.3em]">
-                Dòng chảy thời gian
-              </h3>
+              <h3 className="text-center font-label-md text-sm text-on-surface-variant uppercase tracking-[0.3em]">Dòng chảy thời gian</h3>
               <div className="h-px w-12 bg-outline-variant/30"></div>
             </div>
-            
+
             <div className="marquee-wrapper">
               <div className="marquee-content gap-6">
                 {[...otherQuotes, ...otherQuotes, ...otherQuotes].map((quote, index) => (
-                  <div 
-                    key={`${quote.id}-${index}`} 
+                  <div
+                    key={`${quote.id}-${index}`}
                     onClick={(e) => handleOpenQuote(quote, e)}
                     className="film-strip h-[180px] w-[340px] flex-shrink-0"
                   >
@@ -975,27 +1010,28 @@ export default function MemoryMailbox() {
             </div>
           </div>
         )}
-
       </main>
 
       {/* Animation Sequence Modal */}
-      {modalState !== 'closed' && selectedQuote && (
-        <div className={`fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-black/60 backdrop-blur-sm transition-all duration-700 ${modalState === 'flying_in' ? 'opacity-0' : 'opacity-100'}`}>
-          
+      {modalState !== "closed" && selectedQuote && (
+        <div
+          className={`fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-black/60 backdrop-blur-sm transition-all duration-700 ${modalState === "flying_in" ? "opacity-0" : "opacity-100"}`}
+        >
           {/* Phase 1 & 2: Big Envelope (Flying In, Countdown & Opening) */}
-          {(modalState === 'flying_in' || modalState === 'countdown' || modalState === 'opening') && (
-            <div 
-              className={`absolute top-1/2 left-1/2 perspective-1000 w-[400px] h-[260px] transition-all duration-[800ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] z-[105] ${modalState === 'countdown' ? 'magical-glow rounded-lg' : ''}`}
+          {(modalState === "flying_in" || modalState === "countdown" || modalState === "opening") && (
+            <div
+              className={`absolute top-1/2 left-1/2 perspective-1000 w-[400px] h-[260px] transition-all duration-[800ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] z-[105] ${modalState === "countdown" ? "magical-glow rounded-lg" : ""}`}
               style={transformStyle}
             >
-              
               {/* Back of Envelope */}
               <div className="absolute inset-0 bg-gradient-to-br from-[#f2e9e1] to-[#e8dbce] rounded-lg shadow-2xl border border-[#c2aa93] z-0 overflow-hidden">
                 <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/aged-paper.png')] mix-blend-multiply"></div>
               </div>
-              
+
               {/* The Letter (Slides up during 'opening') */}
-              <div className={`absolute left-4 right-4 bg-[#fdfcf7] rounded shadow-inner z-10 transition-all duration-1000 ease-[cubic-bezier(0.25,0.8,0.25,1)] ${modalState === 'opening' ? '-top-32 bottom-8 opacity-0 scale-95' : 'top-4 bottom-4 opacity-100 scale-100'}`}>
+              <div
+                className={`absolute left-4 right-4 bg-[#fdfcf7] rounded shadow-inner z-10 transition-all duration-1000 ease-[cubic-bezier(0.25,0.8,0.25,1)] ${modalState === "opening" ? "-top-32 bottom-8 opacity-0 scale-95" : "top-4 bottom-4 opacity-100 scale-100"}`}
+              >
                 <div className="mx-6 mt-8 h-px bg-outline-variant/10"></div>
                 <div className="mx-6 mt-4 h-px bg-outline-variant/10"></div>
                 <div className="mx-6 mt-4 h-px bg-outline-variant/10"></div>
@@ -1003,297 +1039,316 @@ export default function MemoryMailbox() {
 
               {/* Front layers of Envelope */}
               <div className="absolute inset-0 z-20 pointer-events-none">
-                <div className="absolute bottom-0 left-0 right-0 h-[160px] bg-gradient-to-t from-[#e6d8ca] to-[#fdfaf6] border-t border-[#c2aa93]/40 rounded-b-lg" style={{ clipPath: 'polygon(0 100%, 50% 0, 100% 100%)' }}></div>
-                <div className="absolute top-0 bottom-0 left-0 w-[200px] bg-gradient-to-r from-[#e6d8ca] to-[#fcf8f3]" style={{ clipPath: 'polygon(0 0, 100% 50%, 0 100%)' }}></div>
-                <div className="absolute top-0 bottom-0 right-0 w-[200px] bg-gradient-to-l from-[#e6d8ca] to-[#fcf8f3]" style={{ clipPath: 'polygon(100% 0, 0 50%, 100% 100%)' }}></div>
+                <div
+                  className="absolute bottom-0 left-0 right-0 h-[160px] bg-gradient-to-t from-[#e6d8ca] to-[#fdfaf6] border-t border-[#c2aa93]/40 rounded-b-lg"
+                  style={{ clipPath: "polygon(0 100%, 50% 0, 100% 100%)" }}
+                ></div>
+                <div
+                  className="absolute top-0 bottom-0 left-0 w-[200px] bg-gradient-to-r from-[#e6d8ca] to-[#fcf8f3]"
+                  style={{ clipPath: "polygon(0 0, 100% 50%, 0 100%)" }}
+                ></div>
+                <div
+                  className="absolute top-0 bottom-0 right-0 w-[200px] bg-gradient-to-l from-[#e6d8ca] to-[#fcf8f3]"
+                  style={{ clipPath: "polygon(100% 0, 0 50%, 100% 100%)" }}
+                ></div>
               </div>
-              
+
               {/* Shimmer effect during countdown */}
-              {modalState === 'countdown' && (
+              {modalState === "countdown" && (
                 <div className="shimmer-wrapper">
                   <div className="shimmer-line"></div>
                 </div>
               )}
 
               {/* Envelope Flap (Rotates up) */}
-              <div className={`absolute top-0 left-0 right-0 h-[150px] bg-gradient-to-b from-[#e8dbce] to-[#f7efe8] border-b border-[#c2aa93]/60 z-30 transform-style-3d origin-top transition-all duration-700 ease-in-out ${modalState === 'opening' ? 'rotate-x-180' : 'rotate-x-0'}`} style={{ clipPath: 'polygon(0 0, 100% 0, 50% 100%)' }}>
-                 <div className={`wax-seal bottom-1 left-1/2 -translate-x-1/2 ${modalState === 'countdown' ? 'heartbeat-seal' : ''}`}>
-                    {modalState === 'countdown' ? (
-                      <span className="font-serif font-bold text-2xl drop-shadow-md relative z-10">{countdown}</span>
-                    ) : (
-                      <span className="material-symbols-outlined text-[24px] relative z-10">mark_email_read</span>
-                    )}
-                 </div>
+              <div
+                className={`absolute top-0 left-0 right-0 h-[150px] bg-gradient-to-b from-[#e8dbce] to-[#f7efe8] border-b border-[#c2aa93]/60 z-30 transform-style-3d origin-top transition-all duration-700 ease-in-out ${modalState === "opening" ? "rotate-x-180" : "rotate-x-0"}`}
+                style={{ clipPath: "polygon(0 0, 100% 0, 50% 100%)" }}
+              >
+                <div className={`wax-seal bottom-1 left-1/2 -translate-x-1/2 ${modalState === "countdown" ? "heartbeat-seal" : ""}`}>
+                  {modalState === "countdown" ? (
+                    <span className="font-serif font-bold text-2xl drop-shadow-md relative z-10">{countdown}</span>
+                  ) : (
+                    <span className="material-symbols-outlined text-[24px] relative z-10">mark_email_read</span>
+                  )}
+                </div>
               </div>
 
               {/* Message below */}
               <div className="absolute -bottom-16 left-0 right-0 text-center text-white/90 font-label-md tracking-[0.2em] uppercase text-[10px] drop-shadow-sm">
-                {modalState === 'countdown' ? (
-                  <span className="animate-pulse">Đang giải mã phong thư...</span>
-                ) : (
-                  <span>Đang mở thư...</span>
-                )}
+                {modalState === "countdown" ? <span className="animate-pulse">Đang giải mã phong thư...</span> : <span>Đang mở thư...</span>}
               </div>
             </div>
           )}
 
           {/* Phase 3 & 4: Flying Book Modal (For Quotes with Story) */}
-          {(modalState === 'flying' || modalState === 'reading') && selectedQuote.hasStory && (
-              <div className={`book-modal flex-col md:flex-row transition-all duration-1000 ease-[cubic-bezier(0.25,0.8,0.25,1)] origin-bottom ${modalState === 'flying' ? 'scale-[0.4] opacity-0 translate-y-32' : 'scale-100 opacity-100 translate-y-0'}`}>
-                
-                {/* Left Page: Classified Document or Telegram */}
-                <div className={`book-page-left w-full md:w-2/5 flex-shrink-0 relative ${selectedQuote.text.length < 150 ? 'dossier-cover-bg' : ''}`}>
-                  
-                  {selectedQuote.text.length < 150 ? (
-                    /* Layout: Bìa Hồ Sơ + Bức Điện Tín (Thư Ngắn) */
-                    <>
-                      <div className="absolute top-8 left-6 text-[#2c2c2a]/10 font-serif transform -rotate-12 pointer-events-none z-0">
-                        <div className="border-[3px] border-[#2c2c2a]/10 px-3 py-1.5 uppercase font-bold text-xl tracking-[0.2em]">Tuyệt Mật</div>
-                        <div className="mt-1 text-xs">Kho lưu trữ số 04</div>
+          {(modalState === "flying" || modalState === "reading") && selectedQuote.hasStory && (
+            <div
+              className={`book-modal flex-col md:flex-row transition-all duration-1000 ease-[cubic-bezier(0.25,0.8,0.25,1)] origin-bottom ${modalState === "flying" ? "scale-[0.4] opacity-0 translate-y-32" : "scale-100 opacity-100 translate-y-0"}`}
+            >
+              {/* Left Page: Classified Document or Telegram */}
+              <div className={`book-page-left w-full md:w-2/5 flex-shrink-0 relative ${selectedQuote.text.length < 150 ? "dossier-cover-bg" : ""}`}>
+                {selectedQuote.text.length < 150 ? (
+                  /* Layout: Bìa Hồ Sơ + Bức Điện Tín (Thư Ngắn) */
+                  <>
+                    <div className="absolute top-8 left-6 text-[#2c2c2a]/10 font-serif transform -rotate-12 pointer-events-none z-0">
+                      <div className="border-[3px] border-[#2c2c2a]/10 px-3 py-1.5 uppercase font-bold text-xl tracking-[0.2em]">Tuyệt Mật</div>
+                      <div className="mt-1 text-xs">Kho lưu trữ số 04</div>
+                    </div>
+
+                    <div className="telegram-card z-10 mt-4">
+                      <div className="paperclip" style={{ top: "-20px", left: "50%", transform: "translateX(-50%)" }}></div>
+                      <div className="text-[10px] text-[#2c2c2a]/50 uppercase tracking-widest border-b border-[#2c2c2a]/10 pb-2 mb-5 flex justify-between">
+                        <span>Trích lục đính kèm</span>
+                        <span>HS: {selectedQuote.theme}</span>
                       </div>
-                      
-                      <div className="telegram-card z-10 mt-4">
-                        <div className="paperclip" style={{top: '-20px', left: '50%', transform: 'translateX(-50%)'}}></div>
-                        <div className="text-[10px] text-[#2c2c2a]/50 uppercase tracking-widest border-b border-[#2c2c2a]/10 pb-2 mb-5 flex justify-between">
-                          <span>Trích lục đính kèm</span>
-                          <span>HS: {selectedQuote.theme}</span>
-                        </div>
-                        <blockquote className="font-serif text-[22px] md:text-[26px] font-medium leading-snug text-[#2c2c2a] mb-6 text-center drop-shadow-sm px-2">
-                          "{selectedQuote.text}"
-                        </blockquote>
-                        <p className="font-mono text-[9px] md:text-[10px] uppercase tracking-widest text-[#2c2c2a]/60 text-right mt-5 pt-3 border-t border-[#2c2c2a]/10">
-                          Nguồn: {selectedQuote.source}
-                        </p>
-                      </div>
-                    </>
-                  ) : (
-                    /* Layout: Bản Báo Cáo Toàn Trang (Thư Dài) */
-                    <>
-                      <div className="absolute top-8 left-8 border-2 border-[#b32d2d]/30 text-[#b32d2d]/40 font-serif font-bold tracking-[0.3em] px-3 py-1 text-xs uppercase transform -rotate-2">
-                        TÀI LIỆU MẬT
-                      </div>
-                      <div className="mb-8 stagger-1 mt-10 relative z-10">
-                        <span className="text-xs font-bold uppercase tracking-[0.3em] text-primary/60 border-b border-primary/20 pb-1">
-                          Hồ sơ: {selectedQuote.theme}
-                        </span>
-                      </div>
-                      
-                      <blockquote className="relative z-10 font-serif text-[20px] md:text-[22px] font-medium leading-[1.8] text-[#2c2c2a] mb-8 stagger-2 text-justify">
-                        {selectedQuote.text}
+                      <blockquote className="font-serif text-[22px] md:text-[26px] font-medium leading-snug text-[#2c2c2a] mb-6 text-center drop-shadow-sm px-2">
+                        "{selectedQuote.text}"
                       </blockquote>
-                      
-                      <p className="relative z-10 font-mono text-xs uppercase tracking-widest text-[#2c2c2a]/60 mt-auto pt-6 border-t border-outline-variant/30 stagger-2">
-                        Trích xuất từ: {selectedQuote.source}
+                      <p className="font-mono text-[9px] md:text-[10px] uppercase tracking-widest text-[#2c2c2a]/60 text-right mt-5 pt-3 border-t border-[#2c2c2a]/10">
+                        Nguồn: {selectedQuote.source}
                       </p>
-                    </>
-                  )}
-
-                  <div className="mt-8 pt-6 border-t border-[#2c2c2a]/10 flex justify-center w-full">
-                    <button
-                      onClick={() => { handleCopy(selectedQuote.text); setStamped(true); setTimeout(() => handleCloseModal(), 2000); }}
-                      disabled={stamped}
-                      className="stamp-btn w-full justify-center"
-                    >
-                      <div className="seal-icon flex-shrink-0">
-                        <span className="material-symbols-outlined text-[18px]">{stamped ? 'done' : 'approval'}</span>
-                      </div>
-                      <span className="font-mono text-xs uppercase tracking-widest text-[#2c2c2a]/70">
-                        {stamped ? 'Đã lưu trữ!' : 'Đóng dấu lưu trữ'}
+                    </div>
+                  </>
+                ) : (
+                  /* Layout: Bản Báo Cáo Toàn Trang (Thư Dài) */
+                  <>
+                    <div className="absolute top-8 left-8 border-2 border-[#b32d2d]/30 text-[#b32d2d]/40 font-serif font-bold tracking-[0.3em] px-3 py-1 text-xs uppercase transform -rotate-2">
+                      TÀI LIỆU MẬT
+                    </div>
+                    <div className="mb-8 stagger-1 mt-10 relative z-10">
+                      <span className="text-xs font-bold uppercase tracking-[0.3em] text-primary/60 border-b border-primary/20 pb-1">
+                        Hồ sơ: {selectedQuote.theme}
                       </span>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Right Page: Scrapbook Timeline */}
-                <div className="book-page-right custom-scrollbar relative" ref={rightPageRef} onScroll={handleRightPageScroll}>
-                  
-                  {/* Reading Progress Bar */}
-                  <div className="reading-progress">
-                    <div className="reading-progress-fill" style={{width: `${scrollProgress * 100}%`}}></div>
-                  </div>
-
-                  {/* Background watermark with parallax */}
-                  <span 
-                    className="material-symbols-outlined absolute left-1/2 -translate-x-1/2 text-[200px] text-primary/5 pointer-events-none z-0"
-                    style={{top: `calc(50% - ${scrollProgress * 60}px)`}}
-                  >history_edu</span>
-
-                  {/* Epigraph */}
-                  {selectedQuote.epigraph && (
-                    <div className="relative z-10 mb-6 stagger-1">
-                      <p className="font-serif italic text-[#2c2c2a]/50 text-sm leading-relaxed text-center border-b border-[#2c2c2a]/10 pb-4">
-                        <span className="material-symbols-outlined text-sm align-bottom mr-1 opacity-40">format_quote</span>
-                        {selectedQuote.epigraph}
-                      </p>
                     </div>
-                  )}
 
-                  <div className="flex justify-between items-center mb-8 stagger-1 relative z-10">
-                    <h2 className="font-serif text-2xl md:text-3xl font-bold text-primary drop-shadow-sm">
-                      {selectedQuote.storyTitle || "Suy ngẫm"}
-                    </h2>
-                  </div>
+                    <blockquote className="relative z-10 font-serif text-[20px] md:text-[22px] font-medium leading-[1.8] text-[#2c2c2a] mb-8 stagger-2 text-justify">
+                      {selectedQuote.text}
+                    </blockquote>
 
-                  <div className="flex-grow relative z-10">
-                    <div className="relative pl-8 pb-4">
-                      {/* Timeline line */}
-                      <div className="absolute left-[11px] top-4 bottom-0 w-[2px] bg-gradient-to-b from-primary/30 via-tertiary/30 to-transparent stagger-2"></div>
-                      
-                      {/* Coffee Stain Decorator */}
-                      <div className="coffee-stain top-0 right-10 stagger-1"></div>
-                      <div className="coffee-stain top-2 right-12 scale-90 rotate-45 opacity-50 stagger-1"></div>
-                      
-                      {/* History Node (Lined Paper) */}
-                      <div className="relative mb-14 stagger-3">
-                        <div className="absolute -left-[42px] top-4 w-5 h-5 rounded-full bg-[#e2d5bd] border-[3px] border-primary flex items-center justify-center shadow-md z-10">
-                           <div className="w-1.5 h-1.5 rounded-full bg-primary"></div>
-                        </div>
-                        
-                        <div className="vintage-paper-lined z-20">
-                          {/* Paperclip */}
-                          <div className="paperclip"></div>
-                          
-                          <h4 className="font-serif font-bold text-[#801318] flex items-center gap-2 text-lg border-b border-[#801318]/20 pb-2 mb-3">
-                            <span className="material-symbols-outlined text-lg">history_edu</span> Bối cảnh lịch sử
-                          </h4>
-                          <p className="text-[#2c2c2a] leading-relaxed text-justify whitespace-pre-line text-[15px]">
-                            {selectedQuote.context}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Polaroid Image Node */}
-                      <div className="relative mb-12 stagger-3">
-                        <div className="absolute -left-[42px] top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-[#e2d5bd] border-[3px] border-secondary flex items-center justify-center shadow-md z-10">
-                           <div className="w-1.5 h-1.5 rounded-full bg-secondary"></div>
-                        </div>
-                        
-                        <div className="flex justify-center pl-4 relative z-20">
-                          <div className="polaroid-photo w-3/4 max-w-[280px]">
-                            {/* Washi tape 1 */}
-                            <div className="washi-tape washi-tape-1"></div>
-                            <img 
-                              src={selectedQuote.polaroidImg || "https://images.unsplash.com/photo-1599839619722-39751411ea63?q=80&w=600&auto=format&fit=crop"} 
-                              alt="Vintage memory" 
-                              className="polaroid-img border border-outline-variant/10"
-                            />
-                            <div className="absolute bottom-3 left-0 right-0 text-center font-serif italic text-on-surface-variant/70 text-xs">
-                              {selectedQuote.polaroidCaption || "Ký ức đọng lại..."}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      {/* Modern Node (Typewriter Memo) */}
-                      <div className="relative mb-12 stagger-4">
-                        <div className="absolute -left-[42px] top-4 w-5 h-5 rounded-full bg-[#e2d5bd] border-[3px] border-tertiary flex items-center justify-center shadow-md z-10">
-                           <div className="w-1.5 h-1.5 rounded-full bg-tertiary"></div>
-                        </div>
-                        
-                        <div className="typewriter-memo z-20 transform rotate-1">
-                          {/* Paperclip */}
-                          <div className="paperclip" style={{left: 'auto', right: '30px', transform: 'rotate(-5deg)'}}></div>
-                          
-                          <h4 className="font-bold flex items-center gap-2 text-base border-b border-[#2c2c2a]/20 pb-2 mb-3 uppercase tracking-widest">
-                            <span className="material-symbols-outlined text-base">notes</span> Biên bản đính kèm
-                          </h4>
-                          <p className="leading-relaxed text-justify whitespace-pre-line text-sm">
-                            {selectedQuote.modern}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Takeaway — Torn Paper */}
-                      <div className="relative pl-2 mt-10 stagger-4">
-                        <div className="torn-paper">
-                          <div className="flex items-start gap-3">
-                            <span className="material-symbols-outlined text-[#801318] text-xl mt-1 flex-shrink-0">auto_awesome</span>
-                            <div>
-                              <p className="font-serif font-bold text-[#801318] text-sm uppercase tracking-widest mb-2">Lời nhắn gửi hậu thế</p>
-                              <p className="font-serif italic text-[#2c2c2a] leading-relaxed text-[15px]">
-                                {selectedQuote.takeaway || "Hãy sống xứng đáng với những gì tiền nhân đã gửi gắm."}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      
-                    </div>
-                  </div>
-
-                </div>
-
-                {/* Stamp Slam Overlay for Book Modal */}
-                {stamped && (
-                  <div className="stamp-overlay" style={{ borderRadius: '4px' }}>
-                    <div className="stamp-shockwave"></div>
-                    <div className="stamp-slam">
-                      <span className="material-symbols-outlined stamp-slam-icon">verified</span>
-                      <div className="stamp-slam-text">ĐÃ<br/>LƯU TRỮ</div>
-                      <div className="stamp-slam-date">{new Date().toLocaleDateString('vi-VN')}</div>
-                    </div>
-                  </div>
+                    <p className="relative z-10 font-mono text-xs uppercase tracking-widest text-[#2c2c2a]/60 mt-auto pt-6 border-t border-outline-variant/30 stagger-2">
+                      Trích xuất từ: {selectedQuote.source}
+                    </p>
+                  </>
                 )}
-              </div>
-          )}
 
-          {/* Phase 3 & 4: Single Card Modal (For Short Quotes) */}
-          {(modalState === 'flying' || modalState === 'reading') && !selectedQuote.hasStory && (
-              <div className={`single-card-modal transition-all duration-1000 ease-[cubic-bezier(0.25,0.8,0.25,1)] origin-bottom ${modalState === 'flying' ? 'scale-[0.4] opacity-0 translate-y-32' : 'scale-100 opacity-100 translate-y-0'}`}>
-                <div className="absolute top-8 left-8 border-2 border-[#b32d2d]/30 text-[#b32d2d]/40 font-serif font-bold tracking-[0.3em] px-3 py-1 text-xs uppercase transform -rotate-2">
-                  TÀI LIỆU MẬT
-                </div>
-                
-                <button
-                  onClick={handleCloseModal}
-                  className="absolute top-6 right-6 text-[#2c2c2a] hover:text-[#b32d2d] transition-colors cursor-pointer w-10 h-10 rounded-full border border-[#2c2c2a]/20 flex items-center justify-center bg-white/30 backdrop-blur-sm shadow-sm z-20"
-                >
-                  <span className="material-symbols-outlined text-sm">close</span>
-                </button>
-                
-                <div className="paperclip" style={{top: '-15px', left: '50%', transform: 'translateX(-50%) rotate(3deg)'}}></div>
-                
-                <span className="material-symbols-outlined text-5xl text-[#2c2c2a]/10 mb-6 stagger-1">format_quote</span>
-                
-                <blockquote className="font-serif text-3xl font-medium leading-relaxed text-[#2c2c2a] mb-10 stagger-2 px-8">
-                  "{selectedQuote.text}"
-                </blockquote>
-                
-                <div className="stagger-3 mt-auto w-full pt-8 border-t border-[#2c2c2a]/20 flex flex-col items-center relative z-10">
-                  <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#2c2c2a]/60 mb-6 font-bold">
-                    Trích từ: {selectedQuote.source}
-                  </p>
-                  
+                <div className="mt-8 pt-6 border-t border-[#2c2c2a]/10 flex justify-center w-full">
                   <button
-                    onClick={() => { handleCopy(selectedQuote.text); setStamped(true); setTimeout(() => handleCloseModal(), 2000); }}
+                    onClick={() => {
+                      handleCopy(selectedQuote.text);
+                      setStamped(true);
+                      setTimeout(() => handleCloseModal(), 2000);
+                    }}
                     disabled={stamped}
-                    className="stamp-btn"
+                    className="stamp-btn w-full justify-center"
                   >
-                    <div className="seal-icon">
-                      <span className="material-symbols-outlined text-[18px]">{stamped ? 'done' : 'approval'}</span>
+                    <div className="seal-icon flex-shrink-0">
+                      <span className="material-symbols-outlined text-[18px]">{stamped ? "done" : "approval"}</span>
                     </div>
                     <span className="font-mono text-xs uppercase tracking-widest text-[#2c2c2a]/70">
-                      {stamped ? 'Đã lưu trữ!' : 'Đóng dấu lưu trữ'}
+                      {stamped ? "Đã lưu trữ!" : "Đóng dấu lưu trữ"}
                     </span>
                   </button>
                 </div>
+              </div>
 
-                {/* Stamp Slam Overlay for Single Card Modal */}
-                {stamped && (
-                  <div className="stamp-overlay" style={{ borderRadius: '8px' }}>
-                    <div className="stamp-shockwave"></div>
-                    <div className="stamp-slam">
-                      <span className="material-symbols-outlined stamp-slam-icon">verified</span>
-                      <div className="stamp-slam-text">ĐÃ<br/>LƯU TRỮ</div>
-                      <div className="stamp-slam-date">{new Date().toLocaleDateString('vi-VN')}</div>
-                    </div>
+              {/* Right Page: Scrapbook Timeline */}
+              <div className="book-page-right custom-scrollbar relative" ref={rightPageRef} onScroll={handleRightPageScroll}>
+                {/* Reading Progress Bar */}
+                <div className="reading-progress">
+                  <div className="reading-progress-fill" style={{ width: `${scrollProgress * 100}%` }}></div>
+                </div>
+
+                {/* Background watermark with parallax */}
+                <span
+                  className="material-symbols-outlined absolute left-1/2 -translate-x-1/2 text-[200px] text-primary/5 pointer-events-none z-0"
+                  style={{ top: `calc(50% - ${scrollProgress * 60}px)` }}
+                >
+                  history_edu
+                </span>
+
+                {/* Epigraph */}
+                {selectedQuote.epigraph && (
+                  <div className="relative z-10 mb-6 stagger-1">
+                    <p className="font-serif italic text-[#2c2c2a]/50 text-sm leading-relaxed text-center border-b border-[#2c2c2a]/10 pb-4">
+                      <span className="material-symbols-outlined text-sm align-bottom mr-1 opacity-40">format_quote</span>
+                      {selectedQuote.epigraph}
+                    </p>
                   </div>
                 )}
+
+                <div className="flex justify-between items-center mb-8 stagger-1 relative z-10">
+                  <h2 className="font-serif text-2xl md:text-3xl font-bold text-primary drop-shadow-sm">{selectedQuote.storyTitle || "Suy ngẫm"}</h2>
+                </div>
+
+                <div className="flex-grow relative z-10">
+                  <div className="relative pl-8 pb-4">
+                    {/* Timeline line */}
+                    <div className="absolute left-[11px] top-4 bottom-0 w-[2px] bg-gradient-to-b from-primary/30 via-tertiary/30 to-transparent stagger-2"></div>
+
+                    {/* Coffee Stain Decorator */}
+                    <div className="coffee-stain top-0 right-10 stagger-1"></div>
+                    <div className="coffee-stain top-2 right-12 scale-90 rotate-45 opacity-50 stagger-1"></div>
+
+                    {/* History Node (Lined Paper) */}
+                    <div className="relative mb-14 stagger-3">
+                      <div className="absolute -left-[42px] top-4 w-5 h-5 rounded-full bg-[#e2d5bd] border-[3px] border-primary flex items-center justify-center shadow-md z-10">
+                        <div className="w-1.5 h-1.5 rounded-full bg-primary"></div>
+                      </div>
+
+                      <div className="vintage-paper-lined z-20">
+                        {/* Paperclip */}
+                        <div className="paperclip"></div>
+
+                        <h4 className="font-serif font-bold text-[#801318] flex items-center gap-2 text-lg border-b border-[#801318]/20 pb-2 mb-3">
+                          <span className="material-symbols-outlined text-lg">history_edu</span> Bối cảnh lịch sử
+                        </h4>
+                        <p className="text-[#2c2c2a] leading-relaxed text-justify whitespace-pre-line text-[15px]">{selectedQuote.context}</p>
+                      </div>
+                    </div>
+
+                    {/* Polaroid Image Node */}
+                    <div className="relative mb-12 stagger-3">
+                      <div className="absolute -left-[42px] top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-[#e2d5bd] border-[3px] border-secondary flex items-center justify-center shadow-md z-10">
+                        <div className="w-1.5 h-1.5 rounded-full bg-secondary"></div>
+                      </div>
+
+                      <div className="flex justify-center pl-4 relative z-20">
+                        <div className="polaroid-photo w-3/4 max-w-[280px]">
+                          {/* Washi tape 1 */}
+                          <div className="washi-tape washi-tape-1"></div>
+                          <img
+                            src={
+                              selectedQuote.polaroidImg ||
+                              "https://images.unsplash.com/photo-1599839619722-39751411ea63?q=80&w=600&auto=format&fit=crop"
+                            }
+                            alt="Vintage memory"
+                            className="polaroid-img border border-outline-variant/10"
+                          />
+                          <div className="absolute bottom-3 left-0 right-0 text-center font-serif italic text-on-surface-variant/70 text-xs">
+                            {selectedQuote.polaroidCaption || "Ký ức đọng lại..."}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Modern Node (Typewriter Memo) */}
+                    <div className="relative mb-12 stagger-4">
+                      <div className="absolute -left-[42px] top-4 w-5 h-5 rounded-full bg-[#e2d5bd] border-[3px] border-tertiary flex items-center justify-center shadow-md z-10">
+                        <div className="w-1.5 h-1.5 rounded-full bg-tertiary"></div>
+                      </div>
+
+                      <div className="typewriter-memo z-20 transform rotate-1">
+                        {/* Paperclip */}
+                        <div className="paperclip" style={{ left: "auto", right: "30px", transform: "rotate(-5deg)" }}></div>
+
+                        <h4 className="font-bold flex items-center gap-2 text-base border-b border-[#2c2c2a]/20 pb-2 mb-3 uppercase tracking-widest">
+                          <span className="material-symbols-outlined text-base">notes</span> Biên bản đính kèm
+                        </h4>
+                        <p className="leading-relaxed text-justify whitespace-pre-line text-sm">{selectedQuote.modern}</p>
+                      </div>
+                    </div>
+
+                    {/* Takeaway — Torn Paper */}
+                    <div className="relative pl-2 mt-10 stagger-4">
+                      <div className="torn-paper">
+                        <div className="flex items-start gap-3">
+                          <span className="material-symbols-outlined text-[#801318] text-xl mt-1 flex-shrink-0">auto_awesome</span>
+                          <div>
+                            <p className="font-serif font-bold text-[#801318] text-sm uppercase tracking-widest mb-2">Lời nhắn gửi hậu thế</p>
+                            <p className="font-serif italic text-[#2c2c2a] leading-relaxed text-[15px]">
+                              {selectedQuote.takeaway || "Hãy sống xứng đáng với những gì tiền nhân đã gửi gắm."}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
+
+              {/* Stamp Slam Overlay for Book Modal */}
+              {stamped && (
+                <div className="stamp-overlay" style={{ borderRadius: "4px" }}>
+                  <div className="stamp-shockwave"></div>
+                  <div className="stamp-slam">
+                    <span className="material-symbols-outlined stamp-slam-icon">verified</span>
+                    <div className="stamp-slam-text">
+                      ĐÃ
+                      <br />
+                      LƯU TRỮ
+                    </div>
+                    <div className="stamp-slam-date">{new Date().toLocaleDateString("vi-VN")}</div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Phase 3 & 4: Single Card Modal (For Short Quotes) */}
+          {(modalState === "flying" || modalState === "reading") && !selectedQuote.hasStory && (
+            <div
+              className={`single-card-modal transition-all duration-1000 ease-[cubic-bezier(0.25,0.8,0.25,1)] origin-bottom ${modalState === "flying" ? "scale-[0.4] opacity-0 translate-y-32" : "scale-100 opacity-100 translate-y-0"}`}
+            >
+              <div className="absolute top-8 left-8 border-2 border-[#b32d2d]/30 text-[#b32d2d]/40 font-serif font-bold tracking-[0.3em] px-3 py-1 text-xs uppercase transform -rotate-2">
+                TÀI LIỆU MẬT
+              </div>
+
+              <button
+                onClick={handleCloseModal}
+                className="absolute top-6 right-6 text-[#2c2c2a] hover:text-[#b32d2d] transition-colors cursor-pointer w-10 h-10 rounded-full border border-[#2c2c2a]/20 flex items-center justify-center bg-white/30 backdrop-blur-sm shadow-sm z-20"
+              >
+                <span className="material-symbols-outlined text-sm">close</span>
+              </button>
+
+              <div className="paperclip" style={{ top: "-15px", left: "50%", transform: "translateX(-50%) rotate(3deg)" }}></div>
+
+              <span className="material-symbols-outlined text-5xl text-[#2c2c2a]/10 mb-6 stagger-1">format_quote</span>
+
+              <blockquote className="font-serif text-3xl font-medium leading-relaxed text-[#2c2c2a] mb-10 stagger-2 px-8">
+                "{selectedQuote.text}"
+              </blockquote>
+
+              <div className="stagger-3 mt-auto w-full pt-8 border-t border-[#2c2c2a]/20 flex flex-col items-center relative z-10">
+                <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#2c2c2a]/60 mb-6 font-bold">Trích từ: {selectedQuote.source}</p>
+
+                <button
+                  onClick={() => {
+                    handleCopy(selectedQuote.text);
+                    setStamped(true);
+                    setTimeout(() => handleCloseModal(), 2000);
+                  }}
+                  disabled={stamped}
+                  className="stamp-btn"
+                >
+                  <div className="seal-icon">
+                    <span className="material-symbols-outlined text-[18px]">{stamped ? "done" : "approval"}</span>
+                  </div>
+                  <span className="font-mono text-xs uppercase tracking-widest text-[#2c2c2a]/70">
+                    {stamped ? "Đã lưu trữ!" : "Đóng dấu lưu trữ"}
+                  </span>
+                </button>
+              </div>
+
+              {/* Stamp Slam Overlay for Single Card Modal */}
+              {stamped && (
+                <div className="stamp-overlay" style={{ borderRadius: "8px" }}>
+                  <div className="stamp-shockwave"></div>
+                  <div className="stamp-slam">
+                    <span className="material-symbols-outlined stamp-slam-icon">verified</span>
+                    <div className="stamp-slam-text">
+                      ĐÃ
+                      <br />
+                      LƯU TRỮ
+                    </div>
+                    <div className="stamp-slam-date">{new Date().toLocaleDateString("vi-VN")}</div>
+                  </div>
+                </div>
+              )}
+            </div>
           )}
         </div>
       )}
-
     </div>
   );
 }

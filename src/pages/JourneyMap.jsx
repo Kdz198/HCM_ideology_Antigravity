@@ -36,6 +36,7 @@ const mapData = {
 
 export default function JourneyMap() {
   const [selectedPoint, setSelectedPoint] = useState(null);
+  const [showMenu, setShowMenu] = useState(false);
   const location = useLocation();
 
   const getLinkClass = (path) => {
@@ -75,10 +76,22 @@ export default function JourneyMap() {
               <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
               <input className="pl-10 pr-4 py-2 bg-surface-container-low border-none rounded-full text-body-md focus:ring-1 focus:ring-primary w-64 transition-all" placeholder="Tìm kiếm di sản..." type="text"/>
             </div>
-            <div className="w-4"></div> {/* Spacer */}
+            <button className="md:hidden flex items-center justify-center w-10 h-10 rounded-lg hover:bg-primary/10 transition-colors cursor-pointer" onClick={() => setShowMenu(!showMenu)}>
+              <span className="material-symbols-outlined text-on-surface-variant">{showMenu ? 'close' : 'menu'}</span>
+            </button>
           </div>
         </div>
       </header>
+      {showMenu && (
+        <div className="fixed top-20 left-0 right-0 z-40 bg-surface/95 backdrop-blur-md border-b border-outline-variant/30 md:hidden animate-fade-in">
+          <div className="flex flex-col px-gutter py-md gap-sm">
+            <Link className={getLinkClass('/')} to="/" onClick={() => setShowMenu(false)}>Trang chủ</Link>
+            <Link className={getLinkClass('/map')} to="/map" onClick={() => setShowMenu(false)}>Bản đồ số</Link>
+            <Link className={getLinkClass('/mailbox')} to="/mailbox" onClick={() => setShowMenu(false)}>Hộp thư ký ức</Link>
+            <Link className={getLinkClass('/quiz')} to="/quiz" onClick={() => setShowMenu(false)}>Trắc nghiệm</Link>
+          </div>
+        </div>
+      )}
 
       <main className="relative min-h-[calc(100vh-80px)] flex flex-col md:flex-row overflow-hidden">
         <aside className="w-full md:w-80 bg-surface-container-low/50 backdrop-blur-sm border-r border-outline-variant/30 z-20 flex flex-col">

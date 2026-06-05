@@ -33,6 +33,7 @@ export default function Home() {
   const [chatInput, setChatInput] = useState("");
   const [chatMessages, setChatMessages] = useState([]);
   const [chatLoading, setChatLoading] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
   const [lastRequestTime, setLastRequestTime] = useState(0);
   const chatMessagesEndRef = useRef(null);
 
@@ -156,10 +157,22 @@ Giữ câu trả lời dưới 150 từ để tiện đọc trên widget chat.`;
           </div>
           <div className="flex items-center gap-md">
             <span className="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary">search</span>
-            <div className="w-4"></div> {/* Empty spacer to maintain layout balance without the login button */}
+            <button className="md:hidden flex items-center justify-center w-10 h-10 rounded-lg hover:bg-primary/10 transition-colors cursor-pointer" onClick={() => setShowMenu(!showMenu)}>
+              <span className="material-symbols-outlined text-on-surface-variant">{showMenu ? 'close' : 'menu'}</span>
+            </button>
           </div>
         </nav>
       </header>
+      {showMenu && (
+        <div className="fixed top-20 left-0 right-0 z-40 bg-surface/95 backdrop-blur-md border-b border-outline-variant/30 md:hidden animate-fade-in">
+          <div className="flex flex-col px-gutter py-md gap-sm">
+            <Link className="text-primary font-bold font-body-md text-body-md py-sm" to="/" onClick={() => setShowMenu(false)}>Trang chủ</Link>
+            <Link className="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md py-sm" to="/map" onClick={() => setShowMenu(false)}>Bản đồ số</Link>
+            <Link className="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md py-sm" to="/mailbox" onClick={() => setShowMenu(false)}>Hộp thư ký ức</Link>
+            <Link className="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md py-sm" to="/quiz" onClick={() => setShowMenu(false)}>Trắc nghiệm</Link>
+          </div>
+        </div>
+      )}
 
       <main className="pt-20">
         {/* Hero Section */}
