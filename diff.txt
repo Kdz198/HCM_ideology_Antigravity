@@ -1,0 +1,971 @@
+﻿diff --git a/src/pages/MemoryMailbox.jsx b/src/pages/MemoryMailbox.jsx
+index 33a8d26..78b3ed2 100644
+--- a/src/pages/MemoryMailbox.jsx
++++ b/src/pages/MemoryMailbox.jsx
+@@ -1,23 +1,20 @@
+-import { useState, useEffect, useRef, useCallback } from "react";
+-import { Link, useLocation } from "react-router-dom";
++import { useState, useEffect, useRef, useCallback } from 'react';
++import { Link, useLocation } from 'react-router-dom';
+ 
+ const quotesData = [
+   {
+     id: 1,
+     text: "Gß║ío ─æem v├áo gi├ú bao ─æau ─æß╗¢n,\nGß║ío gi├ú xong rß╗ôi trß║»ng tß╗▒a b├┤ng.\nSß╗æng ß╗ƒ tr├¬n ─æß╗¥i ng╞░ß╗¥i c┼⌐ng vß║¡y,\nGian nan r├¿n luyß╗çn mß╗¢i th├ánh c├┤ng.",
+     theme: "R├¿n luyß╗çn",
+-    source: 'B├ái th╞í "Nghe tiß║┐ng gi├ú gß║ío" ΓÇö Nhß║¡t k├╜ trong t├╣, 1942',
++    source: "B├ái th╞í \"Nghe tiß║┐ng gi├ú gß║ío\" ΓÇö Nhß║¡t k├╜ trong t├╣, 1942",
+     hasStory: true,
+     storyTitle: "Sß╗▒ hß╗ºy diß╗çt ─æß╗â t├íi sinh",
+     epigraph: "N─âm 1942, giß╗»a ngß╗Ñc tß╗æi Quß║úng T├óy, tiß║┐ng ch├áy gi├ú gß║ío vß║¡ng vß╗ü nh╞░ mß╗Öt lß╗¥i nhß║»n gß╗¡i tß╗½ qu├í khß╗⌐...",
+-    takeaway:
+-      "H├úy nhß╗¢: Vi├¬n kim c╞░╞íng phß║úi chß╗ïu ├íp lß╗▒c h├áng triß╗çu n─âm mß╗¢i tß╗Åa s├íng. Bß║ín c┼⌐ng vß║¡y ΓÇö mß╗ùi lß║ºn bß╗ï cuß╗Öc ─æß╗¥i 'gi├ú' l├á mß╗Öt lß║ºn bß║ín ─æ╞░ß╗úc m├ái s├íng h╞ín.",
++    takeaway: "H├úy nhß╗¢: Vi├¬n kim c╞░╞íng phß║úi chß╗ïu ├íp lß╗▒c h├áng triß╗çu n─âm mß╗¢i tß╗Åa s├íng. Bß║ín c┼⌐ng vß║¡y ΓÇö mß╗ùi lß║ºn bß╗ï cuß╗Öc ─æß╗¥i 'gi├ú' l├á mß╗Öt lß║ºn bß║ín ─æ╞░ß╗úc m├ái s├íng h╞ín.",
+     polaroidImg: "https://images.unsplash.com/photo-1474552226712-ac0f0961a954?q=80&w=600&auto=format&fit=crop",
+     polaroidCaption: "Hß║ít gß║ío qua lß╗¡a thß╗¡...",
+-    context:
+-      "Th╞░a thß║ºy c├┤ v├á c├íc bß║ín, b├ái th╞í n├áy ─æ╞░ß╗úc B├íc viß║┐t n─âm 1942, tß╗½ trong ngß╗Ñc tß╗æi Quß║úng T├óy. Khi nghe tiß║┐ng ch├áy gi├ú gß║ío ch├ít ch├║a nß╗çn xuß╗æng cß╗æi ─æ├í, B├íc nh├¼n thß║Ñy th├ón phß║¡n con ng╞░ß╗¥i. Hß║ít gß║ío bß╗ï ─æß║¡p n├ít lß╗¢p vß╗Å sß║ºn s├╣i, chß╗ïu lß╗▒c ├⌐p nghiß╗ün n├ít ─æß╗â lß╗Ö ra phß║ºn l├╡i trß║»ng. Sß╗▒ tr╞░ß╗ƒng th├ánh kh├┤ng bao giß╗¥ l├á mß╗Öt con ─æ╞░ß╗¥ng ├¬m ├íi, n├│ l├á mß╗Öt qu├í tr├¼nh bß╗ï cuß╗Öc ─æß╗¥i 'gi├ú' li├¬n tß╗Ñc, bß╗ï ch├¿n ├⌐p ─æß║┐n mß╗⌐c t╞░ß╗ƒng chß╗½ng tan n├ít cß║ú thß╗â x├íc lß║½n tinh thß║ºn.",
+-    modern:
+-      "Ng├áy nay, ch├║ng ta th╞░ß╗¥ng n├│i vß╗¢i nhau nhß╗»ng lß╗¥i hoa mß╗╣ vß╗ü viß╗çc 'b╞░ß╗¢c ra khß╗Åi v├╣ng an to├án'. Nh╞░ng thß╗▒c chß║Ñt, ─æ├│ l├á viß╗çc bß║ín phß║úi chß║Ñp nhß║¡n ─æß╗â cho ├íp lß╗▒c cuß╗Öc sß╗æng, nhß╗»ng deadline nghß║╣t thß╗ƒ, nhß╗»ng lß║ºn thß║Ñt bß║íi trß║ºn trß╗Ñi... '─æß║¡p' n├ít c├íi t├┤i yß║┐u ß╗¢t cß╗ºa m├¼nh. ─Éß╗½ng sß╗ú h├úi sß╗▒ ─æau ─æß╗¢n. Bß╗ƒi v├¼ chß╗ë khi lß╗¢p vß╗Å ng├óy th╞í bß╗ï nghiß╗ün n├ít, bß║ún thß╗â cß╗⌐ng c├íp v├á sß║»c b├⌐n nhß║Ñt cß╗ºa bß║ín mß╗¢i thß╗▒c sß╗▒ ─æ╞░ß╗úc sinh ra.",
++    context: "Th╞░a thß║ºy c├┤ v├á c├íc bß║ín, b├ái th╞í n├áy ─æ╞░ß╗úc B├íc viß║┐t n─âm 1942, tß╗½ trong ngß╗Ñc tß╗æi Quß║úng T├óy. Khi nghe tiß║┐ng ch├áy gi├ú gß║ío ch├ít ch├║a nß╗çn xuß╗æng cß╗æi ─æ├í, B├íc nh├¼n thß║Ñy th├ón phß║¡n con ng╞░ß╗¥i. Hß║ít gß║ío bß╗ï ─æß║¡p n├ít lß╗¢p vß╗Å sß║ºn s├╣i, chß╗ïu lß╗▒c ├⌐p nghiß╗ün n├ít ─æß╗â lß╗Ö ra phß║ºn l├╡i trß║»ng. Sß╗▒ tr╞░ß╗ƒng th├ánh kh├┤ng bao giß╗¥ l├á mß╗Öt con ─æ╞░ß╗¥ng ├¬m ├íi, n├│ l├á mß╗Öt qu├í tr├¼nh bß╗ï cuß╗Öc ─æß╗¥i 'gi├ú' li├¬n tß╗Ñc, bß╗ï ch├¿n ├⌐p ─æß║┐n mß╗⌐c t╞░ß╗ƒng chß╗½ng tan n├ít cß║ú thß╗â x├íc lß║½n tinh thß║ºn.",
++    modern: "Ng├áy nay, ch├║ng ta th╞░ß╗¥ng n├│i vß╗¢i nhau nhß╗»ng lß╗¥i hoa mß╗╣ vß╗ü viß╗çc 'b╞░ß╗¢c ra khß╗Åi v├╣ng an to├án'. Nh╞░ng thß╗▒c chß║Ñt, ─æ├│ l├á viß╗çc bß║ín phß║úi chß║Ñp nhß║¡n ─æß╗â cho ├íp lß╗▒c cuß╗Öc sß╗æng, nhß╗»ng deadline nghß║╣t thß╗ƒ, nhß╗»ng lß║ºn thß║Ñt bß║íi trß║ºn trß╗Ñi... '─æß║¡p' n├ít c├íi t├┤i yß║┐u ß╗¢t cß╗ºa m├¼nh. ─Éß╗½ng sß╗ú h├úi sß╗▒ ─æau ─æß╗¢n. Bß╗ƒi v├¼ chß╗ë khi lß╗¢p vß╗Å ng├óy th╞í bß╗ï nghiß╗ün n├ít, bß║ún thß╗â cß╗⌐ng c├íp v├á sß║»c b├⌐n nhß║Ñt cß╗ºa bß║ín mß╗¢i thß╗▒c sß╗▒ ─æ╞░ß╗úc sinh ra."
+   },
+   {
+     id: 2,
+@@ -30,10 +27,8 @@ const quotesData = [
+     takeaway: "C├┤ng nghß╗ç thay ─æß╗òi mß╗ùi ng├áy, nh╞░ng gi├í trß╗ï 'ng╞░ß╗¥i' th├¼ v─⌐nh cß╗¡u. H├úy ─æß║ºu t╞░ v├áo ph├ón bß║ún d├ái hß║ín nhß║Ñt: ch├¡nh bß║ín.",
+     polaroidImg: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=600&auto=format&fit=crop",
+     polaroidCaption: "Gi├ío dß╗Ñc l├á gi├í trß╗ï tr╞░ß╗¥ng tß╗ôn...",
+-    context:
+-      "M├╣a xu├ón n─âm 1958, B├íc ─æ├ú m╞░ß╗ún ├╜ cß╗ºa ng╞░ß╗¥i x╞░a ─æß╗â nhß║Ñn mß║ính chß╗» 'Trß╗ông'. Trß╗ông c├óy cß║ºn ─æß║Ñt tß╗æt, n╞░ß╗¢c trong. 'Trß╗ông ng╞░ß╗¥i' c┼⌐ng cß║ºn mß╗Öt m├┤i tr╞░ß╗¥ng v─ân minh, kh├┤ng ─æß╗Öc hß║íi. ─Éß╗æi vß╗¢i B├íc, con ng╞░ß╗¥i lu├┤n l├á trung t├óm cß╗ºa mß╗ìi sß╗▒ ph├ít triß╗ân, mß╗ìi cuß╗Öc c├ích mß║íng cuß╗æi c├╣ng ─æß╗üu phß║úi h╞░ß╗¢ng tß╗¢i hß║ính ph├║c thß╗▒c sß╗▒ cß╗ºa nh├ón d├ón.",
+-    modern:
+-      "Sß╗▒ nghiß╗çp 'trß╗ông ng╞░ß╗¥i' cß╗ºa thß║┐ kß╗╖ 21 ch├¡nh l├á qu├í tr├¼nh ch├║ng ta kh├┤ng ngß╗½ng tß╗▒ n├óng cß║Ñp bß║ún th├ón. Trong kß╗╖ nguy├¬n c├┤ng nghß╗ç ph├ít triß╗ân v┼⌐ b├úo, m├íy m├│c c├│ thß╗â t├¡nh to├ín nhanh h╞ín, code giß╗Åi h╞ín ch├║ng ta. Nh╞░ng tri thß╗⌐c, ─æß║ío ─æß╗⌐c, sß╗▒ thß║Ñu cß║úm v├á tr├ích nhiß╗çm ΓÇô nhß╗»ng gi├í trß╗ï 'ng╞░ß╗¥i' nhß║Ñt ΓÇô l├á thß╗⌐ c├┤ng nghß╗ç kh├┤ng bao giß╗¥ thay thß║┐ ─æ╞░ß╗úc.",
++    context: "M├╣a xu├ón n─âm 1958, B├íc ─æ├ú m╞░ß╗ún ├╜ cß╗ºa ng╞░ß╗¥i x╞░a ─æß╗â nhß║Ñn mß║ính chß╗» 'Trß╗ông'. Trß╗ông c├óy cß║ºn ─æß║Ñt tß╗æt, n╞░ß╗¢c trong. 'Trß╗ông ng╞░ß╗¥i' c┼⌐ng cß║ºn mß╗Öt m├┤i tr╞░ß╗¥ng v─ân minh, kh├┤ng ─æß╗Öc hß║íi. ─Éß╗æi vß╗¢i B├íc, con ng╞░ß╗¥i lu├┤n l├á trung t├óm cß╗ºa mß╗ìi sß╗▒ ph├ít triß╗ân, mß╗ìi cuß╗Öc c├ích mß║íng cuß╗æi c├╣ng ─æß╗üu phß║úi h╞░ß╗¢ng tß╗¢i hß║ính ph├║c thß╗▒c sß╗▒ cß╗ºa nh├ón d├ón.",
++    modern: "Sß╗▒ nghiß╗çp 'trß╗ông ng╞░ß╗¥i' cß╗ºa thß║┐ kß╗╖ 21 ch├¡nh l├á qu├í tr├¼nh ch├║ng ta kh├┤ng ngß╗½ng tß╗▒ n├óng cß║Ñp bß║ún th├ón. Trong kß╗╖ nguy├¬n c├┤ng nghß╗ç ph├ít triß╗ân v┼⌐ b├úo, m├íy m├│c c├│ thß╗â t├¡nh to├ín nhanh h╞ín, code giß╗Åi h╞ín ch├║ng ta. Nh╞░ng tri thß╗⌐c, ─æß║ío ─æß╗⌐c, sß╗▒ thß║Ñu cß║úm v├á tr├ích nhiß╗çm ΓÇô nhß╗»ng gi├í trß╗ï 'ng╞░ß╗¥i' nhß║Ñt ΓÇô l├á thß╗⌐ c├┤ng nghß╗ç kh├┤ng bao giß╗¥ thay thß║┐ ─æ╞░ß╗úc."
+   },
+   {
+     id: 3,
+@@ -43,68 +38,64 @@ const quotesData = [
+     hasStory: true,
+     storyTitle: "M├ú nguß╗ôn ─æß║ío ─æß╗⌐c cß╗æt l├╡i",
+     epigraph: "Giß╗»a chiß║┐n tr╞░ß╗¥ng kh├│i lß╗¡a 1949, B├íc kh├┤ng n├│i vß╗ü s├║ng ─æß║ín ΓÇö B├íc n├│i vß╗ü Trß╗¥i, ─Éß║Ñt, v├á Ng╞░ß╗¥i...",
+-    takeaway:
+-      "4 chß╗» Cß║ºn ΓÇô Kiß╗çm ΓÇô Li├¬m ΓÇô Ch├¡nh kh├┤ng phß║úi khß║⌐u hiß╗çu. N├│ l├á hß╗ç ─æiß╗üu h├ánh cß╗ºa mß╗Öt con ng╞░ß╗¥i ho├án chß╗ënh. Thiß║┐u mß╗Öt m├│n, hß╗ç thß╗æng sß╗Ñp ─æß╗ò.",
++    takeaway: "4 chß╗» Cß║ºn ΓÇô Kiß╗çm ΓÇô Li├¬m ΓÇô Ch├¡nh kh├┤ng phß║úi khß║⌐u hiß╗çu. N├│ l├á hß╗ç ─æiß╗üu h├ánh cß╗ºa mß╗Öt con ng╞░ß╗¥i ho├án chß╗ënh. Thiß║┐u mß╗Öt m├│n, hß╗ç thß╗æng sß╗Ñp ─æß╗ò.",
+     polaroidImg: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=600&auto=format&fit=crop",
+     polaroidCaption: "Nhß╗»ng trang s├ích kh├┤ng phai...",
+-    context:
+-      "Giß╗»a l├║c cuß╗Öc kh├íng chiß║┐n n─âm 1949 ─æang v├┤ c├╣ng cam go, B├íc kh├┤ng d├╣ng nhß╗»ng l├╜ luß║¡n ch├¡nh trß╗ï kh├┤ khan. B├íc m╞░ß╗ún ngay quy luß║¡t bß║Ñt biß║┐n cß╗ºa v┼⌐ trß╗Ñ ΓÇô Trß╗¥i ß║»t phß║úi c├│ 4 m├╣a, ─Éß║Ñt ß║»t phß║úi c├│ 4 ph╞░╞íng ΓÇô ─æß╗â khß║│ng ─æß╗ïnh: Cß║ºn, Kiß╗çm, Li├¬m, Ch├¡nh l├á cß║Ñu tr├║c nß╗ün tß║úng cß╗ºa mß╗Öt con ng╞░ß╗¥i. Mß║Ñt ─æi mß╗Öt yß║┐u tß╗æ, to├án bß╗Ö cß║Ñu tr├║c ─æ├│ sß║╜ sß╗Ñp ─æß╗ò.",
+-    modern:
+-      "4 chß╗» n├áy kh├┤ng hß╗ü c┼⌐, n├│ ch├¡nh l├á bß╗Ö kß╗╣ n─âng sinh tß╗ôn trong thß╗¥i ─æß║íi sß╗æ:\n\nΓÇó Cß║ºn: L├á sß╗▒ chß╗º ─æß╗Öng cß║¡p nhß║¡t kiß║┐n thß╗⌐c li├¬n tß╗Ñc ─æß╗â kh├┤ng bß╗ï tß╗Ñt hß║¡u.\n\nΓÇó Kiß╗çm: L├á t╞░ duy tß╗æi ╞░u h├│a. Tiß║┐t kiß╗çm quß╗╣ thß╗¥i gian thay v├¼ l╞░ß╗¢t mß║íng v├┤ thß╗⌐c. N├│ giß╗æng nh╞░ nguy├¬n tß║»c giß╗» mß╗ìi thß╗⌐ ─æ╞ín giß║ún v├á gß╗ìn g├áng, loß║íi bß╗Å sß╗▒ r╞░ß╗¥m r├á ─æß╗â tß║¡p trung v├áo gi├í trß╗ï cß╗æt l├╡i.\n\nΓÇó Li├¬m: L├á sß╗▒ minh bß║ích, kh├┤ng 'sß╗æng ß║úo' hay chß║íy theo nhß╗»ng gi├í trß╗ï vß║¡t chß║Ñt ph├╣ phiß║┐m.\n\nΓÇó Ch├¡nh: L├á t├¡nh ch├¡nh trß╗▒c, d├ím bß║úo vß╗ç c├íi ─æ├║ng v├á h├ánh xß╗¡ v─ân minh, c├│ tr├ích nhiß╗çm vß╗¢i tß╗½ng c├║ click chuß╗Öt cß╗ºa m├¼nh tr├¬n kh├┤ng gian mß║íng.",
++    context: "Giß╗»a l├║c cuß╗Öc kh├íng chiß║┐n n─âm 1949 ─æang v├┤ c├╣ng cam go, B├íc kh├┤ng d├╣ng nhß╗»ng l├╜ luß║¡n ch├¡nh trß╗ï kh├┤ khan. B├íc m╞░ß╗ún ngay quy luß║¡t bß║Ñt biß║┐n cß╗ºa v┼⌐ trß╗Ñ ΓÇô Trß╗¥i ß║»t phß║úi c├│ 4 m├╣a, ─Éß║Ñt ß║»t phß║úi c├│ 4 ph╞░╞íng ΓÇô ─æß╗â khß║│ng ─æß╗ïnh: Cß║ºn, Kiß╗çm, Li├¬m, Ch├¡nh l├á cß║Ñu tr├║c nß╗ün tß║úng cß╗ºa mß╗Öt con ng╞░ß╗¥i. Mß║Ñt ─æi mß╗Öt yß║┐u tß╗æ, to├án bß╗Ö cß║Ñu tr├║c ─æ├│ sß║╜ sß╗Ñp ─æß╗ò.",
++    modern: "4 chß╗» n├áy kh├┤ng hß╗ü c┼⌐, n├│ ch├¡nh l├á bß╗Ö kß╗╣ n─âng sinh tß╗ôn trong thß╗¥i ─æß║íi sß╗æ:\n\nΓÇó Cß║ºn: L├á sß╗▒ chß╗º ─æß╗Öng cß║¡p nhß║¡t kiß║┐n thß╗⌐c li├¬n tß╗Ñc ─æß╗â kh├┤ng bß╗ï tß╗Ñt hß║¡u.\n\nΓÇó Kiß╗çm: L├á t╞░ duy tß╗æi ╞░u h├│a. Tiß║┐t kiß╗çm quß╗╣ thß╗¥i gian thay v├¼ l╞░ß╗¢t mß║íng v├┤ thß╗⌐c. N├│ giß╗æng nh╞░ nguy├¬n tß║»c giß╗» mß╗ìi thß╗⌐ ─æ╞ín giß║ún v├á gß╗ìn g├áng, loß║íi bß╗Å sß╗▒ r╞░ß╗¥m r├á ─æß╗â tß║¡p trung v├áo gi├í trß╗ï cß╗æt l├╡i.\n\nΓÇó Li├¬m: L├á sß╗▒ minh bß║ích, kh├┤ng 'sß╗æng ß║úo' hay chß║íy theo nhß╗»ng gi├í trß╗ï vß║¡t chß║Ñt ph├╣ phiß║┐m.\n\nΓÇó Ch├¡nh: L├á t├¡nh ch├¡nh trß╗▒c, d├ím bß║úo vß╗ç c├íi ─æ├║ng v├á h├ánh xß╗¡ v─ân minh, c├│ tr├ích nhiß╗çm vß╗¢i tß╗½ng c├║ click chuß╗Öt cß╗ºa m├¼nh tr├¬n kh├┤ng gian mß║íng."
+   },
+   {
+     id: 4,
+     text: "N╞░ß╗¢c ─æß╗Öc lß║¡p m├á d├ón kh├┤ng h╞░ß╗ƒng hß║ính ph├║c tß╗▒ do, th├¼ ─æß╗Öc lß║¡p c┼⌐ng chß║│ng c├│ ngh─⌐a l├╜ g├¼.",
+     theme: "Con ng╞░ß╗¥i",
+-    source: "Th╞░ gß╗¡i ß╗ªy ban nh├ón d├ón c├íc bß╗Ö, tß╗ënh, huyß╗çn v├á l├áng, 1945",
++    source: "Th╞░ gß╗¡i ß╗ªy ban nh├ón d├ón c├íc bß╗Ö, tß╗ënh, huyß╗çn v├á l├áng, 1945"
+   },
+   {
+     id: 5,
+     text: "C├│ t├ái m├á kh├┤ng c├│ ─æß╗⌐c l├á ng╞░ß╗¥i v├┤ dß╗Ñng, c├│ ─æß╗⌐c m├á kh├┤ng c├│ t├ái th├¼ l├ám viß╗çc g├¼ c┼⌐ng kh├│.",
+     theme: "Con ng╞░ß╗¥i",
+-    source: "B├ái n├│i chuyß╗çn tß║íi Tr╞░ß╗¥ng S╞░ phß║ím Trung ╞░╞íng, 1956",
++    source: "B├ái n├│i chuyß╗çn tß║íi Tr╞░ß╗¥ng S╞░ phß║ím Trung ╞░╞íng, 1956"
+   },
+   {
+     id: 6,
+     text: "─Éß╗¥i sß╗æng mß╗¢i kh├┤ng phß║úi c├íi g├¼ c┼⌐ c┼⌐ng bß╗Å hß║┐t, kh├┤ng phß║úi c├íi g├¼ mß╗¢i c┼⌐ng l├ám theo.",
+     theme: "─Éß║ío ─æß╗⌐c",
+-    source: 'T├íc phß║⌐m "─Éß╗¥i sß╗æng mß╗¢i", 1947',
++    source: "T├íc phß║⌐m \"─Éß╗¥i sß╗æng mß╗¢i\", 1947"
+   },
+   {
+     id: 7,
+     text: "M├¼nh ─æ├ính gi├í ng╞░ß╗¥i kh├íc thß║┐ n├áo th├¼ ng╞░ß╗¥i kh├íc c┼⌐ng ─æ├ính gi├í m├¼nh thß║┐ ß║Ñy.",
+     theme: "─Éß║ío ─æß╗⌐c",
+-    source: "B├ái n├│i tß║íi lß╗¢p chß╗ënh huß║Ñn c├ín bß╗Ö, 1953",
++    source: "B├ái n├│i tß║íi lß╗¢p chß╗ënh huß║Ñn c├ín bß╗Ö, 1953"
+   },
+   {
+     id: 8,
+     text: "V─ân h├│a phß║úi soi ─æ╞░ß╗¥ng cho quß╗æc d├ón ─æi.",
+     theme: "V─ân h├│a",
+-    source: "Hß╗Öi nghß╗ï V─ân h├│a to├án quß╗æc lß║ºn thß╗⌐ nhß║Ñt, 1946",
++    source: "Hß╗Öi nghß╗ï V─ân h├│a to├án quß╗æc lß║ºn thß╗⌐ nhß║Ñt, 1946"
+   },
+   {
+     id: 9,
+     text: "Hß╗ìc hß╗Åi l├á mß╗Öt viß╗çc phß║úi tiß║┐p tß╗Ñc suß╗æt ─æß╗¥i. Kh├┤ng ai c├│ thß╗â tß╗▒ cho m├¼nh ─æ├ú biß║┐t ─æß╗º rß╗ôi, biß║┐t hß║┐t rß╗ôi.",
+     theme: "V─ân h├│a",
+-    source: "B├ái n├│i tß║íi lß╗¢p bß╗ò t├║c v─ân h├│a c├ín bß╗Ö Trung ╞░╞íng, 1959",
++    source: "B├ái n├│i tß║íi lß╗¢p bß╗ò t├║c v─ân h├│a c├ín bß╗Ö Trung ╞░╞íng, 1959"
+   },
+   {
+     id: 10,
+     text: "Thß╗▒c tiß╗àn kh├┤ng c├│ l├╜ luß║¡n h╞░ß╗¢ng dß║½n th├¼ th├ánh thß╗▒c tiß╗àn m├╣ qu├íng. L├╜ luß║¡n m├á kh├┤ng li├¬n hß╗ç vß╗¢i thß╗▒c tiß╗àn l├á l├╜ luß║¡n su├┤ng.",
+     theme: "V─ân h├│a",
+-    source: "B├ái n├│i tß║íi lß╗¢p hß╗ìc ch├¡nh trß╗ï kh├│a I Tr╞░ß╗¥ng ─Éß║íi hß╗ìc Nh├ón d├ón Viß╗çt Nam, 1955",
+-  },
++    source: "B├ái n├│i tß║íi lß╗¢p hß╗ìc ch├¡nh trß╗ï kh├│a I Tr╞░ß╗¥ng ─Éß║íi hß╗ìc Nh├ón d├ón Viß╗çt Nam, 1955"
++  }
+ ];
+ 
+ export default function MemoryMailbox() {
+   const [selectedQuote, setSelectedQuote] = useState(null);
+   const [countdown, setCountdown] = useState(3);
+-  const [modalState, setModalState] = useState("closed");
++  const [modalState, setModalState] = useState('closed');
+   const [copied, setCopied] = useState(false);
+   const [stamped, setStamped] = useState(false);
+   const [transformStyle, setTransformStyle] = useState({});
+   const [scrollProgress, setScrollProgress] = useState(0);
+-  const [showMenu, setShowMenu] = useState(false);
+   const rightPageRef = useRef(null);
+   const location = useLocation();
+ 
+@@ -122,16 +113,16 @@ export default function MemoryMailbox() {
+       : "text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md";
+   };
+ 
+-  const storyQuotes = quotesData.filter((q) => q.hasStory);
+-  const otherQuotes = quotesData.filter((q) => !q.hasStory);
++  const storyQuotes = quotesData.filter(q => q.hasStory);
++  const otherQuotes = quotesData.filter(q => !q.hasStory);
+ 
+   // Animation Sequence Logic
+   useEffect(() => {
+     let t;
+-    if (modalState === "flying_in") {
++    if (modalState === 'flying_in') {
+       t = setTimeout(() => {
+-        setTransformStyle({ transform: "translate(-50%, -50%) scale(1)", opacity: 1 });
+-        setModalState("countdown");
++        setTransformStyle({ transform: 'translate(-50%, -50%) scale(1)', opacity: 1 });
++        setModalState('countdown');
+         setCountdown(3);
+       }, 50); // Small delay to let browser paint starting position
+     }
+@@ -140,12 +131,12 @@ export default function MemoryMailbox() {
+ 
+   useEffect(() => {
+     let timer;
+-    if (modalState === "countdown") {
++    if (modalState === 'countdown') {
+       timer = setInterval(() => {
+         setCountdown((prev) => {
+           if (prev <= 1) {
+             clearInterval(timer);
+-            setModalState("opening");
++            setModalState('opening');
+             return 0;
+           }
+           return prev - 1;
+@@ -157,17 +148,14 @@ export default function MemoryMailbox() {
+ 
+   useEffect(() => {
+     let t1, t2;
+-    if (modalState === "opening") {
++    if (modalState === 'opening') {
+       // ─Éß╗úi nß║»p th╞░ mß╗ƒ ra v├á th╞░ l╞░ß╗¢t l├¬n tr├¬n rß╗ôi chuyß╗ân sang book modal (1 gi├óy)
+-      t1 = setTimeout(() => setModalState("flying"), 1000);
+-    } else if (modalState === "flying") {
++      t1 = setTimeout(() => setModalState('flying'), 1000); 
++    } else if (modalState === 'flying') {
+       // K├¡ch hoß║ít transition ph├│ng to cuß╗æn sß╗ò
+-      t2 = setTimeout(() => setModalState("reading"), 50);
++      t2 = setTimeout(() => setModalState('reading'), 50); 
+     }
+-    return () => {
+-      clearTimeout(t1);
+-      clearTimeout(t2);
+-    };
++    return () => { clearTimeout(t1); clearTimeout(t2); };
+   }, [modalState]);
+ 
+   const handleOpenQuote = (quote, event) => {
+@@ -175,7 +163,7 @@ export default function MemoryMailbox() {
+     setCopied(false);
+     setStamped(false);
+     setScrollProgress(0);
+-
++    
+     if (event && quote.hasStory) {
+       const rect = event.currentTarget.getBoundingClientRect();
+       const cx = window.innerWidth / 2;
+@@ -188,21 +176,21 @@ export default function MemoryMailbox() {
+ 
+       setTransformStyle({
+         transform: `translate(calc(-50% + ${deltaX}px), calc(-50% + ${deltaY}px)) scale(${scale})`,
+-        opacity: 0,
++        opacity: 0
+       });
+-      setModalState("flying_in");
++      setModalState('flying_in');
+     } else if (quote.hasStory) {
+-      setTransformStyle({ transform: "translate(-50%, -50%) scale(1)", opacity: 1 });
+-      setModalState("countdown");
++      setTransformStyle({ transform: 'translate(-50%, -50%) scale(1)', opacity: 1 });
++      setModalState('countdown');
+       setCountdown(3);
+     } else {
+-      setModalState("reading"); // Instant open
++      setModalState('reading'); // Instant open
+     }
+   };
+ 
+   const handleCloseModal = () => {
+     setSelectedQuote(null);
+-    setModalState("closed");
++    setModalState('closed');
+   };
+ 
+   const handleCopy = (text) => {
+@@ -213,12 +201,13 @@ export default function MemoryMailbox() {
+ 
+   return (
+     <div className="bg-background text-on-background lotus-bg paper-texture min-h-screen flex flex-col pt-20 relative overflow-hidden">
++      
+       {/* Warm Spotlight */}
+       <div className="spotlight-bg"></div>
+-
++      
+       {/* Vignette Overlay */}
+       <div className="vignette-overlay"></div>
+-
++      
+       {/* Floating Dust Particles */}
+       <div className="dust-particle"></div>
+       <div className="dust-particle"></div>
+@@ -884,70 +873,40 @@ export default function MemoryMailbox() {
+       {/* Navigation Header */}
+       <nav className="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md border-b border-outline-variant/30">
+         <div className="flex justify-between items-center h-20 px-gutter max-w-container-max mx-auto">
+-          <Link to="/" className="font-display-md text-display-md text-primary tracking-tight">
+-            K├╜ ß╗¿c V─ân H├│a
+-          </Link>
++          <Link to="/" className="font-display-md text-display-md text-primary tracking-tight">K├╜ ß╗¿c V─ân H├│a</Link>
+           <div className="hidden md:flex items-center gap-lg">
+-            <Link className={getLinkClass("/")} to="/">
+-              Trang chß╗º
+-            </Link>
+-            <Link className={getLinkClass("/map")} to="/map">
+-              Bß║ún ─æß╗ô sß╗æ
+-            </Link>
+-            <Link className={getLinkClass("/mailbox")} to="/mailbox">
+-              Hß╗Öp th╞░ k├╜ ß╗⌐c
+-            </Link>
+-            <Link className={getLinkClass("/quiz")} to="/quiz">
+-              Trß║»c nghiß╗çm
+-            </Link>
++            <Link className={getLinkClass('/')} to="/">Trang chß╗º</Link>
++            <Link className={getLinkClass('/map')} to="/map">Bß║ún ─æß╗ô sß╗æ</Link>
++            <Link className={getLinkClass('/mailbox')} to="/mailbox">Hß╗Öp th╞░ k├╜ ß╗⌐c</Link>
++            <Link className={getLinkClass('/quiz')} to="/quiz">Trß║»c nghiß╗çm</Link>
+           </div>
+-          <button
+-            className="md:hidden flex items-center justify-center w-10 h-10 rounded-lg hover:bg-primary/10 transition-colors cursor-pointer"
+-            onClick={() => setShowMenu(!showMenu)}
+-          >
+-            <span className="material-symbols-outlined text-on-surface-variant">{showMenu ? "close" : "menu"}</span>
+-          </button>
++          <div className="w-10"></div>
+         </div>
+       </nav>
+-      {showMenu && (
+-        <div className="fixed top-20 left-0 right-0 z-40 bg-surface/95 backdrop-blur-md border-b border-outline-variant/30 md:hidden animate-fade-in">
+-          <div className="flex flex-col px-gutter py-md gap-sm">
+-            <Link className={getLinkClass("/")} to="/" onClick={() => setShowMenu(false)}>
+-              Trang chß╗º
+-            </Link>
+-            <Link className={getLinkClass("/map")} to="/map" onClick={() => setShowMenu(false)}>
+-              Bß║ún ─æß╗ô sß╗æ
+-            </Link>
+-            <Link className={getLinkClass("/mailbox")} to="/mailbox" onClick={() => setShowMenu(false)}>
+-              Hß╗Öp th╞░ k├╜ ß╗⌐c
+-            </Link>
+-            <Link className={getLinkClass("/quiz")} to="/quiz" onClick={() => setShowMenu(false)}>
+-              Trß║»c nghiß╗çm
+-            </Link>
+-          </div>
+-        </div>
+-      )}
+ 
+       {/* Main Content */}
+       <main className="max-w-6xl mx-auto px-gutter w-full relative z-10 flex flex-col justify-between h-[calc(100vh-80px)] pt-6 pb-4">
++        
+         {/* Compact Header */}
+-        <header className="flex items-center justify-center gap-4 flex-shrink-0" style={{ animation: "fadeSlideUp 1s ease-out forwards" }}>
++        <header className="flex items-center justify-center gap-4 flex-shrink-0" style={{ animation: 'fadeSlideUp 1s ease-out forwards' }}>
+           <div className="h-px w-12 bg-primary/30"></div>
+-          <div className="wax-seal header-seal-pulse" style={{ width: "28px", height: "28px", position: "relative" }}>
++          <div className="wax-seal header-seal-pulse" style={{width: '28px', height: '28px', position: 'relative'}}>
+             <span className="material-symbols-outlined text-[14px] relative z-10">history_edu</span>
+           </div>
+-          <h1 className="vintage-title font-serif text-2xl md:text-3xl font-bold text-primary drop-shadow-sm">Hß╗Öp Th╞░ K├╜ ß╗¿c</h1>
++          <h1 className="vintage-title font-serif text-2xl md:text-3xl font-bold text-primary drop-shadow-sm">
++            Hß╗Öp Th╞░ K├╜ ß╗¿c
++          </h1>
+           <div className="h-px w-12 bg-primary/30"></div>
+         </header>
+ 
+         {/* Featured Story Postcards */}
+         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-20 px-4 md:px-0 flex-shrink-0">
+           {storyQuotes.map((quote) => (
+-            <div
+-              key={quote.id}
++            <div 
++              key={quote.id} 
+               onClick={(e) => handleOpenQuote(quote, e)}
+               className="vintage-postcard"
+-              style={{ animation: "fadeSlideUp 1s ease-out forwards" }}
++              style={{ animation: 'fadeSlideUp 1s ease-out forwards' }}
+             >
+               <div className="postage-stamp">
+                 <span className="material-symbols-outlined text-[24px]">local_florist</span>
+@@ -955,17 +914,21 @@ export default function MemoryMailbox() {
+               <div className="postmark">
+                 <span className="font-serif text-[10px] uppercase font-bold tracking-widest">1945</span>
+               </div>
+-
++              
+               <div className="relative z-10 flex flex-col h-full">
+                 <div className="mb-4">
+                   <span className="text-[10px] text-primary/80 font-bold uppercase tracking-[0.2em] block mb-4 bg-white/60 inline-block px-2 py-1 rounded">
+                     {quote.theme}
+                   </span>
+-                  <h3 className="font-serif text-xl md:text-2xl text-primary font-medium leading-snug mb-2 drop-shadow-sm">{quote.storyTitle}</h3>
++                  <h3 className="font-serif text-xl md:text-2xl text-primary font-medium leading-snug mb-2 drop-shadow-sm">
++                    {quote.storyTitle}
++                  </h3>
+                 </div>
+-
++                
+                 <div className="mt-auto pt-6 flex justify-between items-center text-tertiary">
+-                  <p className="font-serif text-sm text-on-surface-variant/70 italic">Nhß║Ñp ─æß╗â mß╗ƒ th╞░...</p>
++                  <p className="font-serif text-sm text-on-surface-variant/70 italic">
++                    Nhß║Ñp ─æß╗â mß╗ƒ th╞░...
++                  </p>
+                   <div className="flex items-center gap-1">
+                     <span className="material-symbols-outlined text-lg">auto_awesome</span>
+                     <span className="text-[10px] font-bold uppercase tracking-widest">Kß╗â chuyß╗çn</span>
+@@ -978,18 +941,20 @@ export default function MemoryMailbox() {
+ 
+         {/* Marquee Paper Strips */}
+         {otherQuotes.length > 0 && (
+-          <div className="relative z-10 flex-shrink-0" style={{ animation: "fadeSlideUp 1.5s ease-out forwards" }}>
++          <div className="relative z-10 flex-shrink-0" style={{ animation: 'fadeSlideUp 1.5s ease-out forwards' }}>
+             <div className="flex items-center justify-center gap-4 mb-8">
+               <div className="h-px w-12 bg-outline-variant/30"></div>
+-              <h3 className="text-center font-label-md text-sm text-on-surface-variant uppercase tracking-[0.3em]">D├▓ng chß║úy thß╗¥i gian</h3>
++              <h3 className="text-center font-label-md text-sm text-on-surface-variant uppercase tracking-[0.3em]">
++                D├▓ng chß║úy thß╗¥i gian
++              </h3>
+               <div className="h-px w-12 bg-outline-variant/30"></div>
+             </div>
+-
++            
+             <div className="marquee-wrapper">
+               <div className="marquee-content gap-6">
+                 {[...otherQuotes, ...otherQuotes, ...otherQuotes].map((quote, index) => (
+-                  <div
+-                    key={`${quote.id}-${index}`}
++                  <div 
++                    key={`${quote.id}-${index}`} 
+                     onClick={(e) => handleOpenQuote(quote, e)}
+                     className="film-strip h-[180px] w-[340px] flex-shrink-0"
+                   >
+@@ -1010,28 +975,27 @@ export default function MemoryMailbox() {
+             </div>
+           </div>
+         )}
++
+       </main>
+ 
+       {/* Animation Sequence Modal */}
+-      {modalState !== "closed" && selectedQuote && (
+-        <div
+-          className={`fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-black/60 backdrop-blur-sm transition-all duration-700 ${modalState === "flying_in" ? "opacity-0" : "opacity-100"}`}
+-        >
++      {modalState !== 'closed' && selectedQuote && (
++        <div className={`fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-black/60 backdrop-blur-sm transition-all duration-700 ${modalState === 'flying_in' ? 'opacity-0' : 'opacity-100'}`}>
++          
+           {/* Phase 1 & 2: Big Envelope (Flying In, Countdown & Opening) */}
+-          {(modalState === "flying_in" || modalState === "countdown" || modalState === "opening") && (
+-            <div
+-              className={`absolute top-1/2 left-1/2 perspective-1000 w-[400px] h-[260px] transition-all duration-[800ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] z-[105] ${modalState === "countdown" ? "magical-glow rounded-lg" : ""}`}
++          {(modalState === 'flying_in' || modalState === 'countdown' || modalState === 'opening') && (
++            <div 
++              className={`absolute top-1/2 left-1/2 perspective-1000 w-[400px] h-[260px] transition-all duration-[800ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] z-[105] ${modalState === 'countdown' ? 'magical-glow rounded-lg' : ''}`}
+               style={transformStyle}
+             >
++              
+               {/* Back of Envelope */}
+               <div className="absolute inset-0 bg-gradient-to-br from-[#f2e9e1] to-[#e8dbce] rounded-lg shadow-2xl border border-[#c2aa93] z-0 overflow-hidden">
+                 <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/aged-paper.png')] mix-blend-multiply"></div>
+               </div>
+-
++              
+               {/* The Letter (Slides up during 'opening') */}
+-              <div
+-                className={`absolute left-4 right-4 bg-[#fdfcf7] rounded shadow-inner z-10 transition-all duration-1000 ease-[cubic-bezier(0.25,0.8,0.25,1)] ${modalState === "opening" ? "-top-32 bottom-8 opacity-0 scale-95" : "top-4 bottom-4 opacity-100 scale-100"}`}
+-              >
++              <div className={`absolute left-4 right-4 bg-[#fdfcf7] rounded shadow-inner z-10 transition-all duration-1000 ease-[cubic-bezier(0.25,0.8,0.25,1)] ${modalState === 'opening' ? '-top-32 bottom-8 opacity-0 scale-95' : 'top-4 bottom-4 opacity-100 scale-100'}`}>
+                 <div className="mx-6 mt-8 h-px bg-outline-variant/10"></div>
+                 <div className="mx-6 mt-4 h-px bg-outline-variant/10"></div>
+                 <div className="mx-6 mt-4 h-px bg-outline-variant/10"></div>
+@@ -1039,316 +1003,297 @@ export default function MemoryMailbox() {
+ 
+               {/* Front layers of Envelope */}
+               <div className="absolute inset-0 z-20 pointer-events-none">
+-                <div
+-                  className="absolute bottom-0 left-0 right-0 h-[160px] bg-gradient-to-t from-[#e6d8ca] to-[#fdfaf6] border-t border-[#c2aa93]/40 rounded-b-lg"
+-                  style={{ clipPath: "polygon(0 100%, 50% 0, 100% 100%)" }}
+-                ></div>
+-                <div
+-                  className="absolute top-0 bottom-0 left-0 w-[200px] bg-gradient-to-r from-[#e6d8ca] to-[#fcf8f3]"
+-                  style={{ clipPath: "polygon(0 0, 100% 50%, 0 100%)" }}
+-                ></div>
+-                <div
+-                  className="absolute top-0 bottom-0 right-0 w-[200px] bg-gradient-to-l from-[#e6d8ca] to-[#fcf8f3]"
+-                  style={{ clipPath: "polygon(100% 0, 0 50%, 100% 100%)" }}
+-                ></div>
++                <div className="absolute bottom-0 left-0 right-0 h-[160px] bg-gradient-to-t from-[#e6d8ca] to-[#fdfaf6] border-t border-[#c2aa93]/40 rounded-b-lg" style={{ clipPath: 'polygon(0 100%, 50% 0, 100% 100%)' }}></div>
++                <div className="absolute top-0 bottom-0 left-0 w-[200px] bg-gradient-to-r from-[#e6d8ca] to-[#fcf8f3]" style={{ clipPath: 'polygon(0 0, 100% 50%, 0 100%)' }}></div>
++                <div className="absolute top-0 bottom-0 right-0 w-[200px] bg-gradient-to-l from-[#e6d8ca] to-[#fcf8f3]" style={{ clipPath: 'polygon(100% 0, 0 50%, 100% 100%)' }}></div>
+               </div>
+-
++              
+               {/* Shimmer effect during countdown */}
+-              {modalState === "countdown" && (
++              {modalState === 'countdown' && (
+                 <div className="shimmer-wrapper">
+                   <div className="shimmer-line"></div>
+                 </div>
+               )}
+ 
+               {/* Envelope Flap (Rotates up) */}
+-              <div
+-                className={`absolute top-0 left-0 right-0 h-[150px] bg-gradient-to-b from-[#e8dbce] to-[#f7efe8] border-b border-[#c2aa93]/60 z-30 transform-style-3d origin-top transition-all duration-700 ease-in-out ${modalState === "opening" ? "rotate-x-180" : "rotate-x-0"}`}
+-                style={{ clipPath: "polygon(0 0, 100% 0, 50% 100%)" }}
+-              >
+-                <div className={`wax-seal bottom-1 left-1/2 -translate-x-1/2 ${modalState === "countdown" ? "heartbeat-seal" : ""}`}>
+-                  {modalState === "countdown" ? (
+-                    <span className="font-serif font-bold text-2xl drop-shadow-md relative z-10">{countdown}</span>
+-                  ) : (
+-                    <span className="material-symbols-outlined text-[24px] relative z-10">mark_email_read</span>
+-                  )}
+-                </div>
++              <div className={`absolute top-0 left-0 right-0 h-[150px] bg-gradient-to-b from-[#e8dbce] to-[#f7efe8] border-b border-[#c2aa93]/60 z-30 transform-style-3d origin-top transition-all duration-700 ease-in-out ${modalState === 'opening' ? 'rotate-x-180' : 'rotate-x-0'}`} style={{ clipPath: 'polygon(0 0, 100% 0, 50% 100%)' }}>
++                 <div className={`wax-seal bottom-1 left-1/2 -translate-x-1/2 ${modalState === 'countdown' ? 'heartbeat-seal' : ''}`}>
++                    {modalState === 'countdown' ? (
++                      <span className="font-serif font-bold text-2xl drop-shadow-md relative z-10">{countdown}</span>
++                    ) : (
++                      <span className="material-symbols-outlined text-[24px] relative z-10">mark_email_read</span>
++                    )}
++                 </div>
+               </div>
+ 
+               {/* Message below */}
+               <div className="absolute -bottom-16 left-0 right-0 text-center text-white/90 font-label-md tracking-[0.2em] uppercase text-[10px] drop-shadow-sm">
+-                {modalState === "countdown" ? <span className="animate-pulse">─Éang giß║úi m├ú phong th╞░...</span> : <span>─Éang mß╗ƒ th╞░...</span>}
++                {modalState === 'countdown' ? (
++                  <span className="animate-pulse">─Éang giß║úi m├ú phong th╞░...</span>
++                ) : (
++                  <span>─Éang mß╗ƒ th╞░...</span>
++                )}
+               </div>
+             </div>
+           )}
+ 
+           {/* Phase 3 & 4: Flying Book Modal (For Quotes with Story) */}
+-          {(modalState === "flying" || modalState === "reading") && selectedQuote.hasStory && (
+-            <div
+-              className={`book-modal flex-col md:flex-row transition-all duration-1000 ease-[cubic-bezier(0.25,0.8,0.25,1)] origin-bottom ${modalState === "flying" ? "scale-[0.4] opacity-0 translate-y-32" : "scale-100 opacity-100 translate-y-0"}`}
+-            >
+-              {/* Left Page: Classified Document or Telegram */}
+-              <div className={`book-page-left w-full md:w-2/5 flex-shrink-0 relative ${selectedQuote.text.length < 150 ? "dossier-cover-bg" : ""}`}>
+-                {selectedQuote.text.length < 150 ? (
+-                  /* Layout: B├¼a Hß╗ô S╞í + Bß╗⌐c ─Éiß╗çn T├¡n (Th╞░ Ngß║»n) */
+-                  <>
+-                    <div className="absolute top-8 left-6 text-[#2c2c2a]/10 font-serif transform -rotate-12 pointer-events-none z-0">
+-                      <div className="border-[3px] border-[#2c2c2a]/10 px-3 py-1.5 uppercase font-bold text-xl tracking-[0.2em]">Tuyß╗çt Mß║¡t</div>
+-                      <div className="mt-1 text-xs">Kho l╞░u trß╗» sß╗æ 04</div>
+-                    </div>
+-
+-                    <div className="telegram-card z-10 mt-4">
+-                      <div className="paperclip" style={{ top: "-20px", left: "50%", transform: "translateX(-50%)" }}></div>
+-                      <div className="text-[10px] text-[#2c2c2a]/50 uppercase tracking-widest border-b border-[#2c2c2a]/10 pb-2 mb-5 flex justify-between">
+-                        <span>Tr├¡ch lß╗Ñc ─æ├¡nh k├¿m</span>
+-                        <span>HS: {selectedQuote.theme}</span>
++          {(modalState === 'flying' || modalState === 'reading') && selectedQuote.hasStory && (
++              <div className={`book-modal flex-col md:flex-row transition-all duration-1000 ease-[cubic-bezier(0.25,0.8,0.25,1)] origin-bottom ${modalState === 'flying' ? 'scale-[0.4] opacity-0 translate-y-32' : 'scale-100 opacity-100 translate-y-0'}`}>
++                
++                {/* Left Page: Classified Document or Telegram */}
++                <div className={`book-page-left w-full md:w-2/5 flex-shrink-0 relative ${selectedQuote.text.length < 150 ? 'dossier-cover-bg' : ''}`}>
++                  
++                  {selectedQuote.text.length < 150 ? (
++                    /* Layout: B├¼a Hß╗ô S╞í + Bß╗⌐c ─Éiß╗çn T├¡n (Th╞░ Ngß║»n) */
++                    <>
++                      <div className="absolute top-8 left-6 text-[#2c2c2a]/10 font-serif transform -rotate-12 pointer-events-none z-0">
++                        <div className="border-[3px] border-[#2c2c2a]/10 px-3 py-1.5 uppercase font-bold text-xl tracking-[0.2em]">Tuyß╗çt Mß║¡t</div>
++                        <div className="mt-1 text-xs">Kho l╞░u trß╗» sß╗æ 04</div>
++                      </div>
++                      
++                      <div className="telegram-card z-10 mt-4">
++                        <div className="paperclip" style={{top: '-20px', left: '50%', transform: 'translateX(-50%)'}}></div>
++                        <div className="text-[10px] text-[#2c2c2a]/50 uppercase tracking-widest border-b border-[#2c2c2a]/10 pb-2 mb-5 flex justify-between">
++                          <span>Tr├¡ch lß╗Ñc ─æ├¡nh k├¿m</span>
++                          <span>HS: {selectedQuote.theme}</span>
++                        </div>
++                        <blockquote className="font-serif text-[22px] md:text-[26px] font-medium leading-snug text-[#2c2c2a] mb-6 text-center drop-shadow-sm px-2">
++                          "{selectedQuote.text}"
++                        </blockquote>
++                        <p className="font-mono text-[9px] md:text-[10px] uppercase tracking-widest text-[#2c2c2a]/60 text-right mt-5 pt-3 border-t border-[#2c2c2a]/10">
++                          Nguß╗ôn: {selectedQuote.source}
++                        </p>
++                      </div>
++                    </>
++                  ) : (
++                    /* Layout: Bß║ún B├ío C├ío To├án Trang (Th╞░ D├ái) */
++                    <>
++                      <div className="absolute top-8 left-8 border-2 border-[#b32d2d]/30 text-[#b32d2d]/40 font-serif font-bold tracking-[0.3em] px-3 py-1 text-xs uppercase transform -rotate-2">
++                        T├ÇI LIß╗åU Mß║¼T
++                      </div>
++                      <div className="mb-8 stagger-1 mt-10 relative z-10">
++                        <span className="text-xs font-bold uppercase tracking-[0.3em] text-primary/60 border-b border-primary/20 pb-1">
++                          Hß╗ô s╞í: {selectedQuote.theme}
++                        </span>
+                       </div>
+-                      <blockquote className="font-serif text-[22px] md:text-[26px] font-medium leading-snug text-[#2c2c2a] mb-6 text-center drop-shadow-sm px-2">
+-                        "{selectedQuote.text}"
++                      
++                      <blockquote className="relative z-10 font-serif text-[20px] md:text-[22px] font-medium leading-[1.8] text-[#2c2c2a] mb-8 stagger-2 text-justify">
++                        {selectedQuote.text}
+                       </blockquote>
+-                      <p className="font-mono text-[9px] md:text-[10px] uppercase tracking-widest text-[#2c2c2a]/60 text-right mt-5 pt-3 border-t border-[#2c2c2a]/10">
+-                        Nguß╗ôn: {selectedQuote.source}
++                      
++                      <p className="relative z-10 font-mono text-xs uppercase tracking-widest text-[#2c2c2a]/60 mt-auto pt-6 border-t border-outline-variant/30 stagger-2">
++                        Tr├¡ch xuß║Ñt tß╗½: {selectedQuote.source}
+                       </p>
+-                    </div>
+-                  </>
+-                ) : (
+-                  /* Layout: Bß║ún B├ío C├ío To├án Trang (Th╞░ D├ái) */
+-                  <>
+-                    <div className="absolute top-8 left-8 border-2 border-[#b32d2d]/30 text-[#b32d2d]/40 font-serif font-bold tracking-[0.3em] px-3 py-1 text-xs uppercase transform -rotate-2">
+-                      T├ÇI LIß╗åU Mß║¼T
+-                    </div>
+-                    <div className="mb-8 stagger-1 mt-10 relative z-10">
+-                      <span className="text-xs font-bold uppercase tracking-[0.3em] text-primary/60 border-b border-primary/20 pb-1">
+-                        Hß╗ô s╞í: {selectedQuote.theme}
+-                      </span>
+-                    </div>
+-
+-                    <blockquote className="relative z-10 font-serif text-[20px] md:text-[22px] font-medium leading-[1.8] text-[#2c2c2a] mb-8 stagger-2 text-justify">
+-                      {selectedQuote.text}
+-                    </blockquote>
+-
+-                    <p className="relative z-10 font-mono text-xs uppercase tracking-widest text-[#2c2c2a]/60 mt-auto pt-6 border-t border-outline-variant/30 stagger-2">
+-                      Tr├¡ch xuß║Ñt tß╗½: {selectedQuote.source}
+-                    </p>
+-                  </>
+-                )}
+-
+-                <div className="mt-8 pt-6 border-t border-[#2c2c2a]/10 flex justify-center w-full">
+-                  <button
+-                    onClick={() => {
+-                      handleCopy(selectedQuote.text);
+-                      setStamped(true);
+-                      setTimeout(() => handleCloseModal(), 2000);
+-                    }}
+-                    disabled={stamped}
+-                    className="stamp-btn w-full justify-center"
+-                  >
+-                    <div className="seal-icon flex-shrink-0">
+-                      <span className="material-symbols-outlined text-[18px]">{stamped ? "done" : "approval"}</span>
+-                    </div>
+-                    <span className="font-mono text-xs uppercase tracking-widest text-[#2c2c2a]/70">
+-                      {stamped ? "─É├ú l╞░u trß╗»!" : "─É├│ng dß║Ñu l╞░u trß╗»"}
+-                    </span>
+-                  </button>
+-                </div>
+-              </div>
+-
+-              {/* Right Page: Scrapbook Timeline */}
+-              <div className="book-page-right custom-scrollbar relative" ref={rightPageRef} onScroll={handleRightPageScroll}>
+-                {/* Reading Progress Bar */}
+-                <div className="reading-progress">
+-                  <div className="reading-progress-fill" style={{ width: `${scrollProgress * 100}%` }}></div>
+-                </div>
+-
+-                {/* Background watermark with parallax */}
+-                <span
+-                  className="material-symbols-outlined absolute left-1/2 -translate-x-1/2 text-[200px] text-primary/5 pointer-events-none z-0"
+-                  style={{ top: `calc(50% - ${scrollProgress * 60}px)` }}
+-                >
+-                  history_edu
+-                </span>
++                    </>
++                  )}
+ 
+-                {/* Epigraph */}
+-                {selectedQuote.epigraph && (
+-                  <div className="relative z-10 mb-6 stagger-1">
+-                    <p className="font-serif italic text-[#2c2c2a]/50 text-sm leading-relaxed text-center border-b border-[#2c2c2a]/10 pb-4">
+-                      <span className="material-symbols-outlined text-sm align-bottom mr-1 opacity-40">format_quote</span>
+-                      {selectedQuote.epigraph}
+-                    </p>
++                  <div className="mt-8 pt-6 border-t border-[#2c2c2a]/10 flex justify-center w-full">
++                    <button
++                      onClick={() => { handleCopy(selectedQuote.text); setStamped(true); setTimeout(() => handleCloseModal(), 2000); }}
++                      disabled={stamped}
++                      className="stamp-btn w-full justify-center"
++                    >
++                      <div className="seal-icon flex-shrink-0">
++                        <span className="material-symbols-outlined text-[18px]">{stamped ? 'done' : 'approval'}</span>
++                      </div>
++                      <span className="font-mono text-xs uppercase tracking-widest text-[#2c2c2a]/70">
++                        {stamped ? '─É├ú l╞░u trß╗»!' : '─É├│ng dß║Ñu l╞░u trß╗»'}
++                      </span>
++                    </button>
+                   </div>
+-                )}
+-
+-                <div className="flex justify-between items-center mb-8 stagger-1 relative z-10">
+-                  <h2 className="font-serif text-2xl md:text-3xl font-bold text-primary drop-shadow-sm">{selectedQuote.storyTitle || "Suy ngß║½m"}</h2>
+                 </div>
+ 
+-                <div className="flex-grow relative z-10">
+-                  <div className="relative pl-8 pb-4">
+-                    {/* Timeline line */}
+-                    <div className="absolute left-[11px] top-4 bottom-0 w-[2px] bg-gradient-to-b from-primary/30 via-tertiary/30 to-transparent stagger-2"></div>
+-
+-                    {/* Coffee Stain Decorator */}
+-                    <div className="coffee-stain top-0 right-10 stagger-1"></div>
+-                    <div className="coffee-stain top-2 right-12 scale-90 rotate-45 opacity-50 stagger-1"></div>
+-
+-                    {/* History Node (Lined Paper) */}
+-                    <div className="relative mb-14 stagger-3">
+-                      <div className="absolute -left-[42px] top-4 w-5 h-5 rounded-full bg-[#e2d5bd] border-[3px] border-primary flex items-center justify-center shadow-md z-10">
+-                        <div className="w-1.5 h-1.5 rounded-full bg-primary"></div>
+-                      </div>
+-
+-                      <div className="vintage-paper-lined z-20">
+-                        {/* Paperclip */}
+-                        <div className="paperclip"></div>
++                {/* Right Page: Scrapbook Timeline */}
++                <div className="book-page-right custom-scrollbar relative" ref={rightPageRef} onScroll={handleRightPageScroll}>
++                  
++                  {/* Reading Progress Bar */}
++                  <div className="reading-progress">
++                    <div className="reading-progress-fill" style={{width: `${scrollProgress * 100}%`}}></div>
++                  </div>
+ 
+-                        <h4 className="font-serif font-bold text-[#801318] flex items-center gap-2 text-lg border-b border-[#801318]/20 pb-2 mb-3">
+-                          <span className="material-symbols-outlined text-lg">history_edu</span> Bß╗æi cß║únh lß╗ïch sß╗¡
+-                        </h4>
+-                        <p className="text-[#2c2c2a] leading-relaxed text-justify whitespace-pre-line text-[15px]">{selectedQuote.context}</p>
+-                      </div>
++                  {/* Background watermark with parallax */}
++                  <span 
++                    className="material-symbols-outlined absolute left-1/2 -translate-x-1/2 text-[200px] text-primary/5 pointer-events-none z-0"
++                    style={{top: `calc(50% - ${scrollProgress * 60}px)`}}
++                  >history_edu</span>
++
++                  {/* Epigraph */}
++                  {selectedQuote.epigraph && (
++                    <div className="relative z-10 mb-6 stagger-1">
++                      <p className="font-serif italic text-[#2c2c2a]/50 text-sm leading-relaxed text-center border-b border-[#2c2c2a]/10 pb-4">
++                        <span className="material-symbols-outlined text-sm align-bottom mr-1 opacity-40">format_quote</span>
++                        {selectedQuote.epigraph}
++                      </p>
+                     </div>
++                  )}
+ 
+-                    {/* Polaroid Image Node */}
+-                    <div className="relative mb-12 stagger-3">
+-                      <div className="absolute -left-[42px] top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-[#e2d5bd] border-[3px] border-secondary flex items-center justify-center shadow-md z-10">
+-                        <div className="w-1.5 h-1.5 rounded-full bg-secondary"></div>
+-                      </div>
++                  <div className="flex justify-between items-center mb-8 stagger-1 relative z-10">
++                    <h2 className="font-serif text-2xl md:text-3xl font-bold text-primary drop-shadow-sm">
++                      {selectedQuote.storyTitle || "Suy ngß║½m"}
++                    </h2>
++                  </div>
+ 
+-                      <div className="flex justify-center pl-4 relative z-20">
+-                        <div className="polaroid-photo w-3/4 max-w-[280px]">
+-                          {/* Washi tape 1 */}
+-                          <div className="washi-tape washi-tape-1"></div>
+-                          <img
+-                            src={
+-                              selectedQuote.polaroidImg ||
+-                              "https://images.unsplash.com/photo-1599839619722-39751411ea63?q=80&w=600&auto=format&fit=crop"
+-                            }
+-                            alt="Vintage memory"
+-                            className="polaroid-img border border-outline-variant/10"
+-                          />
+-                          <div className="absolute bottom-3 left-0 right-0 text-center font-serif italic text-on-surface-variant/70 text-xs">
+-                            {selectedQuote.polaroidCaption || "K├╜ ß╗⌐c ─æß╗ìng lß║íi..."}
+-                          </div>
++                  <div className="flex-grow relative z-10">
++                    <div className="relative pl-8 pb-4">
++                      {/* Timeline line */}
++                      <div className="absolute left-[11px] top-4 bottom-0 w-[2px] bg-gradient-to-b from-primary/30 via-tertiary/30 to-transparent stagger-2"></div>
++                      
++                      {/* Coffee Stain Decorator */}
++                      <div className="coffee-stain top-0 right-10 stagger-1"></div>
++                      <div className="coffee-stain top-2 right-12 scale-90 rotate-45 opacity-50 stagger-1"></div>
++                      
++                      {/* History Node (Lined Paper) */}
++                      <div className="relative mb-14 stagger-3">
++                        <div className="absolute -left-[42px] top-4 w-5 h-5 rounded-full bg-[#e2d5bd] border-[3px] border-primary flex items-center justify-center shadow-md z-10">
++                           <div className="w-1.5 h-1.5 rounded-full bg-primary"></div>
++                        </div>
++                        
++                        <div className="vintage-paper-lined z-20">
++                          {/* Paperclip */}
++                          <div className="paperclip"></div>
++                          
++                          <h4 className="font-serif font-bold text-[#801318] flex items-center gap-2 text-lg border-b border-[#801318]/20 pb-2 mb-3">
++                            <span className="material-symbols-outlined text-lg">history_edu</span> Bß╗æi cß║únh lß╗ïch sß╗¡
++                          </h4>
++                          <p className="text-[#2c2c2a] leading-relaxed text-justify whitespace-pre-line text-[15px]">
++                            {selectedQuote.context}
++                          </p>
+                         </div>
+                       </div>
+-                    </div>
+ 
+-                    {/* Modern Node (Typewriter Memo) */}
+-                    <div className="relative mb-12 stagger-4">
+-                      <div className="absolute -left-[42px] top-4 w-5 h-5 rounded-full bg-[#e2d5bd] border-[3px] border-tertiary flex items-center justify-center shadow-md z-10">
+-                        <div className="w-1.5 h-1.5 rounded-full bg-tertiary"></div>
++                      {/* Polaroid Image Node */}
++                      <div className="relative mb-12 stagger-3">
++                        <div className="absolute -left-[42px] top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-[#e2d5bd] border-[3px] border-secondary flex items-center justify-center shadow-md z-10">
++                           <div className="w-1.5 h-1.5 rounded-full bg-secondary"></div>
++                        </div>
++                        
++                        <div className="flex justify-center pl-4 relative z-20">
++                          <div className="polaroid-photo w-3/4 max-w-[280px]">
++                            {/* Washi tape 1 */}
++                            <div className="washi-tape washi-tape-1"></div>
++                            <img 
++                              src={selectedQuote.polaroidImg || "https://images.unsplash.com/photo-1599839619722-39751411ea63?q=80&w=600&auto=format&fit=crop"} 
++                              alt="Vintage memory" 
++                              className="polaroid-img border border-outline-variant/10"
++                            />
++                            <div className="absolute bottom-3 left-0 right-0 text-center font-serif italic text-on-surface-variant/70 text-xs">
++                              {selectedQuote.polaroidCaption || "K├╜ ß╗⌐c ─æß╗ìng lß║íi..."}
++                            </div>
++                          </div>
++                        </div>
+                       </div>
+-
+-                      <div className="typewriter-memo z-20 transform rotate-1">
+-                        {/* Paperclip */}
+-                        <div className="paperclip" style={{ left: "auto", right: "30px", transform: "rotate(-5deg)" }}></div>
+-
+-                        <h4 className="font-bold flex items-center gap-2 text-base border-b border-[#2c2c2a]/20 pb-2 mb-3 uppercase tracking-widest">
+-                          <span className="material-symbols-outlined text-base">notes</span> Bi├¬n bß║ún ─æ├¡nh k├¿m
+-                        </h4>
+-                        <p className="leading-relaxed text-justify whitespace-pre-line text-sm">{selectedQuote.modern}</p>
++                      
++                      {/* Modern Node (Typewriter Memo) */}
++                      <div className="relative mb-12 stagger-4">
++                        <div className="absolute -left-[42px] top-4 w-5 h-5 rounded-full bg-[#e2d5bd] border-[3px] border-tertiary flex items-center justify-center shadow-md z-10">
++                           <div className="w-1.5 h-1.5 rounded-full bg-tertiary"></div>
++                        </div>
++                        
++                        <div className="typewriter-memo z-20 transform rotate-1">
++                          {/* Paperclip */}
++                          <div className="paperclip" style={{left: 'auto', right: '30px', transform: 'rotate(-5deg)'}}></div>
++                          
++                          <h4 className="font-bold flex items-center gap-2 text-base border-b border-[#2c2c2a]/20 pb-2 mb-3 uppercase tracking-widest">
++                            <span className="material-symbols-outlined text-base">notes</span> Bi├¬n bß║ún ─æ├¡nh k├¿m
++                          </h4>
++                          <p className="leading-relaxed text-justify whitespace-pre-line text-sm">
++                            {selectedQuote.modern}
++                          </p>
++                        </div>
+                       </div>
+-                    </div>
+ 
+-                    {/* Takeaway ΓÇö Torn Paper */}
+-                    <div className="relative pl-2 mt-10 stagger-4">
+-                      <div className="torn-paper">
+-                        <div className="flex items-start gap-3">
+-                          <span className="material-symbols-outlined text-[#801318] text-xl mt-1 flex-shrink-0">auto_awesome</span>
+-                          <div>
+-                            <p className="font-serif font-bold text-[#801318] text-sm uppercase tracking-widest mb-2">Lß╗¥i nhß║»n gß╗¡i hß║¡u thß║┐</p>
+-                            <p className="font-serif italic text-[#2c2c2a] leading-relaxed text-[15px]">
+-                              {selectedQuote.takeaway || "H├úy sß╗æng xß╗⌐ng ─æ├íng vß╗¢i nhß╗»ng g├¼ tiß╗ün nh├ón ─æ├ú gß╗¡i gß║»m."}
+-                            </p>
++                      {/* Takeaway ΓÇö Torn Paper */}
++                      <div className="relative pl-2 mt-10 stagger-4">
++                        <div className="torn-paper">
++                          <div className="flex items-start gap-3">
++                            <span className="material-symbols-outlined text-[#801318] text-xl mt-1 flex-shrink-0">auto_awesome</span>
++                            <div>
++                              <p className="font-serif font-bold text-[#801318] text-sm uppercase tracking-widest mb-2">Lß╗¥i nhß║»n gß╗¡i hß║¡u thß║┐</p>
++                              <p className="font-serif italic text-[#2c2c2a] leading-relaxed text-[15px]">
++                                {selectedQuote.takeaway || "H├úy sß╗æng xß╗⌐ng ─æ├íng vß╗¢i nhß╗»ng g├¼ tiß╗ün nh├ón ─æ├ú gß╗¡i gß║»m."}
++                              </p>
++                            </div>
+                           </div>
+                         </div>
+                       </div>
++                      
+                     </div>
+                   </div>
++
+                 </div>
+-              </div>
+ 
+-              {/* Stamp Slam Overlay for Book Modal */}
+-              {stamped && (
+-                <div className="stamp-overlay" style={{ borderRadius: "4px" }}>
+-                  <div className="stamp-shockwave"></div>
+-                  <div className="stamp-slam">
+-                    <span className="material-symbols-outlined stamp-slam-icon">verified</span>
+-                    <div className="stamp-slam-text">
+-                      ─É├â
+-                      <br />
+-                      L╞»U TRß╗«
++                {/* Stamp Slam Overlay for Book Modal */}
++                {stamped && (
++                  <div className="stamp-overlay" style={{ borderRadius: '4px' }}>
++                    <div className="stamp-shockwave"></div>
++                    <div className="stamp-slam">
++                      <span className="material-symbols-outlined stamp-slam-icon">verified</span>
++                      <div className="stamp-slam-text">─É├â<br/>L╞»U TRß╗«</div>
++                      <div className="stamp-slam-date">{new Date().toLocaleDateString('vi-VN')}</div>
+                     </div>
+-                    <div className="stamp-slam-date">{new Date().toLocaleDateString("vi-VN")}</div>
+                   </div>
+-                </div>
+-              )}
+-            </div>
++                )}
++              </div>
+           )}
+ 
+           {/* Phase 3 & 4: Single Card Modal (For Short Quotes) */}
+-          {(modalState === "flying" || modalState === "reading") && !selectedQuote.hasStory && (
+-            <div
+-              className={`single-card-modal transition-all duration-1000 ease-[cubic-bezier(0.25,0.8,0.25,1)] origin-bottom ${modalState === "flying" ? "scale-[0.4] opacity-0 translate-y-32" : "scale-100 opacity-100 translate-y-0"}`}
+-            >
+-              <div className="absolute top-8 left-8 border-2 border-[#b32d2d]/30 text-[#b32d2d]/40 font-serif font-bold tracking-[0.3em] px-3 py-1 text-xs uppercase transform -rotate-2">
+-                T├ÇI LIß╗åU Mß║¼T
+-              </div>
+-
+-              <button
+-                onClick={handleCloseModal}
+-                className="absolute top-6 right-6 text-[#2c2c2a] hover:text-[#b32d2d] transition-colors cursor-pointer w-10 h-10 rounded-full border border-[#2c2c2a]/20 flex items-center justify-center bg-white/30 backdrop-blur-sm shadow-sm z-20"
+-              >
+-                <span className="material-symbols-outlined text-sm">close</span>
+-              </button>
+-
+-              <div className="paperclip" style={{ top: "-15px", left: "50%", transform: "translateX(-50%) rotate(3deg)" }}></div>
+-
+-              <span className="material-symbols-outlined text-5xl text-[#2c2c2a]/10 mb-6 stagger-1">format_quote</span>
+-
+-              <blockquote className="font-serif text-3xl font-medium leading-relaxed text-[#2c2c2a] mb-10 stagger-2 px-8">
+-                "{selectedQuote.text}"
+-              </blockquote>
+-
+-              <div className="stagger-3 mt-auto w-full pt-8 border-t border-[#2c2c2a]/20 flex flex-col items-center relative z-10">
+-                <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#2c2c2a]/60 mb-6 font-bold">Tr├¡ch tß╗½: {selectedQuote.source}</p>
+-
++          {(modalState === 'flying' || modalState === 'reading') && !selectedQuote.hasStory && (
++              <div className={`single-card-modal transition-all duration-1000 ease-[cubic-bezier(0.25,0.8,0.25,1)] origin-bottom ${modalState === 'flying' ? 'scale-[0.4] opacity-0 translate-y-32' : 'scale-100 opacity-100 translate-y-0'}`}>
++                <div className="absolute top-8 left-8 border-2 border-[#b32d2d]/30 text-[#b32d2d]/40 font-serif font-bold tracking-[0.3em] px-3 py-1 text-xs uppercase transform -rotate-2">
++                  T├ÇI LIß╗åU Mß║¼T
++                </div>
++                
+                 <button
+-                  onClick={() => {
+-                    handleCopy(selectedQuote.text);
+-                    setStamped(true);
+-                    setTimeout(() => handleCloseModal(), 2000);
+-                  }}
+-                  disabled={stamped}
+-                  className="stamp-btn"
++                  onClick={handleCloseModal}
++                  className="absolute top-6 right-6 text-[#2c2c2a] hover:text-[#b32d2d] transition-colors cursor-pointer w-10 h-10 rounded-full border border-[#2c2c2a]/20 flex items-center justify-center bg-white/30 backdrop-blur-sm shadow-sm z-20"
+                 >
+-                  <div className="seal-icon">
+-                    <span className="material-symbols-outlined text-[18px]">{stamped ? "done" : "approval"}</span>
+-                  </div>
+-                  <span className="font-mono text-xs uppercase tracking-widest text-[#2c2c2a]/70">
+-                    {stamped ? "─É├ú l╞░u trß╗»!" : "─É├│ng dß║Ñu l╞░u trß╗»"}
+-                  </span>
++                  <span className="material-symbols-outlined text-sm">close</span>
+                 </button>
+-              </div>
++                
++                <div className="paperclip" style={{top: '-15px', left: '50%', transform: 'translateX(-50%) rotate(3deg)'}}></div>
++                
++                <span className="material-symbols-outlined text-5xl text-[#2c2c2a]/10 mb-6 stagger-1">format_quote</span>
++                
++                <blockquote className="font-serif text-3xl font-medium leading-relaxed text-[#2c2c2a] mb-10 stagger-2 px-8">
++                  "{selectedQuote.text}"
++                </blockquote>
++                
++                <div className="stagger-3 mt-auto w-full pt-8 border-t border-[#2c2c2a]/20 flex flex-col items-center relative z-10">
++                  <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#2c2c2a]/60 mb-6 font-bold">
++                    Tr├¡ch tß╗½: {selectedQuote.source}
++                  </p>
++                  
++                  <button
++                    onClick={() => { handleCopy(selectedQuote.text); setStamped(true); setTimeout(() => handleCloseModal(), 2000); }}
++                    disabled={stamped}
++                    className="stamp-btn"
++                  >
++                    <div className="seal-icon">
++                      <span className="material-symbols-outlined text-[18px]">{stamped ? 'done' : 'approval'}</span>
++                    </div>
++                    <span className="font-mono text-xs uppercase tracking-widest text-[#2c2c2a]/70">
++                      {stamped ? '─É├ú l╞░u trß╗»!' : '─É├│ng dß║Ñu l╞░u trß╗»'}
++                    </span>
++                  </button>
++                </div>
+ 
+-              {/* Stamp Slam Overlay for Single Card Modal */}
+-              {stamped && (
+-                <div className="stamp-overlay" style={{ borderRadius: "8px" }}>
+-                  <div className="stamp-shockwave"></div>
+-                  <div className="stamp-slam">
+-                    <span className="material-symbols-outlined stamp-slam-icon">verified</span>
+-                    <div className="stamp-slam-text">
+-                      ─É├â
+-                      <br />
+-                      L╞»U TRß╗«
++                {/* Stamp Slam Overlay for Single Card Modal */}
++                {stamped && (
++                  <div className="stamp-overlay" style={{ borderRadius: '8px' }}>
++                    <div className="stamp-shockwave"></div>
++                    <div className="stamp-slam">
++                      <span className="material-symbols-outlined stamp-slam-icon">verified</span>
++                      <div className="stamp-slam-text">─É├â<br/>L╞»U TRß╗«</div>
++                      <div className="stamp-slam-date">{new Date().toLocaleDateString('vi-VN')}</div>
+                     </div>
+-                    <div className="stamp-slam-date">{new Date().toLocaleDateString("vi-VN")}</div>
+                   </div>
+-                </div>
+-              )}
+-            </div>
++                )}
++              </div>
+           )}
+         </div>
+       )}
++
+     </div>
+   );
+ }

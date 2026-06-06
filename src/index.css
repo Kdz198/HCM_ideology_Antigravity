@@ -176,3 +176,19 @@
     opacity: 1;
   }
 }
+
+/* --- DARK MODE CSS FILTER MAGIC --- */
+html.dark {
+  filter: invert(1) hue-rotate(180deg);
+  background-color: #000;
+}
+
+html.dark img, 
+html.dark video, 
+html.dark svg, 
+html.dark .polaroid-photo, 
+html.dark .no-invert,
+html.dark .film-strip {
+  filter: invert(1) hue-rotate(180deg);
+}
+
