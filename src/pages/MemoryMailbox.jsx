@@ -227,6 +227,9 @@ export default function MemoryMailbox() {
           z-index: 0;
           animation: candleFlicker 4s ease-in-out infinite;
         }
+        html.dark .spotlight-bg {
+          background: radial-gradient(circle at 50% 30%, rgba(255,235,180,0.05) 0%, rgba(140,113,110,0.02) 60%, transparent 80%);
+        }
         @keyframes candleFlicker {
           0%, 100% { opacity: 1; }
           25% { opacity: 0.92; }
@@ -806,8 +809,14 @@ export default function MemoryMailbox() {
         .marquee-wrapper::before {
           left: 0; background: linear-gradient(to right, #fcf9f8, transparent);
         }
+        html.dark .marquee-wrapper::before {
+          background: linear-gradient(to right, #121212, transparent);
+        }
         .marquee-wrapper::after {
           right: 0; background: linear-gradient(to left, #fcf9f8, transparent);
+        }
+        html.dark .marquee-wrapper::after {
+          background: linear-gradient(to left, #121212, transparent);
         }
         .marquee-content {
           display: flex; width: max-content; animation: scrollX 40s linear infinite;
