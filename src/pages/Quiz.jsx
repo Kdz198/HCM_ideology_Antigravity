@@ -6,10 +6,10 @@ const quizData = [
   {
     q: "Câu 1: Khi dọn dẹp phòng ngủ hoặc góc làm việc cá nhân, triết lý của bạn là gì?",
     options: [
-      "Bỏ bớt những thứ không dùng trong 3 tháng qua, chỉ giữ lại những đồ vật thực sự có công năng. (Tối giản)",
-      "Trang trí bằng những món đồ lưu niệm độc lạ từ nhiều nơi, sách vở đủ các thể loại. (Cởi mở)",
-      "Sắp xếp sao cho linh hoạt nhất, dễ dàng đóng gói di chuyển hoặc thay đổi công năng khi cần. (Resilience)",
-      "Phải có cây xanh, ánh sáng tự nhiên và một góc nhỏ để chill, nghe nhạc hoặc vẽ vời. (Sống xanh)",
+      "Bỏ bớt những thứ không dùng trong 3 tháng qua, chỉ giữ lại những đồ vật thực sự có công năng.",
+      "Trang trí bằng những món đồ lưu niệm độc lạ từ nhiều nơi, sách vở đủ các thể loại.",
+      "Sắp xếp sao cho linh hoạt nhất, dễ dàng đóng gói di chuyển hoặc thay đổi công năng khi cần.",
+      "Phải có cây xanh, ánh sáng tự nhiên và một góc nhỏ để chill, nghe nhạc hoặc vẽ vời.",
     ],
   },
   {
@@ -150,6 +150,7 @@ export default function Quiz() {
   const [animating, setAnimating] = useState(false);
   const [showQR, setShowQR] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const [selectedGroup, setSelectedGroup] = useState(null);
 
   const quizUrl = typeof window !== "undefined" ? window.location.href : "";
 
@@ -158,6 +159,7 @@ export default function Quiz() {
     setCurrentStep(0);
     setAnswers([]);
     setFinished(false);
+    setSelectedGroup(null);
   };
 
   const handleSelectOption = (optIndex) => {
@@ -211,7 +213,8 @@ export default function Quiz() {
     return maxGroup;
   };
 
-  const activeGroup = finished ? getResultGroup() : "A";
+  const calculatedGroup = finished ? getResultGroup() : "A";
+  const activeGroup = selectedGroup || calculatedGroup;
   const result = resultsData[activeGroup];
   const percent = Math.round(((currentStep + 1) / quizData.length) * 100);
   const question = quizData[currentStep];
@@ -278,7 +281,7 @@ export default function Quiz() {
       )}
 
       {/* Main Content */}
-      <main className="flex-grow pt-32 pb-xl px-gutter max-w-container-max mx-auto w-full">
+      <main className="flex-grow pt-32 pb-xl px-sm md:px-gutter max-w-container-max mx-auto w-full">
         {!started && (
           <header className="text-center max-w-3xl mx-auto mb-xl mt-6 relative">
             {/* Decorative lotus elements */}
@@ -380,7 +383,7 @@ export default function Quiz() {
 
             {/* Question Card */}
             <div
-              className={`bg-surface border border-outline-variant/50 p-lg rounded-xl relative overflow-hidden transition-all duration-300 shadow-md ${animating ? "opacity-0 translate-y-4" : "opacity-100 translate-y-0"}`}
+              className={`bg-surface border border-outline-variant/50 p-md md:p-lg rounded-xl relative overflow-hidden transition-all duration-300 shadow-md ${animating ? "opacity-0 translate-y-4" : "opacity-100 translate-y-0"}`}
             >
               {/* Decorative background pattern */}
               <div className="absolute top-0 right-0 p-lg opacity-[0.03] pointer-events-none">
@@ -444,8 +447,7 @@ export default function Quiz() {
                       <span className="text-xs uppercase tracking-widest text-on-primary-container bg-primary-container px-2 py-1 rounded font-bold">
                         {result.modernStyle}
                       </span>
-                      <h3 className="font-headline-md text-[20px] mt-xs">Phong cách tương đồng:</h3>
-                      <p className="font-display-md text-display-sm text-white font-bold leading-tight">{result.tag}</p>
+                      <p className="font-display-md text-display-sm text-white font-bold leading-tight mt-sm">{result.tag}</p>
                     </div>
                   </div>
 
@@ -481,11 +483,28 @@ export default function Quiz() {
                     </div>
                   </div>
 
-                  <div className="pt-md flex flex-wrap gap-md border-t border-outline-variant/30 mt-lg">
-                    <button
-                      onClick={startQuiz}
-                      className="bg-primary text-on-primary px-xl py-md font-label-md text-label-md rounded-lg flex items-center gap-sm hover:bg-primary-container transition-all shadow-md cursor-pointer"
-                    >
+                  <div className="pt-md border-t border-outline-variant/30 mt-lg">
+                    <h4 className="font-headline-sm font-bold text-on-surface mb-sm">Khám phá các phong cách khác:</h4>
+                    <div className="flex flex-wrap gap-sm mb-lg">
+                      {Object.keys(resultsData).map((key) => (
+                        <button
+                          key={key}
+                          onClick={() => setSelectedGroup(key)}
+                          className={`px-md py-sm rounded-full font-label-md text-sm transition-all cursor-pointer ${
+                            activeGroup === key
+                              ? "bg-primary text-on-primary shadow-md"
+                              : "bg-surface-variant/50 text-on-surface-variant hover:bg-primary/10"
+                          }`}
+                        >
+                          {resultsData[key].tag}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="flex flex-wrap gap-md">
+                      <button
+                        onClick={startQuiz}
+                        className="bg-primary text-on-primary px-xl py-md font-label-md text-label-md rounded-lg flex items-center gap-sm hover:bg-primary-container transition-all shadow-md cursor-pointer"
+                      >
                       <span className="material-symbols-outlined">refresh</span> Làm lại trắc nghiệm
                     </button>
                     <Link
@@ -498,7 +517,8 @@ export default function Quiz() {
                 </div>
               </div>
             </div>
-          </section>
+          </div>
+        </section>
         )}
       </main>
 
