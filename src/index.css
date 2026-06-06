@@ -192,3 +192,12 @@ html.dark .film-strip {
   filter: invert(1) hue-rotate(180deg);
 }
 
+
+html.dark .mailbox-root svg,
+html.dark .mailbox-root img,
+html.dark .mailbox-root .no-invert,
+html.dark .mailbox-root .polaroid-photo,
+html.dark .mailbox-root .film-strip {
+  filter: none;
+}
+

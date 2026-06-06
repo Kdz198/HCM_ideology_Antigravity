@@ -200,7 +200,7 @@ export default function MemoryMailbox() {
   };
 
   return (
-    <div className="bg-background text-on-background lotus-bg paper-texture min-h-screen flex flex-col pt-20 relative overflow-hidden">
+    <div className="mailbox-root no-invert dark:bg-[#121212] dark:text-[#f3f0ef] bg-background text-on-background lotus-bg paper-texture min-h-screen flex flex-col pt-20 relative overflow-hidden">
       
       {/* Warm Spotlight */}
       <div className="spotlight-bg"></div>
@@ -871,9 +871,9 @@ export default function MemoryMailbox() {
       `}</style>
 
       {/* Navigation Header */}
-      <nav className="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md border-b border-outline-variant/30">
+      <nav className="fixed top-0 w-full z-50 bg-surface/90 dark:bg-[#121212]/90 backdrop-blur-md border-b border-outline-variant/30 dark:border-[#58413f]/30">
         <div className="flex justify-between items-center h-20 px-gutter max-w-container-max mx-auto">
-          <Link to="/" className="font-display-md text-display-md text-primary tracking-tight">Ký Ức Văn Hóa</Link>
+          <Link to="/" className="font-display-md text-display-md text-primary dark:text-[#ffb3ae] tracking-tight">Ký Ức Văn Hóa</Link>
           <div className="hidden md:flex items-center gap-lg">
             <Link className={getLinkClass('/')} to="/">Trang chủ</Link>
             <Link className={getLinkClass('/map')} to="/map">Bản đồ số</Link>
@@ -889,14 +889,14 @@ export default function MemoryMailbox() {
         
         {/* Compact Header */}
         <header className="flex items-center justify-center gap-4 flex-shrink-0" style={{ animation: 'fadeSlideUp 1s ease-out forwards' }}>
-          <div className="h-px w-12 bg-primary/30"></div>
+          <div className="h-px w-12 bg-primary/30 dark:bg-[#ffb3ae]/30"></div>
           <div className="wax-seal header-seal-pulse" style={{width: '28px', height: '28px', position: 'relative'}}>
-            <span className="material-symbols-outlined text-[14px] relative z-10">history_edu</span>
+            <span className="material-symbols-outlined text-[14px] relative z-10 text-white">history_edu</span>
           </div>
-          <h1 className="vintage-title font-serif text-2xl md:text-3xl font-bold text-primary drop-shadow-sm">
+          <h1 className="vintage-title font-serif text-2xl md:text-3xl font-bold text-primary dark:text-[#ffb3ae] drop-shadow-sm">
             Hộp Thư Ký Ức
           </h1>
-          <div className="h-px w-12 bg-primary/30"></div>
+          <div className="h-px w-12 bg-primary/30 dark:bg-[#ffb3ae]/30"></div>
         </header>
 
         {/* Featured Story Postcards */}
@@ -944,7 +944,7 @@ export default function MemoryMailbox() {
           <div className="relative z-10 flex-shrink-0" style={{ animation: 'fadeSlideUp 1.5s ease-out forwards' }}>
             <div className="flex items-center justify-center gap-4 mb-8">
               <div className="h-px w-12 bg-outline-variant/30"></div>
-              <h3 className="text-center font-label-md text-sm text-on-surface-variant uppercase tracking-[0.3em]">
+              <h3 className="text-center font-label-md text-sm text-on-surface-variant dark:text-[#dfbfbc] uppercase tracking-[0.3em]">
                 Dòng chảy thời gian
               </h3>
               <div className="h-px w-12 bg-outline-variant/30"></div>
