@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 export default function JourneyDetail() {
+  const [showMenu, setShowMenu] = useState(false);
   return (
     <div className="bg-background text-on-background font-body-md selection:bg-primary-fixed-dim selection:text-on-primary-fixed scroll-smooth paper-texture min-h-screen flex flex-col">
       <header className="bg-surface/95 border-b border-outline-variant/20 backdrop-blur-sm fixed top-0 w-full z-50">
@@ -12,9 +14,21 @@ export default function JourneyDetail() {
             <Link className="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" to="/mailbox">Hộp thư ký ức</Link>
             <Link className="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" to="/quiz">Trắc nghiệm</Link>
           </nav>
-          <div className="w-10"></div> {/* Empty spacer to maintain layout balance without the login button */}
+          <button className="md:hidden flex items-center justify-center w-10 h-10 rounded-lg hover:bg-primary/10 transition-colors cursor-pointer" onClick={() => setShowMenu(!showMenu)}>
+            <span className="material-symbols-outlined text-on-surface-variant">{showMenu ? 'close' : 'menu'}</span>
+          </button>
         </div>
       </header>
+      {showMenu && (
+        <div className="fixed top-20 left-0 right-0 z-40 bg-surface/95 backdrop-blur-md border-b border-outline-variant/30 md:hidden animate-fade-in">
+          <div className="flex flex-col px-gutter py-md gap-sm">
+            <Link className="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md py-sm" to="/" onClick={() => setShowMenu(false)}>Trang chủ</Link>
+            <Link className="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md py-sm" to="/map" onClick={() => setShowMenu(false)}>Bản đồ số</Link>
+            <Link className="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md py-sm" to="/mailbox" onClick={() => setShowMenu(false)}>Hộp thư ký ức</Link>
+            <Link className="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md py-sm" to="/quiz" onClick={() => setShowMenu(false)}>Trắc nghiệm</Link>
+          </div>
+        </div>
+      )}
 
       <main className="flex-grow pt-[80px] px-gutter max-w-container-max mx-auto w-full">
         <section className="py-xl text-center relative">

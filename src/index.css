@@ -163,3 +163,16 @@
     transform: translateY(0) scale(1);
   }
 }
+
+/* QR Modal fade-in animation */
+.animate-fade-in {
+  animation: fade-in 0.25s ease-out forwards;
+}
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}

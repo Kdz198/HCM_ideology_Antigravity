@@ -1,14 +1,15 @@
-import { useState } from "react";
+import { QRCodeSVG } from "qrcode.react";
+import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 
 const quizData = [
   {
     q: "Câu 1: Khi dọn dẹp phòng ngủ hoặc góc làm việc cá nhân, triết lý của bạn là gì?",
     options: [
-      "Bỏ bớt những thứ không dùng trong 3 tháng qua, chỉ giữ lại những đồ vật thực sự có công năng. (Tối giản)",
-      "Trang trí bằng những món đồ lưu niệm độc lạ từ nhiều nơi, sách vở đủ các thể loại. (Cởi mở)",
-      "Sắp xếp sao cho linh hoạt nhất, dễ dàng đóng gói di chuyển hoặc thay đổi công năng khi cần. (Resilience)",
-      "Phải có cây xanh, ánh sáng tự nhiên và một góc nhỏ để chill, nghe nhạc hoặc vẽ vời. (Sống xanh)",
+      "Bỏ bớt những thứ không dùng trong 3 tháng qua, chỉ giữ lại những đồ vật thực sự có công năng.",
+      "Trang trí bằng những món đồ lưu niệm độc lạ từ nhiều nơi, sách vở đủ các thể loại.",
+      "Sắp xếp sao cho linh hoạt nhất, dễ dàng đóng gói di chuyển hoặc thay đổi công năng khi cần.",
+      "Phải có cây xanh, ánh sáng tự nhiên và một góc nhỏ để chill, nghe nhạc hoặc vẽ vời.",
     ],
   },
   {
@@ -147,12 +148,19 @@ export default function Quiz() {
   const [answers, setAnswers] = useState([]); // Array of option indexes chosen (0, 1, 2, 3)
   const [finished, setFinished] = useState(false);
   const [animating, setAnimating] = useState(false);
+  const [showQR, setShowQR] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
+  const [selectedGroup, setSelectedGroup] = useState(null);
+  const resultRef = useRef(null);
+
+  const quizUrl = typeof window !== "undefined" ? window.location.href : "";
 
   const startQuiz = () => {
     setStarted(true);
     setCurrentStep(0);
     setAnswers([]);
     setFinished(false);
+    setSelectedGroup(null);
   };
 
   const handleSelectOption = (optIndex) => {
@@ -206,7 +214,13 @@ export default function Quiz() {
     return maxGroup;
   };
 
-  const activeGroup = finished ? getResultGroup() : "A";
+  const handleGroupSelect = (key) => {
+    setSelectedGroup(key);
+    resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const calculatedGroup = finished ? getResultGroup() : "A";
+  const activeGroup = selectedGroup || calculatedGroup;
   const result = resultsData[activeGroup];
   const percent = Math.round(((currentStep + 1) / quizData.length) * 100);
   const question = quizData[currentStep];
@@ -233,12 +247,47 @@ export default function Quiz() {
               Trắc nghiệm
             </Link>
           </div>
-          <div className="w-10"></div> {/* Empty spacer to maintain layout balance without the login button */}
+          <button
+            className="md:hidden flex items-center justify-center w-10 h-10 rounded-lg hover:bg-primary/10 transition-colors cursor-pointer"
+            onClick={() => setShowMenu(!showMenu)}
+          >
+            <span className="material-symbols-outlined text-on-surface-variant">{showMenu ? "close" : "menu"}</span>
+          </button>
         </div>
       </nav>
+      {showMenu && (
+        <div className="fixed top-20 left-0 right-0 z-40 bg-surface/95 backdrop-blur-md border-b border-outline-variant/30 md:hidden animate-fade-in">
+          <div className="flex flex-col px-gutter py-md gap-sm">
+            <Link
+              className="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md py-sm"
+              to="/"
+              onClick={() => setShowMenu(false)}
+            >
+              Trang chủ
+            </Link>
+            <Link
+              className="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md py-sm"
+              to="/map"
+              onClick={() => setShowMenu(false)}
+            >
+              Bản đồ số
+            </Link>
+            <Link
+              className="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md py-sm"
+              to="/mailbox"
+              onClick={() => setShowMenu(false)}
+            >
+              Hộp thư ký ức
+            </Link>
+            <Link className="text-primary font-bold font-body-md text-body-md py-sm" to="/quiz" onClick={() => setShowMenu(false)}>
+              Trắc nghiệm
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* Main Content */}
-      <main className="flex-grow pt-32 pb-xl px-gutter max-w-container-max mx-auto w-full">
+      <main className="flex-grow pt-32 pb-xl px-sm md:px-gutter max-w-container-max mx-auto w-full">
         {!started && (
           <header className="text-center max-w-3xl mx-auto mb-xl mt-6 relative">
             {/* Decorative lotus elements */}
@@ -299,6 +348,17 @@ export default function Quiz() {
             <p className="font-caption text-caption text-on-surface-variant/60 mt-lg relative z-10">
               ⏱ Khoảng 5 phút · 10 câu hỏi · Kết quả phân tích chi tiết
             </p>
+
+            {/* QR Code Button */}
+            <div className="mt-xl relative z-10">
+              <button
+                onClick={() => setShowQR(true)}
+                className="inline-flex items-center gap-sm bg-surface border border-outline-variant/50 text-on-surface-variant hover:text-primary hover:border-primary px-md py-sm rounded-full font-label-md text-label-sm transition-all cursor-pointer hover:shadow-md hover:bg-primary/5"
+              >
+                <span className="material-symbols-outlined text-xl">qr_code_2</span>
+                Chia sẻ trắc nghiệm
+              </button>
+            </div>
           </header>
         )}
 
@@ -329,7 +389,7 @@ export default function Quiz() {
 
             {/* Question Card */}
             <div
-              className={`bg-surface border border-outline-variant/50 p-lg rounded-xl relative overflow-hidden transition-all duration-300 shadow-md ${animating ? "opacity-0 translate-y-4" : "opacity-100 translate-y-0"}`}
+              className={`bg-surface border border-outline-variant/50 p-md md:p-lg rounded-xl relative overflow-hidden transition-all duration-300 shadow-md ${animating ? "opacity-0 translate-y-4" : "opacity-100 translate-y-0"}`}
             >
               {/* Decorative background pattern */}
               <div className="absolute top-0 right-0 p-lg opacity-[0.03] pointer-events-none">
@@ -371,7 +431,7 @@ export default function Quiz() {
         )}
 
         {finished && (
-          <section className="max-w-4xl mx-auto mt-4">
+          <section className="max-w-4xl mx-auto mt-4 scroll-mt-24" ref={resultRef}>
             <div className="bg-surface border border-outline-variant/50 p-md md:p-xl rounded-2xl shadow-xl overflow-hidden relative quiz-result-enter">
               <div className="paper-texture absolute inset-0 opacity-10 pointer-events-none"></div>
 
@@ -393,8 +453,7 @@ export default function Quiz() {
                       <span className="text-xs uppercase tracking-widest text-on-primary-container bg-primary-container px-2 py-1 rounded font-bold">
                         {result.modernStyle}
                       </span>
-                      <h3 className="font-headline-md text-[20px] mt-xs">Phong cách tương đồng:</h3>
-                      <p className="font-display-md text-display-sm text-white font-bold leading-tight">{result.tag}</p>
+                      <p className="font-display-md text-display-sm text-white font-bold leading-tight mt-sm">{result.tag}</p>
                     </div>
                   </div>
 
@@ -429,24 +488,45 @@ export default function Quiz() {
                       </p>
                     </div>
                   </div>
+                </div>
+              </div>
 
-                  <div className="pt-md flex flex-wrap gap-md border-t border-outline-variant/30 mt-lg">
-                    <button
-                      onClick={startQuiz}
-                      className="bg-primary text-on-primary px-xl py-md font-label-md text-label-md rounded-lg flex items-center gap-sm hover:bg-primary-container transition-all shadow-md cursor-pointer"
-                    >
+              <div className="pt-md border-t border-outline-variant/30 mt-lg relative z-10 w-full">
+                <h4 className="font-headline-sm font-bold text-on-surface mb-sm">Khám phá các phong cách khác:</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-sm mb-lg">
+                      {Object.keys(resultsData).map((key) => (
+                        <button
+                          key={key}
+                          onClick={() => handleGroupSelect(key)}
+                          className={`px-md py-sm rounded-xl font-label-md text-sm transition-all cursor-pointer border text-left flex items-center justify-between group ${
+                            activeGroup === key
+                              ? "bg-primary text-on-primary border-primary shadow-md"
+                              : "bg-surface-variant/30 text-on-surface-variant border-outline-variant/30 hover:bg-primary/5 hover:border-primary/30"
+                          }`}
+                        >
+                          {resultsData[key].tag}
+                          <span className={`material-symbols-outlined text-lg ${activeGroup === key ? "opacity-100" : "opacity-0 group-hover:opacity-50"}`}>
+                            arrow_forward
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-md">
+                      <button
+                        onClick={startQuiz}
+                        className="bg-primary text-on-primary px-xl py-md font-label-md text-label-md rounded-lg flex items-center justify-center gap-sm hover:bg-primary-container transition-all shadow-md cursor-pointer w-full"
+                      >
                       <span className="material-symbols-outlined">refresh</span> Làm lại trắc nghiệm
                     </button>
                     <Link
                       to="/notebook"
-                      className="border border-primary text-primary px-xl py-md font-label-md text-label-md rounded-lg flex items-center gap-sm hover:bg-primary/5 transition-all"
+                      className="border border-primary text-primary px-xl py-md font-label-md text-label-md rounded-lg flex items-center justify-center gap-sm hover:bg-primary/5 transition-all w-full"
                     >
                       <span className="material-symbols-outlined">auto_stories</span> Khám phá di sản tư liệu
                     </Link>
                   </div>
                 </div>
               </div>
-            </div>
           </section>
         )}
       </main>
@@ -479,6 +559,59 @@ export default function Quiz() {
           </div>
         </div>
       </footer>
+      {/* QR Code Full-Screen Modal */}
+      {showQR && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in p-md"
+          onClick={() => setShowQR(false)}
+        >
+          <div
+            className="bg-surface rounded-3xl p-md max-w-md w-full mx-auto text-center shadow-2xl relative max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close button */}
+            <button
+              onClick={() => setShowQR(false)}
+              className="absolute top-3 right-3 w-9 h-9 rounded-full bg-surface-variant/50 hover:bg-primary/10 flex items-center justify-center transition-colors cursor-pointer z-10"
+            >
+              <span className="material-symbols-outlined text-on-surface-variant text-lg">close</span>
+            </button>
+
+            {/* Header */}
+            <div className="mb-sm">
+              <span className="material-symbols-outlined text-primary text-3xl mb-xs block">qr_code_2</span>
+              <h3 className="font-headline-md text-headline-md text-on-surface font-serif">Quét mã QR</h3>
+            </div>
+
+            {/* QR Code */}
+            <div className="bg-white rounded-xl inline-block mb-sm shadow-inner">
+              <QRCodeSVG
+                value={quizUrl}
+                size={Math.min(300, typeof window !== "undefined" ? window.innerWidth - 80 : 300)}
+                level="M"
+                includeMargin={false}
+                fgColor="#1a1a1a"
+                bgColor="#ffffff"
+              />
+            </div>
+
+            {/* URL display */}
+            <p className="font-caption text-caption text-on-surface-variant/70 break-all px-sm mb-xs">{quizUrl}</p>
+
+            {/* Copy button */}
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(quizUrl);
+                alert("Đã sao chép liên kết!");
+              }}
+              className="inline-flex items-center gap-xs bg-primary text-on-primary px-lg py-sm rounded-full font-label-md text-label-sm cursor-pointer hover:bg-primary-container transition-all"
+            >
+              <span className="material-symbols-outlined text-base">content_copy</span>
+              Sao chép liên kết
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

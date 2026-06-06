@@ -1,68 +1,124 @@
-import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 
 const travelData = {
   vietnam11: {
     title: "Bến cảng Nhà Rồng (Việt Nam)",
     subtitle: "Khát vọng vươn khơi và Bản lĩnh văn hóa từ hai bàn tay trắng",
     year: "05/06/1911",
-    story: "Điểm khởi đầu của một tư duy văn hóa mở: Chủ động bước ra thế giới để tìm hiểu sự thật, từ chối lối mòn cứu nước cũ kỹ phong kiến của các bậc tiền bối.",
+    story:
+      "Điểm khởi đầu của một tư duy văn hóa mở: Chủ động bước ra thế giới để tìm hiểu sự thật, từ chối lối mòn cứu nước cũ kỹ phong kiến của các bậc tiền bối.",
     ideology: "Khát vọng Giải phóng & Tự lực tự cường",
     transformation: "Sẵn sàng từ bỏ lối sống quen thuộc và con đường mòn cũ, tự lực dấn thân lên tàu tìm đường cứu nước chỉ với hai bàn tay trắng.",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuDUIZ65QqW84q8m0SLzwv7wBVMyetBoH-DV-hmX7WN0yUwTD_1NysMRYM79inbUm47pmG7s7mt-Y3V95yJAF5sJjvdSFXZQs_aTWp6NnLF-vdcU1kSpY6IIb4Vs5KiU8eHAxe8AsNsdD1NulyRX6xvCXQI-BfxH5w1qwL4lgljinE76RqYJCCoBmgh0q6LZ7i76npLgOVdwlEfj031JgjbbeFGfpLwwHXw69fxgSDOxnI8wQDf2V7rU3K2dVxdO2uI-ewuD01Ja2flo"
+    image:
+      "https://lh3.googleusercontent.com/aida-public/AB6AXuDUIZ65QqW84q8m0SLzwv7wBVMyetBoH-DV-hmX7WN0yUwTD_1NysMRYM79inbUm47pmG7s7mt-Y3V95yJAF5sJjvdSFXZQs_aTWp6NnLF-vdcU1kSpY6IIb4Vs5KiU8eHAxe8AsNsdD1NulyRX6xvCXQI-BfxH5w1qwL4lgljinE76RqYJCCoBmgh0q6LZ7i76npLgOVdwlEfj031JgjbbeFGfpLwwHXw69fxgSDOxnI8wQDf2V7rU3K2dVxdO2uI-ewuD01Ja2flo",
   },
   france: {
     title: "Kinh đô Ánh sáng Paris (Pháp)",
     subtitle: "Thử thách tự học và Cuộc đối thoại trực diện với Văn minh phương Tây",
     year: "1917 – 1923",
-    story: "Tiếp thu giá trị dân chủ, tư duy lý tính và nghệ thuật tiến bộ của nhân loại; khẳng định văn hóa phải gắn liền với độc lập dân tộc và quyền tự do của con người.",
+    story:
+      "Tiếp thu giá trị dân chủ, tư duy lý tính và nghệ thuật tiến bộ của nhân loại; khẳng định văn hóa phải gắn liền với độc lập dân tộc và quyền tự do của con người.",
     ideology: "Dân chủ, Tự do & Tư duy Lý tính Khai phóng",
-    transformation: "Học hỏi tinh hoa phương Tây, nghiên cứu sâu sắc tư tưởng Khai sáng và các cuộc cách mạng dân chủ nhưng giữ vững độc bản văn hóa Việt Nam.",
-    image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=2073&auto=format&fit=crop"
+    transformation:
+      "Học hỏi tinh hoa phương Tây, nghiên cứu sâu sắc tư tưởng Khai sáng và các cuộc cách mạng dân chủ nhưng giữ vững độc bản văn hóa Việt Nam.",
+    image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=2073&auto=format&fit=crop",
   },
   russia: {
     title: "Thủ đô Moscow (Nga)",
     subtitle: "Ánh sáng lý luận và Sứ mệnh văn hóa phục vụ nhân dân lao động",
     year: "1923 – 1924",
-    story: "Định hình văn hóa là một \"mặt trận\", người làm nghệ thuật là \"chiến sĩ\". Văn hóa không phải là xa xỉ phẩm mà phải phục vụ đại chúng quần chúng lao động.",
+    story:
+      'Định hình văn hóa là một "mặt trận", người làm nghệ thuật là "chiến sĩ". Văn hóa không phải là xa xỉ phẩm mà phải phục vụ đại chúng quần chúng lao động.',
     ideology: "Văn hóa Cách mạng & Phụng sự Nhân dân",
-    transformation: "Định hướng văn hóa phải đồng hành cùng chính trị và kinh tế, văn hóa soi đường cho quốc dân, nghệ thuật thuộc về nhân dân lao động.",
-    image: "https://images.unsplash.com/photo-1513326738677-b964603b136d?q=80&w=1949&auto=format&fit=crop"
+    transformation:
+      "Định hướng văn hóa phải đồng hành cùng chính trị và kinh tế, văn hóa soi đường cho quốc dân, nghệ thuật thuộc về nhân dân lao động.",
+    image: "https://images.unsplash.com/photo-1513326738677-b964603b136d?q=80&w=1949&auto=format&fit=crop",
   },
   china: {
     title: "Quảng Châu & Diên An (Trung Quốc)",
     subtitle: "Giao thoa phương Đông và Đỉnh cao nghệ thuật giữa chốn ngục tù",
     year: "1924 – 1927",
-    story: "Gạn đục khơi trong triết học phương Đông (Nho giáo, Phật giáo); dùng ngòi bút làm vũ khí văn hóa để thức tỉnh tinh thần tự chủ và đoàn kết dân tộc.",
+    story:
+      "Gạn đục khơi trong triết học phương Đông (Nho giáo, Phật giáo); dùng ngòi bút làm vũ khí văn hóa để thức tỉnh tinh thần tự chủ và đoàn kết dân tộc.",
     ideology: "Định hình Nhân cách Cách mạng & Thơ ca chiến đấu",
-    transformation: "Chuyển hóa Nho giáo truyền thống thành đạo đức cách mạng mới (Cần, Kiệm, Liêm, Chính, Chí công vô tư); rèn luyện ý chí vượt khó vô song.",
-    image: "https://images.unsplash.com/photo-1547981609-4b6bfe67ca0b?q=80&w=2070&auto=format&fit=crop"
+    transformation:
+      "Chuyển hóa Nho giáo truyền thống thành đạo đức cách mạng mới (Cần, Kiệm, Liêm, Chính, Chí công vô tư); rèn luyện ý chí vượt khó vô song.",
+    image: "https://images.unsplash.com/photo-1547981609-4b6bfe67ca0b?q=80&w=2070&auto=format&fit=crop",
   },
   vietnam41: {
     title: "Hang Pác Bó, Cao Bằng (Việt Nam)",
     subtitle: "Trở về cội nguồn và Khái niệm tối giản về một nền văn hóa mới",
     year: "28/01/1941",
-    story: "Hòa nhập chứ không hòa tan. Tinh hoa nhân loại sau 30 năm được đúc kết lại thành một lối sống tối giản thanh bạch, một nền văn hóa đậm đà bản sắc Việt Nam.",
+    story:
+      "Hòa nhập chứ không hòa tan. Tinh hoa nhân loại sau 30 năm được đúc kết lại thành một lối sống tối giản thanh bạch, một nền văn hóa đậm đà bản sắc Việt Nam.",
     ideology: "Tinh hoa Kết tinh & Lối sống Tối giản Hòa hợp Thiên nhiên",
-    transformation: "Lối sống ung dung, tự tại chốn rừng núi Cao Bằng thể hiện đỉnh cao nhân cách: hòa quyện sâu sắc với đất trời mà vẫn làm chủ vận mệnh cách mạng.",
-    image: "https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=2070&auto=format&fit=crop"
-  }
+    transformation:
+      "Lối sống ung dung, tự tại chốn rừng núi Cao Bằng thể hiện đỉnh cao nhân cách: hòa quyện sâu sắc với đất trời mà vẫn làm chủ vận mệnh cách mạng.",
+    image: "https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=2070&auto=format&fit=crop",
+  },
 };
 
 const placesCoords = {
-  vietnam11: { x: 965, y: 340, flagUrl: "https://flagcdn.com/w80/vn.png", label: "1. Bến Nhà Rồng", labelXOffset: 12, labelYOffset: 4, textAnchor: "start", rot: 0 },
-  france: { x: 560, y: 180, flagUrl: "https://flagcdn.com/w80/fr.png", label: "2. Paris (Pháp)", labelXOffset: 0, labelYOffset: 22, textAnchor: "middle", rot: 45 },
-  russia: { x: 680, y: 140, flagUrl: "https://flagcdn.com/w80/ru.png", label: "3. Moscow (Nga)", labelXOffset: 0, labelYOffset: 22, textAnchor: "middle", rot: -25 },
-  china: { x: 930, y: 250, flagUrl: "https://flagcdn.com/w80/cn.png", label: "4. Quảng Châu", labelXOffset: -12, labelYOffset: 4, textAnchor: "end", rot: 25 },
-  vietnam41: { x: 955, y: 305, flagUrl: "https://flagcdn.com/w80/vn.png", label: "5. Pác Bó", labelXOffset: -12, labelYOffset: 4, textAnchor: "end", rot: -12 }
+  vietnam11: {
+    x: 965,
+    y: 340,
+    flagUrl: "https://flagcdn.com/w80/vn.png",
+    label: "1. Bến Nhà Rồng",
+    labelXOffset: 12,
+    labelYOffset: 4,
+    textAnchor: "start",
+    rot: 0,
+  },
+  france: {
+    x: 560,
+    y: 180,
+    flagUrl: "https://flagcdn.com/w80/fr.png",
+    label: "2. Paris (Pháp)",
+    labelXOffset: 0,
+    labelYOffset: 22,
+    textAnchor: "middle",
+    rot: 45,
+  },
+  russia: {
+    x: 680,
+    y: 140,
+    flagUrl: "https://flagcdn.com/w80/ru.png",
+    label: "3. Moscow (Nga)",
+    labelXOffset: 0,
+    labelYOffset: 22,
+    textAnchor: "middle",
+    rot: -25,
+  },
+  china: {
+    x: 930,
+    y: 250,
+    flagUrl: "https://flagcdn.com/w80/cn.png",
+    label: "4. Quảng Châu",
+    labelXOffset: -12,
+    labelYOffset: 4,
+    textAnchor: "end",
+    rot: 25,
+  },
+  vietnam41: {
+    x: 955,
+    y: 305,
+    flagUrl: "https://flagcdn.com/w80/vn.png",
+    label: "5. Pác Bó",
+    labelXOffset: -12,
+    labelYOffset: 4,
+    textAnchor: "end",
+    rot: -12,
+  },
 };
 
-const stopsOrder = ['vietnam11', 'france', 'russia', 'china', 'vietnam41'];
+const stopsOrder = ["vietnam11", "france", "russia", "china", "vietnam41"];
 
 export default function GlobeMap() {
   const [visitedIndex, setVisitedIndex] = useState(0); // Progressive index (0 to 4)
-  const [selectedPlace, setSelectedPlace] = useState('vietnam11');
+  const [selectedPlace, setSelectedPlace] = useState("vietnam11");
   const [showCompletionModal, setShowCompletionModal] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
   const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 1024);
   const location = useLocation();
 
@@ -70,8 +126,8 @@ export default function GlobeMap() {
     const handleResize = () => {
       setIsLargeScreen(window.innerWidth >= 1024);
     };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const getLinkClass = (path) => {
@@ -85,7 +141,7 @@ export default function GlobeMap() {
       const nextIdx = visitedIndex + 1;
       setVisitedIndex(nextIdx);
       setSelectedPlace(stopsOrder[nextIdx]);
-      
+
       // Auto-trigger completion modal with delay once boat reaches 5th stop (Pác Bó)
       if (nextIdx === 4) {
         setTimeout(() => {
@@ -116,18 +172,18 @@ export default function GlobeMap() {
 
   const isFocused = selectedPlace !== null && !showCompletionModal;
   const activeCoords = placesCoords[selectedPlace];
-  
-  let mapTransform = 'translate(0%, 0%) scale(1.15) rotate(0deg) translate(0%, 0%)';
+
+  let mapTransform = "translate(0%, 0%) scale(1.15) rotate(0deg) translate(0%, 0%)";
   if (isFocused && activeCoords) {
     const dx = 600 - activeCoords.x;
     const dy = 300 - activeCoords.y;
     const pctX = (dx / 1200) * 100;
     const pctY = (dy / 600) * 100;
-    
-    // Shift focus target coordinates slightly to the right on larger viewports 
+
+    // Shift focus target coordinates slightly to the right on larger viewports
     // to prevent the stop from being covered by the left floating panel.
     const screenOffsetX = isLargeScreen ? 12 : 0;
-    
+
     // Mathematically precise camera system:
     // 1. translate(pctX, pctY) centers the active stop at the map center (unrotated)
     // 2. rotate(rot) rotates the map around this active stop
@@ -192,31 +248,65 @@ export default function GlobeMap() {
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(140, 113, 110, 0.3); border-radius: 4px; }
       `}</style>
-      
+
       <nav className="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md border-b border-outline-variant/30">
         <div className="flex justify-between items-center h-20 px-gutter max-w-container-max mx-auto">
-          <Link to="/" className="font-display-md text-display-md text-primary tracking-tight">Ký Ức Văn Hóa</Link>
+          <Link to="/" className="font-display-md text-display-md text-primary tracking-tight">
+            Ký Ức Văn Hóa
+          </Link>
           <div className="hidden md:flex items-center gap-lg">
-            <Link className={getLinkClass('/')} to="/">Trang chủ</Link>
-            <Link className={getLinkClass('/map')} to="/map">Bản đồ số</Link>
-            <Link className={getLinkClass('/mailbox')} to="/mailbox">Hộp thư ký ức</Link>
-            <Link className={getLinkClass('/quiz')} to="/quiz">Trắc nghiệm</Link>
+            <Link className={getLinkClass("/")} to="/">
+              Trang chủ
+            </Link>
+            <Link className={getLinkClass("/map")} to="/map">
+              Bản đồ số
+            </Link>
+            <Link className={getLinkClass("/mailbox")} to="/mailbox">
+              Hộp thư ký ức
+            </Link>
+            <Link className={getLinkClass("/quiz")} to="/quiz">
+              Trắc nghiệm
+            </Link>
           </div>
+          <button
+            className="md:hidden flex items-center justify-center w-10 h-10 rounded-lg hover:bg-primary/10 transition-colors cursor-pointer"
+            onClick={() => setShowMenu(!showMenu)}
+          >
+            <span className="material-symbols-outlined text-on-surface-variant">{showMenu ? "close" : "menu"}</span>
+          </button>
         </div>
       </nav>
+      {showMenu && (
+        <div className="fixed top-20 left-0 right-0 z-40 bg-surface/95 backdrop-blur-md border-b border-outline-variant/30 md:hidden animate-fade-in">
+          <div className="flex flex-col px-gutter py-md gap-sm">
+            <Link className={getLinkClass("/")} to="/" onClick={() => setShowMenu(false)}>
+              Trang chủ
+            </Link>
+            <Link className={getLinkClass("/map")} to="/map" onClick={() => setShowMenu(false)}>
+              Bản đồ số
+            </Link>
+            <Link className={getLinkClass("/mailbox")} to="/mailbox" onClick={() => setShowMenu(false)}>
+              Hộp thư ký ức
+            </Link>
+            <Link className={getLinkClass("/quiz")} to="/quiz" onClick={() => setShowMenu(false)}>
+              Trắc nghiệm
+            </Link>
+          </div>
+        </div>
+      )}
 
       <div className="flex-grow relative overflow-hidden flex flex-col">
         <div className="absolute inset-0 bg-secondary-container overflow-hidden">
-          <div 
+          <div
             className="absolute inset-0"
             style={{
               transform: mapTransform,
-              transformOrigin: 'center center',
-              transition: 'transform 2.5s cubic-bezier(0.25, 1, 0.5, 1)'
+              transformOrigin: "center center",
+              transition: "transform 2.5s cubic-bezier(0.25, 1, 0.5, 1)",
             }}
           >
             <div className="absolute inset-0 opacity-40 bg-[url('https://images.unsplash.com/photo-1521295121783-8a321d551ad2?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center grayscale contrast-75 brightness-110"></div>
-            
+
             <svg className="absolute inset-0 w-full h-full pointer-events-auto" preserveAspectRatio="xMidYMid slice" viewBox="0 0 1200 600">
               {visitedIndex >= 1 && (
                 <path
@@ -258,12 +348,12 @@ export default function GlobeMap() {
                   className="opacity-75 animate-dash"
                 />
               )}
-  
+
               {stopsOrder.map((key, index) => {
                 const coords = placesCoords[key];
                 const isUnlocked = visitedIndex >= index;
                 if (!isUnlocked) return null;
-                
+
                 return (
                   <g key={key} transform={`translate(${coords.x}, ${coords.y - 25})`} className="pointer-events-none">
                     <g className="animate-pop-pin">
@@ -289,11 +379,11 @@ export default function GlobeMap() {
                   </g>
                 );
               })}
-  
+
               <g
                 transform={`translate(${boatCoords.x}, ${boatCoords.y})`}
                 className="pointer-events-none z-30"
-                style={{ transition: 'transform 2.5s cubic-bezier(0.25, 1, 0.5, 1)' }}
+                style={{ transition: "transform 2.5s cubic-bezier(0.25, 1, 0.5, 1)" }}
               >
                 <circle r="18" fill="rgba(128, 19, 24, 0.2)" className="marker-pulse" />
                 <g transform="translate(-10, -11) scale(0.9)">
@@ -307,7 +397,7 @@ export default function GlobeMap() {
                   <line x1="0" y1="0" x2="0" y2="6" stroke="#cca830" strokeWidth="1.2" />
                 </g>
               </g>
-  
+
               {stopsOrder.map((key, index) => {
                 const coords = placesCoords[key];
                 const isUnlocked = visitedIndex >= index;
@@ -315,25 +405,28 @@ export default function GlobeMap() {
                 const labelX = coords.x + (coords.labelXOffset || 0);
                 const labelY = coords.y + (coords.labelYOffset || 22);
                 const textAnchor = coords.textAnchor || "middle";
-                
+
                 return (
-                  <g 
-                    key={key} 
-                    className={`map-marker transition-opacity duration-300 ${isUnlocked ? 'opacity-100' : 'opacity-40 cursor-not-allowed'}`} 
+                  <g
+                    key={key}
+                    className={`map-marker transition-opacity duration-300 ${isUnlocked ? "opacity-100" : "opacity-40 cursor-not-allowed"}`}
                     onClick={() => handleMarkerClick(key)}
                   >
                     <circle className="fill-primary/20 marker-pulse" cx={coords.x} cy={coords.y} r="12"></circle>
-                    <circle 
-                      className={`transition-all duration-300 ${isSelected ? 'fill-tertiary' : 'fill-primary'}`} 
-                      cx={coords.x} 
-                      cy={coords.y} 
+                    <circle
+                      className={`transition-all duration-300 ${isSelected ? "fill-tertiary" : "fill-primary"}`}
+                      cx={coords.x}
+                      cy={coords.y}
                       r={isSelected ? 8 : 5}
                     ></circle>
-                    {isSelected && (
-                      <circle className="fill-tertiary/40 animate-ping pointer-events-none" cx={coords.x} cy={coords.y} r="16"></circle>
-                    )}
-                    <text className="font-label-md text-[11px] fill-on-surface font-semibold animate-fade-in" textAnchor={textAnchor} x={labelX} y={labelY}>
-                      {coords.label} {!isUnlocked && '🔒'}
+                    {isSelected && <circle className="fill-tertiary/40 animate-ping pointer-events-none" cx={coords.x} cy={coords.y} r="16"></circle>}
+                    <text
+                      className="font-label-md text-[11px] fill-on-surface font-semibold animate-fade-in"
+                      textAnchor={textAnchor}
+                      x={labelX}
+                      y={labelY}
+                    >
+                      {coords.label} {!isUnlocked && "🔒"}
                     </text>
                   </g>
                 );
@@ -395,12 +488,16 @@ export default function GlobeMap() {
             <div className="overflow-y-auto custom-scrollbar p-md md:p-lg space-y-md text-left">
               <div className="flex justify-between items-start border-b border-outline-variant/30 pb-sm">
                 <div>
-                  <span className="font-label-md text-xs text-primary bg-primary/10 px-sm py-1 rounded-full font-bold uppercase tracking-wider">{activePlaceData.year}</span>
+                  <span className="font-label-md text-xs text-primary bg-primary/10 px-sm py-1 rounded-full font-bold uppercase tracking-wider">
+                    {activePlaceData.year}
+                  </span>
                   <h2 className="font-display-md text-[20px] text-primary mt-xs leading-snug font-serif font-bold">{activePlaceData.title}</h2>
-                  <p className="font-headline-md text-[13px] text-on-surface-variant font-bold italic mt-xs leading-relaxed">"{activePlaceData.subtitle}"</p>
+                  <p className="font-headline-md text-[13px] text-on-surface-variant font-bold italic mt-xs leading-relaxed">
+                    "{activePlaceData.subtitle}"
+                  </p>
                 </div>
-                <button 
-                  onClick={() => setSelectedPlace(null)} 
+                <button
+                  onClick={() => setSelectedPlace(null)}
                   className="p-1 hover:bg-surface-container rounded-full text-on-surface-variant cursor-pointer transition-colors flex-shrink-0"
                   title="Đóng bảng chi tiết"
                 >
@@ -439,9 +536,9 @@ export default function GlobeMap() {
                   </p>
                 </section>
               </div>
-              
-              <button 
-                onClick={() => setSelectedPlace(null)} 
+
+              <button
+                onClick={() => setSelectedPlace(null)}
                 className="mt-xs w-full py-sm border border-primary text-primary font-label-md text-xs hover:bg-primary hover:text-on-primary transition-all duration-300 rounded-lg cursor-pointer font-bold animate-fade-in"
               >
                 Đóng xem chi tiết
@@ -457,7 +554,7 @@ export default function GlobeMap() {
           <div className="bg-surface border-2 border-primary/40 p-lg rounded-2xl shadow-2xl max-w-xl w-full max-h-[85vh] flex flex-col relative overflow-hidden animate-bloom-card isolate">
             {/* Paper texture overlay inside the card to avoid multiply blend with dark backdrop */}
             <div className="paper-texture absolute inset-0 opacity-15 pointer-events-none z-0"></div>
-            
+
             <button
               onClick={() => setShowCompletionModal(false)}
               className="absolute top-4 right-4 text-on-surface-variant hover:text-primary transition-colors cursor-pointer w-8 h-8 rounded-full border border-outline-variant/40 flex items-center justify-center z-10 bg-surface/80 backdrop-blur-sm"
@@ -473,17 +570,15 @@ export default function GlobeMap() {
                 <span className="material-symbols-outlined text-primary text-3xl animate-bounce">emoji_events</span>
               </div>
 
-              <h2 className="font-display-md text-headline-lg font-bold text-primary font-serif">
-                Chúc mừng bạn đã hoàn thành Hải trình Di sản!
-              </h2>
+              <h2 className="font-display-md text-headline-lg font-bold text-primary font-serif">Chúc mừng bạn đã hoàn thành Hải trình Di sản!</h2>
 
-              <p className="text-xs text-secondary font-semibold uppercase tracking-widest">
-                Thông điệp Tư tưởng Hồ Chí Minh về Văn hóa
-              </p>
+              <p className="text-xs text-secondary font-semibold uppercase tracking-widest">Thông điệp Tư tưởng Hồ Chí Minh về Văn hóa</p>
 
               {/* Gold Quote Block */}
               <div className="bg-primary/5 border-y-2 border-primary/30 py-md px-sm relative overflow-hidden rounded-xl flex-shrink-0">
-                <span className="material-symbols-outlined text-primary/10 text-[72px] absolute top-1/2 left-4 -translate-y-1/2 pointer-events-none">format_quote</span>
+                <span className="material-symbols-outlined text-primary/10 text-[72px] absolute top-1/2 left-4 -translate-y-1/2 pointer-events-none">
+                  format_quote
+                </span>
                 <blockquote className="font-display-md text-headline-md text-primary italic leading-snug font-serif">
                   "Văn hóa soi đường cho quốc dân đi."
                 </blockquote>
@@ -492,10 +587,15 @@ export default function GlobeMap() {
 
               <div className="space-y-sm text-sm text-on-surface-variant leading-relaxed text-justify px-xs">
                 <p>
-                  Qua 30 năm bôn ba khảo sát khắp các lục địa, Chủ tịch Hồ Chí Minh đã tiếp thu tinh hoa văn hóa của nhân loại để kiến tạo nên một hệ thống tư tưởng toàn diện, nhân văn và sâu sắc. Người khẳng định: <strong>văn hóa không đứng ngoài mà phải nằm trong kinh tế và chính trị</strong>, đóng vai trò là nền tảng tinh thần vững chắc và là động lực quyết định thúc đẩy sự tiến bộ xã hội.
+                  Qua 30 năm bôn ba khảo sát khắp các lục địa, Chủ tịch Hồ Chí Minh đã tiếp thu tinh hoa văn hóa của nhân loại để kiến tạo nên một hệ
+                  thống tư tưởng toàn diện, nhân văn và sâu sắc. Người khẳng định:{" "}
+                  <strong>văn hóa không đứng ngoài mà phải nằm trong kinh tế và chính trị</strong>, đóng vai trò là nền tảng tinh thần vững chắc và là
+                  động lực quyết định thúc đẩy sự tiến bộ xã hội.
                 </p>
                 <p>
-                  Thế hệ trẻ chúng ta ngày nay, đứng trước làn sóng toàn cầu hóa và công nghệ số bão táp, thừa hưởng di sản văn hóa vĩ đại đó. Sứ mệnh của Gen Z chính là <strong>hội nhập quốc tế chủ động, không ngừng học hỏi và sáng tạo</strong>, nhưng đồng thời phải giữ vững, bảo tồn và làm tỏa sáng bản sắc văn hóa Việt Nam độc bản.
+                  Thế hệ trẻ chúng ta ngày nay, đứng trước làn sóng toàn cầu hóa và công nghệ số bão táp, thừa hưởng di sản văn hóa vĩ đại đó. Sứ mệnh
+                  của Gen Z chính là <strong>hội nhập quốc tế chủ động, không ngừng học hỏi và sáng tạo</strong>, nhưng đồng thời phải giữ vững, bảo
+                  tồn và làm tỏa sáng bản sắc văn hóa Việt Nam độc bản.
                 </p>
               </div>
             </div>
