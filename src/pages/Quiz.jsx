@@ -1,5 +1,5 @@
 import { QRCodeSVG } from "qrcode.react";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 
 const quizData = [
@@ -151,6 +151,7 @@ export default function Quiz() {
   const [showQR, setShowQR] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState(null);
+  const resultRef = useRef(null);
 
   const quizUrl = typeof window !== "undefined" ? window.location.href : "";
 
@@ -211,6 +212,11 @@ export default function Quiz() {
     });
 
     return maxGroup;
+  };
+
+  const handleGroupSelect = (key) => {
+    setSelectedGroup(key);
+    resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   const calculatedGroup = finished ? getResultGroup() : "A";
@@ -425,7 +431,7 @@ export default function Quiz() {
         )}
 
         {finished && (
-          <section className="max-w-4xl mx-auto mt-4">
+          <section className="max-w-4xl mx-auto mt-4 scroll-mt-24" ref={resultRef}>
             <div className="bg-surface border border-outline-variant/50 p-md md:p-xl rounded-2xl shadow-xl overflow-hidden relative quiz-result-enter">
               <div className="paper-texture absolute inset-0 opacity-10 pointer-events-none"></div>
 
@@ -482,43 +488,46 @@ export default function Quiz() {
                       </p>
                     </div>
                   </div>
+                </div>
+              </div>
 
-                  <div className="pt-md border-t border-outline-variant/30 mt-lg">
-                    <h4 className="font-headline-sm font-bold text-on-surface mb-sm">Khám phá các phong cách khác:</h4>
-                    <div className="flex flex-wrap gap-sm mb-lg">
+              <div className="pt-md border-t border-outline-variant/30 mt-lg relative z-10 w-full">
+                <h4 className="font-headline-sm font-bold text-on-surface mb-sm">Khám phá các phong cách khác:</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-sm mb-lg">
                       {Object.keys(resultsData).map((key) => (
                         <button
                           key={key}
-                          onClick={() => setSelectedGroup(key)}
-                          className={`px-md py-sm rounded-full font-label-md text-sm transition-all cursor-pointer ${
+                          onClick={() => handleGroupSelect(key)}
+                          className={`px-md py-sm rounded-xl font-label-md text-sm transition-all cursor-pointer border text-left flex items-center justify-between group ${
                             activeGroup === key
-                              ? "bg-primary text-on-primary shadow-md"
-                              : "bg-surface-variant/50 text-on-surface-variant hover:bg-primary/10"
+                              ? "bg-primary text-on-primary border-primary shadow-md"
+                              : "bg-surface-variant/30 text-on-surface-variant border-outline-variant/30 hover:bg-primary/5 hover:border-primary/30"
                           }`}
                         >
                           {resultsData[key].tag}
+                          <span className={`material-symbols-outlined text-lg ${activeGroup === key ? "opacity-100" : "opacity-0 group-hover:opacity-50"}`}>
+                            arrow_forward
+                          </span>
                         </button>
                       ))}
                     </div>
-                    <div className="flex flex-wrap gap-md">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-md">
                       <button
                         onClick={startQuiz}
-                        className="bg-primary text-on-primary px-xl py-md font-label-md text-label-md rounded-lg flex items-center gap-sm hover:bg-primary-container transition-all shadow-md cursor-pointer"
+                        className="bg-primary text-on-primary px-xl py-md font-label-md text-label-md rounded-lg flex items-center justify-center gap-sm hover:bg-primary-container transition-all shadow-md cursor-pointer w-full"
                       >
                       <span className="material-symbols-outlined">refresh</span> Làm lại trắc nghiệm
                     </button>
                     <Link
                       to="/notebook"
-                      className="border border-primary text-primary px-xl py-md font-label-md text-label-md rounded-lg flex items-center gap-sm hover:bg-primary/5 transition-all"
+                      className="border border-primary text-primary px-xl py-md font-label-md text-label-md rounded-lg flex items-center justify-center gap-sm hover:bg-primary/5 transition-all w-full"
                     >
                       <span className="material-symbols-outlined">auto_stories</span> Khám phá di sản tư liệu
                     </Link>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </section>
+          </section>
         )}
       </main>
 
